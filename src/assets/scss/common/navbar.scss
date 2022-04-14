@@ -1,0 +1,138 @@
+@import '../utils/vars';
+/* Sidebar */
+#sidebar-wrapper {
+  z-index: 1;
+  position: absolute;
+  width: 0;
+  height: 100%;
+  overflow-y: hidden;
+  background: $menuBackground;
+  opacity: 0.9;
+  transition: all 0.5s;
+  display: flex;
+  flex-direction: column;
+}
+
+#username,
+#balance,
+#team{
+  color: $navColor;
+  font-weight: bold;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+}
+
+#balance {
+  font-weight: normal;
+  color: $balanceColor;
+}
+
+#sideBarWrapper {
+  display: flex;
+  background-color: $navColor;
+  padding: 0;
+}
+
+/* Main Content */
+#page-content-wrapper {
+  width: 100%;
+  position: absolute;
+  padding: 0;
+  // transition: all 0.5s;
+}
+
+#menu-toggle {
+  transition: all 0.3s;
+  font-size: 2em;
+}
+/* Change the width of the sidebar to display it*/
+#wrapper.menuDisplayed #sidebar-wrapper {
+  width: 30vh;
+}
+
+#wrapper.menuDisplayed #page-content-wrapper {
+  padding-left: 250px;
+}
+
+/* Sidebar styling */
+
+
+.nav-bar {
+  background-color: #fff;
+  height: 7vh;
+  padding-top: 0.5rem;
+}
+
+.sidebar-nav {
+  margin-top: $sidebarNav;
+  list-style: none;
+  transition: all 0.5s;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.sidebar-nav li, .user-info, #sidebar-tittle {
+  line-height: 2.5rem;
+  width: 100%;
+  transition: all 0.3s;
+  padding: 1rem;
+  color: #ddd;
+}
+
+#sidebar-tittle{
+  font-weight: 700;
+  color: white;
+  font-size: 1.3rem;
+  align-items: right;
+  padding-top: 1.1rem;
+  
+  
+}
+
+
+
+
+.sidebar-nav li a {
+  display: block;
+  text-decoration: none;
+  color: #ddd;
+}
+
+.sidebar-nav li:hover {
+  background: $menuHover;
+}
+
+.nav-bar {
+  padding-left: 0.89rem;
+}
+
+svg.button-toggle {
+  opacity: 0.9;
+  fill: #000;
+  stroke: #000;
+}
+
+.tb-container {
+  padding: 4rem 4rem 4rem 0.5rem; // up right down left
+}
+
+.tb {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  padding-top: $userInfoTop;
+  line-height: 1rem;
+}
+
+.user-info li:last-child {
+  line-height: $userInfoBalance;
+}
+
+

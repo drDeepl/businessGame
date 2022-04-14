@@ -1,0 +1,16 @@
+@import 'common/navbar';
+@import 'utils/vars';
+@import 'utils/reset';
+
+body {
+  font-family: Montserrat;
+  font-size: $mainFontSize;
+  color: $mainFontColor;
+  font-weight: $mainFontWeight;
+  background-color: $bodyBackground;
+}
+
+.container {
+  padding: 0;
+  margin: 0;
+}
