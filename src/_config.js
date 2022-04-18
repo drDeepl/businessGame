@@ -1,7 +1,7 @@
 export const links = [
   {title: 'Склад', url: '/storage', icon: 'warehouse'},
   {title: 'Магазин', url: '/shop', icon: 'shopping-cart'},
-  {title: 'Пользователи', url: '/users', icon: 'user'},
+  {title: 'Пользовательская информация', url: '/users', icon: 'user'},
   {title: '', url: '/profile', icon: ''}
 ];
 
@@ -29,7 +29,7 @@ export const teamInfo = {
   account : null
 }
 
-export const userAttr = {
+export const usersTableHeader = {
   'id': 'id',
   'username': 'Имя пользователя',
   'role': 'Роль',
@@ -44,8 +44,21 @@ export const userAttr = {
   
 }
 
-export const infoUsersSections = [
-  'Список пользователей',
-  'Счета',
-  'Транзакции'
+export const accountsTableHeader = {
+  'id': 'id',
+  'balance': 'Баланс',
+  'is_unlimited': 'Безлимитный',
+}
+
+export const transactionsTableHeader = {
+  'from_account': 'Отправитель',
+  'to_account': 'Получатель',
+  'amount': 'Сумма',
+  'timestamp': 'Дата',
+}
+
+export const cardsShowList = [
+  {title: 'Список пользователей', body: 'users', tableHeaders: ''},
+  {title: 'Список счетов', body: 'accounts', tableHeaders: ''},
+  {title: 'Список транзакций', body: 'transactions', tableHeaders: ''},
 ]

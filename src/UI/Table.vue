@@ -1,45 +1,41 @@
 <template>
-    <div class="table-responsive">
+    <div>{{titles}}</div>
+    <!-- <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
                 <th 
-                    v-for="tittle in table.thTable" 
-                    :key="tittle"
+                    v-for="title in titles" 
+                    :key="title"
                     scope="col">
                 {{tittle}}
                 </th>
             </tr>
             </thead>
             <tbody>
-                <tr v-for="userJSON in usersArray" :key="userJSON.id">
-                    <td v-for="userAttr in Object.keys(table.thTable)"
-                        :key="userAttr">
-                        <span v-if="userAttr != 'id '">{{userJSON[userAttr]}}</span>
+                <tr v-for="dataJSON in dataArray" :key="dataJSON.id">
+                    <td v-for="dataAttr in Object.keys(titles)"
+                        :key="dataAttr">
+                        <span v-if="dataAttr != 'id '">{{dataJSON[dataAttr]}}</span>
                     </td>
                     
                 </tr>
             </tbody>
         </table>
-      </div>
+      </div> -->
 </template>
 
 <script>
 
-import {
-    userAttr,
-} from '@/_config';
 // TODO: Настроить отображение таблицы пользователей
 export default {
-    data(){
-        return{
-            table:{
-                thTable: userAttr,
-                }
-        }
-    },
+
     props:{
-        usersArray: {
+        titles: {
+            type: Object,
+            required: true
+        },
+        dataArray: {
             type: Array,
             required: true,
         },

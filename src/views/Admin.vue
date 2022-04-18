@@ -1,17 +1,13 @@
 <template>
     <div class="wrapper">
-        <CollapsedCard :title="blockTitle" />
-        <div class="admin-page-nav">
-            <div
-                class="tittle"
-                v-for="title in titleSections" 
-                :key='title'>
-            <span>{{title}}</span>
-        </div>
-        </div>
-
-        <div class="admin-page-content">
-            <Table :usersArray="usersArray_JSON"/>
+        <div
+            class="card"
+            v-for="card in cards"
+            :key="card.title"
+            >
+            <CollapsedCard :title="card.title">
+                <Table :titles="tableHeaders[card.body]" :dataArray="array[card.body]"/>
+            </CollapsedCard>
         </div>
     </div>
 </template>
@@ -20,24 +16,37 @@
 // TODO: Закинуть в компонент другой компонент....?
 import userService from '@/services/user.service';
 import Table from '@/UI/Table';
-import CollapsedCard from '@/UI/CollapsedCard';
-import {infoUsersSections} from '@/_config';
+import CollapsedCard from '@/components/CollapsedCard';
+import {
+    usersTableHeader,
+    cardsShowList,
+    accountsTableHeader,
+    transactionsTableHeader
+} from '@/_config';
 
 export default {
-    data () {
-        return {
-            blockTitle: 'BlockName',
-            titleSections: infoUsersSections,
-            usersArray_JSON: [],
+    data() {
+        return{
+            tableHeaders: {
+                users: usersTableHeader,
+                accounts: accountsTableHeader,
+                transactions: transactionsTableHeader,
+            },
+            cards: cardsShowList,
+            array: {
+                users: '',
+                accounts: ['1', '2'],
+                transactions: ['1', '2'],
+            },
+            userArray_JSON: [],
 
         }
     },
 
     async mounted(){
             const users = await userService.getUsersList()
-            this.usersArray_JSON = users
-
-    },
+            this.array.users = users
+        },
     components: {Table, CollapsedCard},
  
 }

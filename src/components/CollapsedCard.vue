@@ -1,5 +1,7 @@
 <template>
-    <div class="card">
+
+    <div>тут должна быть карточка</div>
+    <!-- <div class="card">
         <div class="card-header" id="headingOne">
         <h5 class="mb-0">
             <button :class="card.button.buttonClass"
@@ -8,7 +10,7 @@
                     :aria-expanded="card.button.ariaExpanded"
                     aria-controls="collapseOne"
                     @click.prevent="OnClickButtonCard">
-            Open Card
+            <span class="card-title">{{title}}</span>
             </button>
         </h5>
         </div>
@@ -18,15 +20,15 @@
              aria-labelledby="headingOne"
              data-parent="#accordion">
         <div class="card-body">
-            SomeContent
+            <slot></slot>
         </div>
         </div>
-    </div>
+    </div> -->
 </template>
 
 
 <script>
-// TODO: Добавить контент для карточки
+// TODO: Сделать карточку
 export default {
     data(){
         return{
