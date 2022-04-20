@@ -54,11 +54,12 @@
       <div class="container-fluid">
         <div class="tb-container">
           <span class="tb">{{ tab.activeTab }}</span>
-          
         </div>
         <div class="row">
           <div class="col-lg-12">
-            <router-view />
+            <div class="content-wrapper">
+              <router-view />
+            </div>
           </div>
         </div>
       </div>
@@ -66,11 +67,12 @@
   </div>
 </template>
 <script>
-
+// TODO: Разбить основной слой на отдельные блоки
+// TODO: Вынести СайдБар в отдельный компонент
 import {links, app} from '@/_config';
 import userService from '@/services/user.service';
-import teamService from '@/services/team.service'
-import accountService from '@/services/account.service'
+import teamService from '@/services/team.service';
+import accountService from '@/services/account.service';
 export default {
   data() {
     return {
@@ -92,20 +94,17 @@ export default {
       }
     };
   },
-  async mounted(){
-    const accessToken = this.currentUser.access
-    const userId = userService.getUserId(accessToken)
-    const userData = await userService.getUserInfo(userId)
-    const teamId = userData.team
-    this.sidebarUserInfo.username = userData.username
-    const teamData = await teamService.getDataTeam(teamId)
-    this.sidebarUserInfo.team = teamData.name
-    const accountId = userData.account
-    const userBalance = await accountService.getBalance(accountId)
-    this.sidebarUserInfo.balance = userBalance
-    
-
-    
+  async mounted() {
+    const accessToken = this.currentUser.access;
+    const userId = userService.getUserId(accessToken);
+    const userData = await userService.getUserInfo(userId);
+    const teamId = userData.team;
+    this.sidebarUserInfo.username = userData.username;
+    const teamData = await teamService.getDataTeam(teamId);
+    this.sidebarUserInfo.team = teamData.name;
+    const accountId = userData.account;
+    const userBalance = await accountService.getBalance(accountId);
+    this.sidebarUserInfo.balance = userBalance;
   },
   computed: {
     currentUser() {
@@ -135,24 +134,22 @@ export default {
       this.$store.dispatch('auth/logout');
       this.$router.push('/');
     },
-    onMyProfile(){
-      this.$router.push('/')
+    onMyProfile() {
+      this.$router.push('/');
     },
-   async onClickMenu() {
+    async onClickMenu() {
       this.sideBar.isActive = !this.sideBar.isActive;
-        if (this.sideBar.isActive) {
-         console.log('Open Menu')
-          
+      if (this.sideBar.isActive) {
+        console.log('Open Menu');
 
-          
-          this.sideBar.className = 'menuDisplayed'
+        this.sideBar.className = 'menuDisplayed';
       } else {
-          this.sideBar.className = '';
+        this.sideBar.className = '';
       }
     },
     setActiveTab(title) {
       return (this.tab.activeTab = title);
-    },
+    }
   }
 };
 </script>
