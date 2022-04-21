@@ -28,7 +28,7 @@ export default {
         button: {
           active: false,
           ariaExpanded: false,
-          buttonClass: 'btn btn-primary collapsed',
+          buttonClass: 'card-collapsed collapsed',
           datatarget: '#' + this.$props.id,
           ariaControls: this.$props.id
         },
@@ -45,10 +45,10 @@ export default {
       this.card.button.active = !this.card.button.active;
       this.card.button.ariaExpanded = !this.card.button.ariaExpanded;
       if (this.card.button.active) {
-        this.card.button.buttonClass = 'btn btn-primary';
+        this.card.button.buttonClass = 'card-collapsed';
         this.card.cardClass = 'collapse show';
       } else {
-        this.card.button.buttonClass = 'btn btn-primary collapsed';
+        this.card.button.buttonClass = 'card-collapsed collapsed';
         this.card.cardClass = 'collapse';
       }
     }

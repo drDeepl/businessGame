@@ -1,26 +1,47 @@
 @import '../utils/vars.scss';
+
+:root {
+  --color-purple: #5a4fcf;
+  --color-white: #fff;
+  --color-black: #111;
+}
+
 .collapsedCard__wrapper {
   display: flex;
   flex-direction: column;
 }
 
-.btn {
-  border: none;
+.card-collapsed {
+  background-color: var(--color-purple);
+  color: var(--color-white);
+  position: relative;
+  line-height: 3rem;
+  letter-spacing: $letter-spacing;
+  text-decoration: none;
+  text-transform: uppercase;
+  text-align: center;
+  border: 0.5px solid var(--color-purple);
+  border-radius: 0.9rem;
 }
 
-.btn-primary,
-.collapsed {
-  background-color: green;
-  border: 0;
+.card-collapsed:hover {
+  background-color: #fff;
+  color: var(--color-black);
 }
 
-.btn-primary:hover,
-.btn:focus,
-.btn:active {
-  background-color: green;
-  border: none;
-}
+// .btn-primary,
+// .collapsed {
+//   background-color: green;
+//   border: 0;
+// }
 
-.collapse {
-  background-color: none;
-}
+// .btn-primary:hover,
+// .btn:focus,
+// .btn:active {
+//   background-color: green;
+//   border: none;
+// }
+
+// .collapse {
+//   background-color: none;
+// }

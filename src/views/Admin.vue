@@ -2,7 +2,6 @@
   <div class="wrapper">
     <div class="card" v-for="card in cards" :key="card.body">
       <CollapsedCard :title="card.title" :id="card.body">
-        {{ array[card.body] }}
         <Table
           :titles="tableHeaders[card.body]"
           :dataArray="array[card.body]"
@@ -15,6 +14,7 @@
 <script>
 import userService from '@/services/user.service';
 import accountService from '@/services/account.service';
+import transactionService from '@/services/transaction.service';
 import Table from '@/UI/Table';
 import CollapsedCard from '@/components/CollapsedCard';
 import {
@@ -35,20 +35,20 @@ export default {
       cards: cardsShowList,
       array: {
         users: '',
-        accounts: ['1', '2'],
-        transactions: ['1', '2']
+        accounts: '',
+        transactions: ''
       },
       userArray_JSON: []
     };
   },
 
   async mounted() {
-    //   TODO: Добавить отображение списка транзакций
     const users = await userService.getUsersList();
     const accounts = await accountService.getListAccounts();
+    const transactions = await transactionService.getTransactions();
     this.array.users = users;
     this.array.accounts = accounts;
-    this.array.transactions = accounts;
+    this.array.transactions = transactions;
   },
   components: {Table, CollapsedCard}
 };

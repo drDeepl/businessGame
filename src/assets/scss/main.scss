@@ -1,7 +1,8 @@
 @import 'common/navbar';
 @import 'utils/vars';
 @import 'utils/reset';
-@import 'common/cardCollapsed.scss';
+@import 'common/cardCollapsed';
+@import 'common/mainLayout';
 body {
   font-family: Montserrat;
   font-size: $mainFontSize;

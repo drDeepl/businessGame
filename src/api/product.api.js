@@ -1,22 +1,19 @@
-import instance from 'main'
+import instance from 'main';
 
 class productAPI {
+  createProduct(name) {
+    return instance.post('products', name);
+  }
 
-    createProduct(name){
-        return instance.post('products', name)
+  getAllProducts() {
+    return instance.get('products');
+  }
 
-    }
+  updateProduct(productId) {
+    instance.put('products/' + productId);
+  }
 
-    getAllProducts(){
-        return instance.get('products')
-    }
-
-    updateProduct(productId){
-        instance.put('products/' + productId)
-    }
-
-    deleteProduct(productId){
-        instance.delete('products/' + productId)
-    }
-
+  deleteProduct(productId) {
+    instance.delete('products/' + productId);
+  }
 }
