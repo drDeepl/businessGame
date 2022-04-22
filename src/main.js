@@ -17,7 +17,9 @@ import {
   faSignOutAlt,
   faWarehouse,
   faShoppingCart,
-  faTag
+  faTag,
+  faAddressCard,
+  faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from './layouts/MainLayout.vue';
 import setupInterceptors from './services/setupInterceptors';
@@ -30,14 +32,15 @@ library.add(
   faSignOutAlt,
   faWarehouse,
   faShoppingCart,
-  faTag
+  faTag,
+  faAddressCard,
+  faUsers
 );
 
 Vue.config.productionTip = false;
 
 Vue.use(VeeValidate);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
-
 
 Vue.use(Vuex);
 

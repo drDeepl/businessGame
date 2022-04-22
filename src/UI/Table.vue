@@ -2,13 +2,24 @@
   <div class="table-responsive">
     <table class="table">
       <thead>
-        <tr>
-          <th scope="col" v-for="title in titles" :key="title">{{ title }}</th>
+        <tr class="table-row">
+          <th
+            class="table-head"
+            scope="col"
+            v-for="title in titles"
+            :key="title"
+          >
+            {{ title }}
+          </th>
         </tr>
       </thead>
-      <tr v-for="(data, id) in dataArray" :key="id">
-        <td v-for="dataTitle in Object.keys(titles)" :key="dataTitle">
-          {{ data[dataTitle] }}
+      <tr class="table-row" v-for="(data, id) in dataArray" :key="id">
+        <td
+          class="data-row"
+          v-for="dataTitle in Object.keys(titles)"
+          :key="dataTitle"
+        >
+          <span class="data-row">{{ data[dataTitle] }}</span>
         </td>
       </tr>
     </table>
@@ -16,7 +27,6 @@
 </template>
 
 <script>
-// TODO: Настроить отображение таблиц
 export default {
   props: {
     titles: {

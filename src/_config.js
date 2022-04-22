@@ -2,7 +2,14 @@ export const links = [
   {title: 'Склад', url: '/storage', icon: 'warehouse'},
   {title: 'Магазин', url: '/shop', icon: 'shopping-cart'},
   {title: 'Информация о пользователях', url: '/users', icon: 'user'},
-  {title: '', url: '/profile', icon: ''}
+  {title: 'Обо мне', url: '/profile', icon: 'address-card'}
+];
+
+export const adminLinks = [
+  {title: 'Информация о пользователях', url: '/users', icon: 'users'},
+  {title: 'Управление пользователями', url: '/users', icon: 'users'},
+  {title: 'Управление командами', url: '/users', icon: 'users'},
+  {title: 'Управление счетами', url: '/users', icon: 'users'}
 ];
 
 export const app = {
