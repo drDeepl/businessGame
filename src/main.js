@@ -19,7 +19,8 @@ import {
   faShoppingCart,
   faTag,
   faAddressCard,
-  faUsers
+  faUsers,
+  faArrowAltCircleRight
 } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from './layouts/MainLayout.vue';
 import setupInterceptors from './services/setupInterceptors';
@@ -34,7 +35,8 @@ library.add(
   faShoppingCart,
   faTag,
   faAddressCard,
-  faUsers
+  faUsers,
+  faArrowAltCircleRight
 );
 
 Vue.config.productionTip = false;

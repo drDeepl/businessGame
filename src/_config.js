@@ -1,15 +1,36 @@
 export const links = [
   {title: 'Склад', url: '/storage', icon: 'warehouse'},
   {title: 'Магазин', url: '/shop', icon: 'shopping-cart'},
-  {title: 'Информация о пользователях', url: '/users', icon: 'user'},
   {title: 'Обо мне', url: '/profile', icon: 'address-card'}
 ];
 
+export const adminSidebarManage = [
+  {title: 'Управление', url: '/manage', icon: 'circle-right'},
+  {title: 'Информация о пользователях', url: '/users', icon: 'user'}
+];
+
 export const adminLinks = [
-  {title: 'Информация о пользователях', url: '/users', icon: 'users'},
   {title: 'Управление пользователями', url: '/users', icon: 'users'},
   {title: 'Управление командами', url: '/users', icon: 'users'},
   {title: 'Управление счетами', url: '/users', icon: 'users'}
+];
+
+export const rowUpdateUser = {
+  role: 'Роль',
+  first_name: 'Имя',
+  last_name: 'Фамилия',
+  team_id: 'Название команды'
+};
+
+export const selectUpdateUser = [
+  {
+    title: 'Роль',
+    options: {
+      manufacturer: 'Поставщик',
+      player: 'Игрок',
+      customer: 'Клиент'
+    }
+  }
 ];
 
 export const app = {

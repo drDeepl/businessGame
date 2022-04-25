@@ -1,6 +1,12 @@
 <template>
   <div :class="sideBar.className" id="wrapper">
-    <!-- Sidebar -->
+    <div>
+      <li v-for="row in Object.keys(test)" :key="row">
+        {{ row }}: {{ test[row] }}
+      </li>
+    </div>
+    <button @click.prevent="onClickUpdateRole(1, 'admin')">updateRole</button>
+    <Form :inputs="testArrayInput" :selects="testArraySelect" />
     <aside id="sidebar-wrapper">
       <div class="container">
         <p id="sidebar-tittle" class="user-info">{{ title }}</p>
@@ -70,15 +76,25 @@
 </template>
 
 <script>
-import {links, adminLinks, app} from '@/_config';
+// TODO: Добавить динамическое изменение компонентов
+import {
+  links,
+  adminSidebarManage,
+  app,
+  rowUpdateUser,
+  selectUpdateUser
+} from '@/_config';
 import userService from '@/services/user.service';
 import teamService from '@/services/team.service';
 import accountService from '@/services/account.service';
+import {isAdmin} from '@/helpers/admin.helper';
+import Form from '@/UI/Form';
 export default {
   data() {
     return {
-      adminLinks: adminLinks,
       test: '',
+      testArrayInput: rowUpdateUser,
+      testArraySelect: selectUpdateUser,
       title: app.title,
       userRole: '',
       sidebarUserInfo: {
@@ -92,6 +108,10 @@ export default {
         template: 'Деловая игра',
         links: links
       },
+      admin: {
+        isAdmin: false,
+        adminLinks: adminSidebarManage
+      },
       tab: {
         activeTab: ''
       }
@@ -101,6 +121,8 @@ export default {
     const accessToken = this.currentUser.access;
     const userId = userService.getUserId(accessToken);
     const userData = await userService.getUserInfo(userId);
+    this.test = userData;
+    this.admin.isAdmin = isAdmin(userData.role);
     const teamId = userData.team;
     this.sidebarUserInfo.username = userData.username;
     const teamData = await teamService.getDataTeam(teamId);
@@ -108,9 +130,7 @@ export default {
     const accountId = userData.account;
     const userBalance = await accountService.getBalance(accountId);
     this.sidebarUserInfo.balance = userBalance;
-    // TODO:|FIXME:| При расширении массива ломается боковое меню
-    const arr = Array.prototype.push.apply(links, adminLinks);
-    this.test = arr;
+
     // }
   },
   computed: {
@@ -146,9 +166,6 @@ export default {
         this.sideBar.className = '';
       }
     },
-    isAdmin() {
-      return this.currentUser;
-    },
     setActiveTab(title) {
       return (this.tab.activeTab = title);
     },
@@ -161,7 +178,11 @@ export default {
     },
     onClickJWT() {
       this.test = this.userData;
+    },
+    onClickUpdateRole(user_id, role) {
+      userService.updateDataUser(user_id, role);
     }
-  }
+  },
+  components: {Form}
 };
 </script>

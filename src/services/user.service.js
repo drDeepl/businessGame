@@ -1,6 +1,7 @@
 import userAPI from '@/api/user.api';
 import jwt_decode from 'jwt-decode';
 import {userInfo} from '@/_config';
+import {checkObjNullUndef} from '@/helpers/data.helper';
 
 class userService {
   cashDataUser = userInfo;
@@ -53,6 +54,21 @@ class userService {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  async updateDataUser(user_id, role, first_name, last_name, team_id) {
+    let data = {
+      role: role,
+      first_name: first_name,
+      last_name: last_name,
+      team_id: team_id
+    };
+    console.log(user_id);
+    console.log(checkObjNullUndef(data));
+
+    // TODO: функцию изменение данных пользователя админом
+    // const updatedData = await userAPI.updateUser(user_id, data);
+    // this.setDataCash(updatedData);
   }
 
   setDataCash(userData) {
