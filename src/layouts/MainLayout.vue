@@ -6,7 +6,11 @@
       </li>
     </div>
     <button @click.prevent="onClickUpdateRole(1, 'admin')">updateRole</button>
-    <Form :inputs="testArrayInput" :selects="testArraySelect" />
+    <Form
+      :inputs="testArrayInput"
+      :selects="testArraySelect"
+      :onSubmitForm="onSubmitForm"
+    />
     <aside id="sidebar-wrapper">
       <div class="container">
         <p id="sidebar-tittle" class="user-info">{{ title }}</p>
@@ -181,6 +185,11 @@ export default {
     },
     onClickUpdateRole(user_id, role) {
       userService.updateDataUser(user_id, role);
+    },
+    onSubmitForm(data) {
+      // TODO: Закончить действие обновление данных пользователя
+      console.log('MAIN LAYOUT');
+      console.log(data.data);
     }
   },
   components: {Form}

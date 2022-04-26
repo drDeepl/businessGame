@@ -16,14 +16,14 @@ export const adminLinks = [
 ];
 
 export const rowUpdateUser = {
-  role: 'Роль',
   first_name: 'Имя',
   last_name: 'Фамилия',
-  team_id: 'Название команды'
+  team_name: 'Название команды'
 };
 
 export const selectUpdateUser = [
   {
+    id: 'role',
     title: 'Роль',
     options: {
       manufacturer: 'Поставщик',
