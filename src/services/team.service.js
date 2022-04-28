@@ -39,6 +39,11 @@ class teamService{
           }
       }
 
+      async getTeams(){
+        const teams = await teamAPI.getTeams()
+        return teams.data
+      }
+
       setDataCash(dataTeam){
         console.log('teamService: setDataCash')
         console.log(dataTeam)

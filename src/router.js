@@ -16,11 +16,33 @@ export const router = new Router({
       path: '/',
       component: () => import('./layouts/MainLayout.vue'),
       children: [
-    { path: '/profile', name: 'profile', component: () => import('./views/Profile.vue') },
-    { path: '/shop', name: 'shop', component: () => import('./views/Shop.vue') },
-    { path: '/storage', name: 'storage', component: () => import('./views/Storage.vue') },
-    { path: '/users', name: 'users', component: () => import('./views/Admin.vue') },
-  ]}
+        {
+          path: '/profile',
+          name: 'profile',
+          component: () => import('./views/Profile.vue')
+        },
+        {
+          path: '/shop',
+          name: 'shop',
+          component: () => import('./views/Shop.vue')
+        },
+        {
+          path: '/storage',
+          name: 'storage',
+          component: () => import('./views/Storage.vue')
+        },
+        {
+          path: '/users',
+          name: 'users',
+          component: () => import('./views/Users.vue')
+        },
+        {
+          path: '/admin',
+          name: 'admin',
+          component: () => import('@/views/Admin.vue')
+        }
+      ]
+    }
   ]
 });
 

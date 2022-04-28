@@ -80,7 +80,7 @@ export default {
   },
   methods: {
     onSubmit() {
-      this.onSubmitForm({data: this.dataForm});
+      this.onSubmitForm({dataForm: this.dataForm});
     }
   },
   mounted() {

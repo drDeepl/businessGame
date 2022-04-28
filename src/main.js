@@ -20,7 +20,7 @@ import {
   faTag,
   faAddressCard,
   faUsers,
-  faArrowAltCircleRight
+  faChartLine
 } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from './layouts/MainLayout.vue';
 import setupInterceptors from './services/setupInterceptors';
@@ -36,14 +36,14 @@ library.add(
   faTag,
   faAddressCard,
   faUsers,
-  faArrowAltCircleRight
+  faChartLine
 );
 
 Vue.config.productionTip = false;
 
 Vue.use(VeeValidate);
-Vue.component('font-awesome-icon', FontAwesomeIcon);
 
+Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.use(Vuex);
 
 Vue.use(MainLayout);

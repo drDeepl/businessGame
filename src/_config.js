@@ -4,9 +4,13 @@ export const links = [
   {title: 'Обо мне', url: '/profile', icon: 'address-card'}
 ];
 
-export const adminSidebarManage = [
-  {title: 'Управление', url: '/manage', icon: 'circle-right'},
-  {title: 'Информация о пользователях', url: '/users', icon: 'user'}
+export const adminSidebar = [
+  {
+    title: 'Панель администратора',
+    url: '/admin',
+    icon: 'chart-line'
+  },
+  {title: 'Информация о пользователях\n УДАЛИТЬ', url: '/users', icon: 'user'}
 ];
 
 export const adminLinks = [
@@ -82,6 +86,22 @@ export const transactionsTableHeader = {
   amount: 'Сумма',
   timestamp: 'Дата'
 };
+
+export const teamsTableHeader = {
+  id: 'id',
+  name: 'Название',
+  account: 'Счёт'
+};
+
+export const adminTabs = [
+  {title: 'Пользователи', url: 'users'},
+  {title: 'Команды', url: 'teams'},
+  {title: 'Счета', url: 'accounts'},
+  {
+    title: 'Транзакции',
+    url: 'transactions'
+  }
+];
 
 export const cardsShowList = [
   {title: 'Список пользователей', body: 'users', tableHeaders: ''},

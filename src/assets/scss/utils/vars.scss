@@ -1,5 +1,5 @@
 // main-colors
-$color-purple: #5a4fcf;
+$color-purple: #5c27fe;
 $color-white: #fff;
 $color-black: #111;
 // Font
@@ -25,6 +25,7 @@ $bodyBackground: #cfd8e3;
 $menuBackground: #1a202e;
 $menuHover: #121620;
 $navColor: #ffffff;
+$mainLayoutColor: #ffffff;
 
 // sidebar Color
 $balanceColor: #06c17f;
@@ -45,3 +46,9 @@ $WrapperMargin: 2em 0.5em;
 
 // padding
 $cardPadding: 2rem;
+
+// TABS
+$tab-bg: #fff;
+$tab-hover-bg: $color-purple;
+$tab-color: #000;
+$tab-hover-color: #fff;

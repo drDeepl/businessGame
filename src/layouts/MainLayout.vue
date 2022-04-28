@@ -1,16 +1,5 @@
 <template>
   <div :class="sideBar.className" id="wrapper">
-    <div>
-      <li v-for="row in Object.keys(test)" :key="row">
-        {{ row }}: {{ test[row] }}
-      </li>
-    </div>
-    <button @click.prevent="onClickUpdateRole(1, 'admin')">updateRole</button>
-    <Form
-      :inputs="testArrayInput"
-      :selects="testArraySelect"
-      :onSubmitForm="onSubmitForm"
-    />
     <aside id="sidebar-wrapper">
       <div class="container">
         <p id="sidebar-tittle" class="user-info">{{ title }}</p>
@@ -26,7 +15,7 @@
         <hr id="sideBarWrapper" />
       </div>
       <ul class="sidebar-nav">
-        <li v-for="link in sideBar.links" :key="link.title">
+        <li v-for="link in sideBar.links" :key="link.url">
           <span @click.prevent="setActiveTab(link.title)">
             <router-link :to="link.url">
               <font-awesome-icon :icon="link.icon" />
@@ -81,26 +70,17 @@
 
 <script>
 // TODO: Добавить динамическое изменение компонентов
-import {
-  links,
-  adminSidebarManage,
-  app,
-  rowUpdateUser,
-  selectUpdateUser
-} from '@/_config';
+import {links, adminSidebar, app} from '@/_config';
 import userService from '@/services/user.service';
 import teamService from '@/services/team.service';
 import accountService from '@/services/account.service';
 import {isAdmin} from '@/helpers/admin.helper';
-import Form from '@/UI/Form';
 export default {
   data() {
     return {
       test: '',
-      testArrayInput: rowUpdateUser,
-      testArraySelect: selectUpdateUser,
       title: app.title,
-      userRole: '',
+      userId: 0,
       sidebarUserInfo: {
         team: '',
         username: '',
@@ -114,19 +94,25 @@ export default {
       },
       admin: {
         isAdmin: false,
-        adminLinks: adminSidebarManage
+        adminLinks: adminSidebar
       },
       tab: {
         activeTab: ''
       }
     };
   },
-  async mounted() {
+  async created() {
     const accessToken = this.currentUser.access;
     const userId = userService.getUserId(accessToken);
     const userData = await userService.getUserInfo(userId);
     this.test = userData;
-    this.admin.isAdmin = isAdmin(userData.role);
+    this.userId = userData.id;
+    userData.role = 'admin';
+    const admin = (this.admin.isAdmin = isAdmin(userData.role));
+    this.admin.isAdmin = admin;
+    if (admin) {
+      Array.prototype.push.apply(this.sideBar.links, this.admin.adminLinks);
+    }
     const teamId = userData.team;
     this.sidebarUserInfo.username = userData.username;
     const teamData = await teamService.getDataTeam(teamId);
@@ -164,7 +150,6 @@ export default {
       this.sideBar.isActive = !this.sideBar.isActive;
       if (this.sideBar.isActive) {
         console.log('Open Menu');
-
         this.sideBar.className = 'menuDisplayed';
       } else {
         this.sideBar.className = '';
@@ -182,16 +167,7 @@ export default {
     },
     onClickJWT() {
       this.test = this.userData;
-    },
-    onClickUpdateRole(user_id, role) {
-      userService.updateDataUser(user_id, role);
-    },
-    onSubmitForm(data) {
-      // TODO: Закончить действие обновление данных пользователя
-      console.log('MAIN LAYOUT');
-      console.log(data.data);
     }
-  },
-  components: {Form}
+  }
 };
 </script>

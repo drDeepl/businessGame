@@ -27,6 +27,7 @@
 </template>
 
 <script>
+// TODO: props не видит массив
 export default {
   props: {
     titles: {

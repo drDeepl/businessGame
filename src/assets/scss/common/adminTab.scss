@@ -1,0 +1,35 @@
+.admin-tab__wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.admin-tab {
+  text-decoration: none;
+  border: none;
+  padding: 1em 1.5em;
+  background-color: $tab-bg;
+  cursor: pointer;
+  border-radius: 3px;
+  overflow: hidden;
+  color: rgba(0, 0, 0, 0);
+  text-shadow: 0 0 0 $tab-color, 0 3rem 0 $tab-hover-color;
+  transition: background-color 150ms, text-shadow 200ms;
+  font-size: 1.1rem;
+  &:hover {
+    background-color: $tab-hover-bg;
+    text-shadow: 0 -3rem 0 $tab-color, 0 0 0 $tab-hover-color;
+  }
+  &:focus {
+    border-color: $tab-bg;
+    background-color: $tab-hover-bg;
+    color: $tab-bg;
+    text-shadow: none;
+  }
+}
+
+// .admin-tab:active,
+// .admin-tab:focus {
+//   border-color: white;
+//   background-color: #5c27fe;
+//   color: white;
+// }
