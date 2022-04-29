@@ -1,3 +1,5 @@
+@import '../utils/vars';
+
 .table-head {
   text-align: center;
   font-weight: 600;
@@ -5,4 +7,21 @@
 
 .data-row {
   text-align: center;
+}
+
+.table-row {
+  &:hover {
+    background: $color-purple;
+    color: $color-white;
+    cursor: pointer;
+  }
+}
+
+.tab-action {
+  display: flex;
+  z-index: 1;
+  position: relative;
+  background: black;
+  padding: 13rem;
+  padding-top: 0;
 }

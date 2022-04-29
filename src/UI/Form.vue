@@ -1,6 +1,5 @@
 <template>
   <div class="form__wrapper">
-    <!-- TODO: Добавить сбор данных с формы -->
     <form @submit.prevent="onSubmit">
       <div class="form-group">
         <input

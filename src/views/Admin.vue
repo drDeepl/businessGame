@@ -14,7 +14,9 @@
       v-bind:is="currentTabComponent"
       v-bind:titles="tableHeaders[currentTabComponent]"
       v-bind:dataArray="array[currentTabComponent]"
-    ></component>
+    >
+      <button class="admin-tab">Редактировать</button>
+    </component>
   </div>
 </template>
 

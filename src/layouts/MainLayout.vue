@@ -15,7 +15,11 @@
         <hr id="sideBarWrapper" />
       </div>
       <ul class="sidebar-nav">
-        <li v-for="link in sideBar.links" :key="link.url">
+        <li
+          v-for="link in sideBar.links"
+          :key="link.url"
+          @click.prevent="onClickTab"
+        >
           <span @click.prevent="setActiveTab(link.title)">
             <router-link :to="link.url">
               <font-awesome-icon :icon="link.icon" />
@@ -154,6 +158,9 @@ export default {
       } else {
         this.sideBar.className = '';
       }
+    },
+    onClickTab() {
+      this.sideBar.className = '';
     },
     setActiveTab(title) {
       return (this.tab.activeTab = title);

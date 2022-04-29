@@ -15,6 +15,7 @@
     "bootstrap": "^4.6.0",
     "core-js": "^3.6.5",
     "jquery": "^3.6.0",
+    "jwt-decode": "^3.1.2",
     "mdbvue": "^6.7.3",
     "nodejs-base64": "^2.0.0",
     "popper.js": "^1.16.1",
