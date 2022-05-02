@@ -1,53 +1,53 @@
 <template>
-  <div class="table-responsive">
-    <table class="table">
-      <thead>
-        <tr class="head-table-row">
-          <th
-            class="table-head"
-            scope="col"
-            v-for="title in titles"
-            :key="title"
-          >
-            {{ title }}
-          </th>
-        </tr>
-      </thead>
-      <tr
-        class="table-row"
-        v-for="(data, id) in dataArray"
-        :key="id"
-        @click.prevent="onClickTableButton(id, data)"
-      >
-        <td
-          class="data-row"
-          v-for="dataTitle in Object.keys(titles)"
-          :key="dataTitle"
+  <div class="table__wrapper">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr class="head-table-row">
+            <th
+              class="table-head"
+              scope="col"
+              v-for="title in titles"
+              :key="title"
+            >
+              {{ title }}
+            </th>
+          </tr>
+        </thead>
+        <tr
+          id="show-modal"
+          class="table-row"
+          v-for="(data, id) in dataArray"
+          :key="id"
+          @click.prevent="onClickTableButton(data)"
         >
-          <span class="data-row">{{ data[dataTitle] }}</span>
-        </td>
-      </tr>
-    </table>
-
-    <div class="tab-action" v-if="tabAction.isActive">
-      <button
-        v-for="action in tabAction.actions"
-        :key="action"
-        class="admin-tab"
-      >
-        {{ action }}
-      </button>
+          <td
+            class="data-row"
+            v-for="dataTitle in Object.keys(titles)"
+            :key="dataTitle"
+          >
+            <span class="data-row">
+              {{ data[dataTitle] }}
+            </span>
+          </td>
+        </tr>
+      </table>
     </div>
+    <modal v-if="modalWindow.showModal" @close="modalWindow.showModal = false">
+      <modalWindow :title="title" />
+    </modal>
   </div>
 </template>
 
 <script>
+import modalWindow from '@/UI/modalWindow';
 // TODO: Сделать переключение между формой в таблице
 export default {
   data() {
     return {
-      tabAction: {
-        isActive: false,
+      modalWindow: {
+        showModal: false,
+        title: '',
         actions: ['Редактировать', 'Удалить']
       }
     };
@@ -63,10 +63,10 @@ export default {
     }
   },
   methods: {
-    onClickTableButton(data) {
-      this.tabAction.isActive = !this.tabAction.isActive;
-      this.tabAction.data = data;
+    onClickTableButton() {
+      this.modalWindow.showModal = !this.modalWindow.showModal;
     }
-  }
+  },
+  components: {modalWindow}
 };
 </script>

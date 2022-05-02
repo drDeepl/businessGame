@@ -1,15 +1,5 @@
 <template>
-  <div class="tab-conatiner">
-    <div class="admin-tab__wrapper">
-      <button
-        class="admin-tab"
-        v-for="tab in tabs"
-        :key="tab.url"
-        @click.prevent="changeTab(tab.url)"
-      >
-        {{ tab.title }}
-      </button>
-    </div>
+  <Tab :tabs="tabs" :onClickTab="onClickTab">
     <component
       v-bind:is="currentTabComponent"
       v-bind:titles="tableHeaders[currentTabComponent]"
@@ -17,11 +7,12 @@
     >
       <button class="admin-tab">Редактировать</button>
     </component>
-  </div>
+  </Tab>
 </template>
 
 <script>
 import Table from '@/UI/Table';
+import Tab from '@/components/Tab';
 import userService from '@/services/user.service';
 import accountService from '@/services/account.service';
 import transactionService from '@/services/transaction.service';
@@ -34,10 +25,11 @@ import {
   teamsTableHeader,
   adminTabs
 } from '@/_config';
-// TODO: Добавить возможность изменять данные в таблице
+// TODO: Добавить модальное окно по клику
 export default {
   data() {
     return {
+      test: '',
       currentTab: '',
       tabs: adminTabs,
       tableHeaders: {
@@ -62,8 +54,8 @@ export default {
     }
   },
   methods: {
-    changeTab(url) {
-      return (this.currentTab = url);
+    onClickTab(data) {
+      this.currentTab = data.tabUrl;
     }
   },
   async mounted() {
@@ -78,6 +70,12 @@ export default {
     this.array.teams = teams;
   },
   // Немного костылей в код))))))
-  components: {users: Table, teams: Table, accounts: Table, transactions: Table}
+  components: {
+    users: Table,
+    teams: Table,
+    accounts: Table,
+    transactions: Table,
+    Tab: Tab
+  }
 };
 </script>
