@@ -1,96 +1,42 @@
 <template>
   <div class="form__wrapper">
-    <form @submit.prevent="onSubmit">
-      <div class="form-group">
-        <input
-          v-for="inputProp in Object.keys(input)"
-          :key="inputProp"
-          required
-          class="form-control"
-          :id="inputProp"
-          :placeholder="input[inputProp]"
-          v-model="dataForm[inputProp]"
-        />
-        {{ dataForm }}
+    <!-- <div>
+      {{ data }}
+    </div>
+    <hr />
+    <div>
+      {{ labels }}
+    </div> -->
+    <form class="form-container">
+      <div class="mb-3" v-for="dataKey in Object.keys(data)" :key="dataKey">
+        <div class="form-rows" v-if="dataKey !== 'id'">
+          <label :for="dataKey" class="form-label">{{ labels[dataKey] }}</label>
+          <input
+            type="email"
+            class="form-control form-input"
+            :id="dataKey"
+            :placeholder="data[dataKey]"
+          />
+        </div>
       </div>
-      <div class="form-group">
-        <label v-for="row in selects" :key="row.title">
-          {{ row.title }}
-        </label>
-        <select
-          class="form-control"
-          v-for="select in selects"
-          :key="select.id"
-          id="form-select"
-          v-model="dataForm[select.id]"
-        >
-          <option
-            class="form-option"
-            v-for="option in Object.keys(select.options)"
-            :key="option"
-          >
-            {{ select.options[option] }}
-          </option>
-        </select>
-      </div>
-      <button class="form-btn" type="submit">Готово</button>
     </form>
   </div>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
-      input: {
-        // {input: placehole}
-      },
-      dataForm: {}
-    };
-  },
+  //TODO: Сделать получение данных из формы
+  //TODO: Сделать чтение данных из формы в computed
   props: {
-    onSubmitForm: {
-      type: Function
-    },
-    inputs: {
-      // {
-      //     "id"(string): "title(string)"
-      // }
+    data: {
       type: Object,
-      required: true
+      require: true
     },
-    selects: {
-      // [
-      //  {
-      //     title: string,
-      //     optins: array
-      // }
-      //]
-      type: Array
+    labels: {
+      // data key is key in labels
+      type: Object,
+      require: true
     }
-  },
-  arrayOptions: {
-    type: Array
-  },
-  computed: {
-    inputRole() {
-      return this.input;
-    }
-  },
-  methods: {
-    onSubmit() {
-      this.onSubmitForm({dataForm: this.dataForm});
-    }
-  },
-  mounted() {
-    let tmpInput = Object();
-    const inputsId = Object.keys(this.inputs);
-    for (let inputId in inputsId) {
-      let propInput = inputsId[inputId];
-      tmpInput[propInput] = this.inputs[propInput];
-    }
-    console.log(tmpInput);
-    this.input = tmpInput;
   }
 };
 </script>

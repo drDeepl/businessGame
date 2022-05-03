@@ -15,11 +15,10 @@
           </tr>
         </thead>
         <tr
-          id="show-modal"
           class="table-row"
           v-for="(data, id) in dataArray"
           :key="id"
-          @click.prevent="onClickTableButton(data)"
+          @click.prevent="onClickTable(data)"
         >
           <td
             class="data-row"
@@ -33,23 +32,14 @@
         </tr>
       </table>
     </div>
-    <modal v-if="modalWindow.showModal" @close="modalWindow.showModal = false">
-      <modalWindow :title="title" />
-    </modal>
   </div>
 </template>
 
 <script>
-import modalWindow from '@/UI/modalWindow';
-// TODO: Сделать переключение между формой в таблице
 export default {
   data() {
     return {
-      modalWindow: {
-        showModal: false,
-        title: '',
-        actions: ['Редактировать', 'Удалить']
-      }
+      clickRow: false
     };
   },
   props: {
@@ -60,13 +50,21 @@ export default {
     dataArray: {
       type: Array,
       required: true
+    },
+    onClickTableRow: Function
+  },
+  computed: {
+    isActiveClick() {
+      return this.clickRow;
     }
   },
   methods: {
-    onClickTableButton() {
-      this.modalWindow.showModal = !this.modalWindow.showModal;
+    onClickTable(data) {
+      this.clickRow = !this.clickRow;
+      this.onClickTableRow({
+        data: data
+      });
     }
-  },
-  components: {modalWindow}
+  }
 };
 </script>

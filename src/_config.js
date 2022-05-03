@@ -1,32 +1,32 @@
 export const links = [
   {title: 'Склад', url: '/storage', icon: 'warehouse'},
   {title: 'Магазин', url: '/shop', icon: 'shopping-cart'},
-  {title: 'Обо мне', url: '/profile', icon: 'address-card'},
+  {title: 'Обо мне', url: '/profile', icon: 'address-card'}
 ];
 
 export const adminSidebar = [
   {
     title: 'Панель администратора',
     url: '/admin',
-    icon: 'chart-line',
+    icon: 'chart-line'
   },
   {
     title: 'Информация о пользователях\n УДАЛИТЬ',
     url: '/users',
-    icon: 'user',
-  },
+    icon: 'user'
+  }
 ];
 
 export const adminLinks = [
   {title: 'Управление пользователями', url: '/users', icon: 'users'},
   {title: 'Управление командами', url: '/users', icon: 'users'},
-  {title: 'Управление счетами', url: '/users', icon: 'users'},
+  {title: 'Управление счетами', url: '/users', icon: 'users'}
 ];
 
 export const rowUpdateUser = {
   first_name: 'Имя',
   last_name: 'Фамилия',
-  team_name: 'Название команды',
+  team_name: 'Название команды'
 };
 
 export const selectUpdateUser = [
@@ -36,13 +36,13 @@ export const selectUpdateUser = [
     options: {
       manufacturer: 'Поставщик',
       player: 'Игрок',
-      customer: 'Клиент',
-    },
-  },
+      customer: 'Клиент'
+    }
+  }
 ];
 
 export const app = {
-  title: 'Деловая игра',
+  title: 'Деловая игра'
 };
 
 export const userInfo = {
@@ -55,13 +55,13 @@ export const userInfo = {
   last_name: null,
   role: null,
   team: null,
-  username: null,
+  username: null
 };
 
 export const teamInfo = {
   id: null,
   name: null,
-  account: null,
+  account: null
 };
 
 export const usersTableHeader = {
@@ -75,26 +75,26 @@ export const usersTableHeader = {
   data_joined: 'Дата создания аккаунта',
   last_login: 'Последняя авторизация',
   first_name: 'Имя',
-  last_name: 'Фамилия',
+  last_name: 'Фамилия'
 };
 
 export const accountsTableHeader = {
   id: 'id',
   balance: 'Баланс',
-  is_unlimited: 'Безлимитный',
+  is_unlimited: 'Безлимитный'
 };
 
 export const transactionsTableHeader = {
   from_account: 'Отправитель',
   to_account: 'Получатель',
   amount: 'Сумма',
-  timestamp: 'Дата',
+  timestamp: 'Дата'
 };
 
 export const teamsTableHeader = {
   id: 'id',
   name: 'Название',
-  account: 'Счёт',
+  account: 'Счёт'
 };
 
 export const adminTabs = [
@@ -103,12 +103,6 @@ export const adminTabs = [
   {title: 'Счета', url: 'accounts'},
   {
     title: 'Транзакции',
-    url: 'transactions',
-  },
-];
-
-export const cardsShowList = [
-  {title: 'Список пользователей', body: 'users', tableHeaders: ''},
-  {title: 'Список счетов', body: 'accounts', tableHeaders: ''},
-  {title: 'Список транзакций', body: 'transactions', tableHeaders: ''},
+    url: 'transactions'
+  }
 ];

@@ -4,22 +4,36 @@
       v-bind:is="currentTabComponent"
       v-bind:titles="tableHeaders[currentTabComponent]"
       v-bind:dataArray="array[currentTabComponent]"
+      :onClickTableRow="onClickTableRow"
     >
       <button class="admin-tab">Редактировать</button>
     </component>
+    <div v-if="modalWindow.isActive">
+      <modalWindow
+        :title="currentTabComponent"
+        :styleForActivatedModal="modalWindow.styleForActivated"
+        :showModal="showModal"
+      >
+        <Form
+          :data="modalWindow.data"
+          :labels="tableHeaders[currentTabComponent]"
+        />
+      </modalWindow>
+    </div>
   </Tab>
 </template>
 
 <script>
 import Table from '@/UI/Table';
 import Tab from '@/components/Tab';
+import Form from '@/UI/Form';
+import modalWindow from '@/UI/modalWindow';
 import userService from '@/services/user.service';
 import accountService from '@/services/account.service';
 import transactionService from '@/services/transaction.service';
 import teamService from '@/services/team.service';
 import {
   usersTableHeader,
-  cardsShowList,
   accountsTableHeader,
   transactionsTableHeader,
   teamsTableHeader,
@@ -38,7 +52,11 @@ export default {
         transactions: transactionsTableHeader,
         teams: teamsTableHeader
       },
-      cards: cardsShowList,
+      modalWindow: {
+        isActive: false,
+        styleForActivatedModal: 'hidden:block',
+        data: ''
+      },
       array: {
         users: '',
         accounts: '',
@@ -56,9 +74,17 @@ export default {
   methods: {
     onClickTab(data) {
       this.currentTab = data.tabUrl;
+    },
+    onClickTableRow(data) {
+      this.modalWindow.isActive = true;
+      this.modalWindow.data = data.data;
+    },
+    showModal(data) {
+      this.modalWindow.isActive = data.modalisActive;
+      this.styleForActivatedModal = data.styleShowModal;
     }
   },
-  async mounted() {
+  async created() {
     const users = await userService.getUsersList();
     const accounts = await accountService.getListAccounts();
     const transactions = await transactionService.getTransactions();
@@ -75,7 +101,9 @@ export default {
     teams: Table,
     accounts: Table,
     transactions: Table,
-    Tab: Tab
+    Tab: Tab,
+    modalWindow: modalWindow,
+    Form: Form
   }
 };
 </script>
