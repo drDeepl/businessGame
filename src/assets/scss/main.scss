@@ -8,15 +8,13 @@
 @import 'common/form';
 @import 'common/adminTab';
 @import 'common/modalWindow';
-body {
+@import 'common/login';
+body,
+#app {
   font-family: Montserrat;
   font-size: $mainFontSize;
   color: $mainFontColor;
   font-weight: $mainFontWeight;
-  background-color: $bodyBackground;
-}
-
-.container {
   padding: 0;
   margin: 0;
 }

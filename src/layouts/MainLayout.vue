@@ -161,6 +161,7 @@ export default {
     },
     onClickTab() {
       this.sideBar.className = '';
+      this.sideBar.isActive = !this.sideBar.isActive;
     },
     setActiveTab(title) {
       return (this.tab.activeTab = title);

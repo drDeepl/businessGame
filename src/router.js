@@ -32,11 +32,6 @@ export const router = new Router({
           component: () => import('./views/Storage.vue')
         },
         {
-          path: '/users',
-          name: 'users',
-          component: () => import('./views/Users.vue')
-        },
-        {
           path: '/admin',
           name: 'admin',
           component: () => import('@/views/Admin.vue')

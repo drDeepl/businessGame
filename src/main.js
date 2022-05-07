@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './assets/scss/main.scss';
 import VeeValidate from 'vee-validate';
 import Vuex from 'vuex';
+import vuetify from '@/plugins/vuetify';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {
@@ -53,5 +54,6 @@ setupInterceptors(store);
 new Vue({
   router,
   store,
+  vuetify,
   render: h => h(App)
 }).$mount('#app');

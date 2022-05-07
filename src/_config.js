@@ -106,3 +106,7 @@ export const adminTabs = [
     url: 'transactions'
   }
 ];
+
+export const colors = {
+  purple: '#6b4ee6'
+};
