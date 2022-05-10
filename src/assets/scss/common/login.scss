@@ -1,18 +1,26 @@
 #login__container {
-  width: 25rem;
-  height: 70vh;
-  margin-top: 7rem;
-  padding: 0;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  width: 22rem;
+  height: 48vh;
+  margin-top: 12rem;
+  box-shadow: $shadow;
 }
 #login_logo {
   margin: 0;
   padding: 0;
   height: 12rem;
-  padding-left: 3rem;
+  padding-left: 2rem;
 }
+
+.login-row {
+  margin-top: 0.5rem;
+}
+.login-btn {
+  margin-top: 1.2rem;
+  width: 19rem;
+}
+
 @media screen and (max-height: 720px) {
-  #login__wrapper {
+  #login__container {
     top: 0;
     width: 100vw;
     height: 100vh;
@@ -20,7 +28,7 @@
 }
 
 @media screen and(min-height: 1024) {
-  #login__wrapper {
+  #login__container {
     right: 10vw;
   }
 }
