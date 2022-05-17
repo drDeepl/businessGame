@@ -24,7 +24,6 @@ class teamService{
       }
 
       async getDataTeam(teamId){
-          // TODO: Почему haveCash is True??
           if(this.haveCash()){
             console.log(this.cashDataTeam)
             console.log('TEAM.SERVICE.getDataTeam: to cash')

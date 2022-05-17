@@ -1,17 +1,16 @@
 import instance from '@/api/main';
-
+const subdomain = 'token';
 class TokenAPI {
-  subdomain = 'token';
   verify(token) {
-    return instance.post(this.subdomain + '/verify', {token: token});
+    return instance.post(subdomain + '/verify', {token: token});
   }
 
   pair(user) {
-    const reqBody = {
-      password: user.password,
-      username: user.username
-    };
-    return instance.post(this.subdomain + '/pair', reqBody);
+    return instance.post(subdomain + '/pair', user);
+  }
+
+  refresh(refresh) {
+    return instance.post(subdomain + '/refresh', refresh);
   }
 }
 

@@ -17,3 +17,5 @@ class productAPI {
     instance.delete('products/' + productId);
   }
 }
+
+export default productAPI;

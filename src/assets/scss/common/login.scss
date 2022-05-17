@@ -1,8 +1,11 @@
 #login__container {
+  display: flex;
+  flex-direction: column;
   width: 22rem;
-  height: 48vh;
-  margin-top: 12rem;
+  height: 26.5rem;
+  margin-bottom: 12rem;
   box-shadow: $shadow;
+  padding-bottom: 1rem;
 }
 #login_logo {
   margin: 0;
@@ -19,16 +22,16 @@
   width: 19rem;
 }
 
-@media screen and (max-height: 720px) {
-  #login__container {
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-  }
-}
+// @media screen and (max-height: 844px) and (max-width: 400px) {
+//   #login__container {
+//     top: 0;
+//     width: 100vw;
+//     height: 100vh;
+//   }
+// }
 
-@media screen and(min-height: 1024) {
-  #login__container {
-    right: 10vw;
-  }
-}
+// @media screen and(min-height: 1024) {
+//   #login__container {
+//     right: 10vw;
+//   }
+// }

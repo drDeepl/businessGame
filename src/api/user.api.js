@@ -1,19 +1,28 @@
 import instance from '@/api/main';
 
 class userAPI {
-  baseTab = 'users';
+  subdomain = 'users/';
   getUsers() {
-    return instance.get(this.baseTab);
+    return instance.get(this.subdomain);
   }
 
   getUserData(userId) {
     console.log('get data ');
-    return instance.get(this.baseTab + '/' + userId);
+    return instance.get(this.subdomain + userId);
   }
-
+  getUserByName(username) {
+    return instance.get(this.subdomain + '/name/' + username);
+  }
   updateUser(user_id, data) {
-    return instance.put(this.baseTab + '/' + user_id, data);
+    return instance.put(this.subdomain + user_id, data);
+  }
+  deleteUser(userId) {
+    return instance.delete(this.subdomain + userId);
+  }
+  getRoles() {
+    return instance.get('/roles');
   }
 }
 
 export default new userAPI();
+

@@ -27,18 +27,18 @@
         @click.prevent="onLogIn"
         >Войти</v-btn
       >
+      <v-alert
+        class="login-alert"
+        v-if="authErrors.length"
+        dense
+        elevation="5"
+        outlined
+        type="error"
+      >
+        {{ authErrors[0] }}
+      </v-alert>
     </v-form>
     {{ test }}
-    <v-alert
-      class="login-alert"
-      v-if="authErrors.length"
-      dense
-      elevation="5"
-      outlined
-      type="error"
-    >
-      {{ authErrors[0] }}
-    </v-alert>
   </v-container>
 </template>
 
@@ -61,10 +61,10 @@ export default {
     async onLogIn() {
       try {
         this.test = await this.$store.dispatch('auth/login', this.user);
-      } catch {
-        this.authErrors.push('Неверный логин или пароль');
+      } catch (e) {
+        console.log(e);
       }
-      console.log(this.initState);
+      console.log('InitState', this.initState);
     }
   }
 };
