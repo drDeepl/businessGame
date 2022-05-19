@@ -1,5 +1,6 @@
 @import '../utils/vars';
 /* Sidebar */
+
 #sidebar-wrapper {
   z-index: 1;
   position: fixed;
@@ -52,6 +53,10 @@
 
 #wrapper.menuDisplayed #page-content-wrapper {
   padding-left: 250px;
+}
+
+.sidebar-container {
+  overflow: scroll;
 }
 
 /* Sidebar styling */

@@ -73,12 +73,7 @@
 </template>
 
 <script>
-// TODO: Добавить динамическое изменение компонентов
 import {links, adminSidebar, app} from '@/_config';
-import userService from '@/services/user.service';
-import teamService from '@/services/team.service';
-import accountService from '@/services/account.service';
-import {isAdmin} from '@/helpers/admin.helper';
 export default {
   data() {
     return {
@@ -92,7 +87,7 @@ export default {
       },
       sideBar: {
         isActive: false,
-        className: '',
+        className: 'sidebar-container',
         template: 'Деловая игра',
         links: links
       },
@@ -106,26 +101,19 @@ export default {
     };
   },
   async created() {
-    const accessToken = this.currentUser.access;
-    const userId = userService.getUserId(accessToken);
-    const userData = await userService.getUserInfo(userId);
-    this.test = userData;
-    this.userId = userData.id;
-    userData.role = 'admin';
-    const admin = (this.admin.isAdmin = isAdmin(userData.role));
-    this.admin.isAdmin = admin;
-    if (admin) {
-      Array.prototype.push.apply(this.sideBar.links, this.admin.adminLinks);
+    // TODO: Перенести логику в store
+    if (this.$store.state.auth.status.loggedIn) {
+      ('Что должно происходить здесь\
+    0.Проверка на авторизацию\
+    1.Получение access токена\
+    2.Извлечение из него id пользователя\
+    3.Получение информации о пользователе для отображения её в сайдбаре\
+    4.Если админ, то показать панель админа\
+    5.Отобразить имя, команду, баланс пользователя');
+    } else {
+      this.$router.push('/');
+      console.log('Нахер отсюда!');
     }
-    const teamId = userData.team;
-    this.sidebarUserInfo.username = userData.username;
-    const teamData = await teamService.getDataTeam(teamId);
-    this.sidebarUserInfo.team = teamData.name;
-    const accountId = userData.account;
-    const userBalance = await accountService.getBalance(accountId);
-    this.sidebarUserInfo.balance = userBalance;
-
-    // }
   },
   computed: {
     currentUser() {
@@ -160,7 +148,7 @@ export default {
       }
     },
     onClickTab() {
-      this.sideBar.className = '';
+      this.sideBar.className = 'sidebar-container';
       this.sideBar.isActive = !this.sideBar.isActive;
     },
     setActiveTab(title) {
@@ -171,10 +159,7 @@ export default {
       this.$router.push('/');
     },
     onMyProfile() {
-      this.$router.push('/');
-    },
-    onClickJWT() {
-      this.test = this.userData;
+      this.$router.push('/profile');
     }
   }
 };

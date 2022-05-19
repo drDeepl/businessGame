@@ -3,12 +3,14 @@ import TokenService from '@/services/token.service';
 import validatePropertyResponse from '@/helpers/api.helper';
 import ModelObtainToken from '@/models/model.token';
 class AuthService {
-  async login(user) {
-    console.log('AuthServce: login');
-    const response = await TokenAPI.pair(user);
+  async login(formData) {
+    console.log('Auth.Service: login');
+    const response = await TokenAPI.pair(formData);
     const obtainToken = new ModelObtainToken(response.data);
+    console.log('Obtain.Token');
+    console.log(obtainToken);
     validatePropertyResponse(obtainToken);
-    TokenService.setUser(response.data);
+    TokenService.setUser(obtainToken);
     return response;
   }
 

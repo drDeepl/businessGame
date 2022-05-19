@@ -5,7 +5,6 @@ import Login from './views/Login.vue';
 Vue.use(Router);
 
 export const router = new Router({
-  // TODO: Настроить роутеры
   mode: 'history',
   routes: [
     {

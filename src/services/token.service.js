@@ -1,4 +1,3 @@
-
 class TokenService {
   getLocalRefreshToken() {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -21,6 +20,7 @@ class TokenService {
   }
 
   setUser(user) {
+    console.log('toke.service.setUser');
     console.log(JSON.stringify(user));
     localStorage.setItem('user', JSON.stringify(user));
   }
