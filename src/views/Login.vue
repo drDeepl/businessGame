@@ -42,6 +42,7 @@
 import {validationMixin} from 'vuelidate';
 import {required} from 'vuelidate/lib/validators';
 import LoginForm from '@/models/model.login.form';
+
 export default {
   mixins: [validationMixin],
   data() {

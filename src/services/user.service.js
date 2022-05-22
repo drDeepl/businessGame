@@ -1,9 +1,9 @@
 import userAPI from '@/api/user.api';
 import jwt_decode from 'jwt-decode';
 import {userInfo} from '@/_config';
-// import {checkObjNullUndef} from '@/helpers/data.helper';
-
-class userService {
+import {ValidateResponse} from '@/helpers/helper.decorator';
+import UserInfo from '@/models/model.user';
+class UserService {
   cashDataUser = userInfo;
   isAdmin(role) {
     if (role.toLowerCase() === 'admin') {
@@ -39,7 +39,6 @@ class userService {
   }
 
   async getUserInfo(userId) {
-    // TODO: Почему функция возвращает промис???
     try {
       if (this.haveCash()) {
         console.log('USER.SERVICE: response to cash');
@@ -47,9 +46,16 @@ class userService {
         return userData;
       } else {
         console.log('USER.SERVICE: response to backend');
-        const userData = await userAPI.getUserData(userId);
-        this.setDataCash(userData.data);
-        return userData.data;
+        const responseUserData = await userAPI
+          .getUserData(userId)
+          .catch(err => err.response);
+        if (responseUserData.status == 200) {
+          const userInfo = new UserInfo(responseUserData.data);
+          // TODO: Сделать проверку ответа
+          ValidateResponse(userInfo, responseUserData.data);
+          this.setDataCash(responseUserData.data);
+          return responseUserData.data;
+        }
       }
     } catch (e) {
       console.log(e);
@@ -83,4 +89,4 @@ class userService {
   }
 }
 
-export default new userService();
+export default new UserService();

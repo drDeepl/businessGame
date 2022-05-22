@@ -74,6 +74,7 @@
 
 <script>
 import {links, adminSidebar, app} from '@/_config';
+
 export default {
   data() {
     return {
@@ -102,6 +103,7 @@ export default {
   },
   async created() {
     // TODO: Перенести логику в store
+    console.log('MainLayout.vue: Created');
     if (this.$store.state.auth.status.loggedIn) {
       ('Что должно происходить здесь\
     0.Проверка на авторизацию\
@@ -110,6 +112,9 @@ export default {
     3.Получение информации о пользователе для отображения её в сайдбаре\
     4.Если админ, то показать панель админа\
     5.Отобразить имя, команду, баланс пользователя');
+      const userId = this.$store.state.auth.user.user_id;
+      this.$store.dispatch('user/getUserInfo', userId);
+      this.$store.state.user.userInfo;
     } else {
       this.$router.push('/');
       console.log('Нахер отсюда!');

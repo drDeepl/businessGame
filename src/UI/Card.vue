@@ -27,27 +27,27 @@
 -->
 
 <template>
-    <div class="card">
-      <div class="profile-info">
-        <span class="card-name">{{username}}</span>
-        <span>{{id}}</span>
+  <div class="card">
+    <div class="profile-info">
+      <span class="card-name">{{ username }}</span>
+      <div>
+        <small>{{ id }}</small>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
-
 export default {
-    props:{
-        id: {
-            type: Number,
-            required: true,
-        },
-        username: {
-            type: String,
-            required: true,
-        },
+  props: {
+    id: {
+      type: Number,
+      required: true
+    },
+    username: {
+      type: String,
+      required: true
     }
-  
+  }
 };
-</script> 
+</script>

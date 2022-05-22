@@ -6,7 +6,6 @@
 </template>
 
 <script>
-import VueJwtDecode from 'vue-jwt-decode';
 import Card from '@/UI/Card';
 export default {
   components: {Card}, // <=> {Card: Card}
@@ -20,9 +19,9 @@ export default {
     },
 
     getUserId() {
-      const data = this.$store.state.auth.user.access;
-      const decodeAccess = VueJwtDecode.decode(data);
-      return decodeAccess.user_id;
+      console.log('Profile.vue: ' + 'getUserId');
+      const userId = this.$store.state.auth.user.user_id;
+      return userId;
     }
   },
   mounted() {
