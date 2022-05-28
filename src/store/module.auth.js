@@ -1,6 +1,5 @@
 import AuthService from '@/services/auth.service';
 import {UserNotFound} from '@/errors/auth.errors';
-import VueJwtDecode from 'vue-jwt-decode';
 const user = JSON.parse(localStorage.getItem('user'));
 const initialState = user
   ? {status: {loggedIn: true}, user}
@@ -14,12 +13,7 @@ export const auth = {
       console.log('Module.Auth.Login');
       const resp = await AuthService.login(user).catch(err => err.response);
       if (resp.status == 200) {
-        const userId = VueJwtDecode.decode(resp.data.access).user_id;
-        resp.data.user_id = userId;
-        const dataResp = resp.data;
-        context.commit('loginSuccess', dataResp);
-
-        console.log(resp);
+        context.commit('loginSuccess', user);
       } else {
         context.commit('loginFailure');
         throw new UserNotFound('Status Code: ' + resp.status);

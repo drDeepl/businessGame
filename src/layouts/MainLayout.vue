@@ -74,7 +74,6 @@
 
 <script>
 import {links, adminSidebar, app} from '@/_config';
-
 export default {
   data() {
     return {
@@ -90,7 +89,7 @@ export default {
         isActive: false,
         className: 'sidebar-container',
         template: 'Деловая игра',
-        links: links
+        links: ''
       },
       admin: {
         isAdmin: false,
@@ -103,18 +102,22 @@ export default {
   },
   async created() {
     // TODO: Перенести логику в store
-    console.log('MainLayout.vue: Created');
     if (this.$store.state.auth.status.loggedIn) {
-      ('Что должно происходить здесь\
+      console.log(links);
+      const username = this.currentUser.username;
+      console.log('Get STORE');
+      this.$store.dispatch(
+        'user/getUserDataByUsName',
+        username
+      )(
+        'Что должно происходить здесь\
     0.Проверка на авторизацию\
     1.Получение access токена\
     2.Извлечение из него id пользователя\
     3.Получение информации о пользователе для отображения её в сайдбаре\
     4.Если админ, то показать панель админа\
-    5.Отобразить имя, команду, баланс пользователя');
-      const userId = this.$store.state.auth.user.user_id;
-      this.$store.dispatch('user/getUserInfo', userId);
-      this.$store.state.user.userInfo;
+    5.Отобразить имя, команду, баланс пользователя'
+      );
     } else {
       this.$router.push('/');
       console.log('Нахер отсюда!');

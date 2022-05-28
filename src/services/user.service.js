@@ -1,8 +1,9 @@
 import userAPI from '@/api/user.api';
 import jwt_decode from 'jwt-decode';
 import {userInfo} from '@/_config';
-import {ValidateResponse} from '@/helpers/helper.decorator';
-import UserInfo from '@/models/model.user';
+import User from '@/models/model.user';
+// import {checkObjNullUndef} from '@/helpers/data.helper';
+
 class UserService {
   cashDataUser = userInfo;
   isAdmin(role) {
@@ -38,7 +39,8 @@ class UserService {
     return userId;
   }
 
-  async getUserInfo(userId) {
+  async getUserDataById(userId) {
+    // TODO: Почему функция возвращает промис???
     try {
       if (this.haveCash()) {
         console.log('USER.SERVICE: response to cash');
@@ -46,30 +48,36 @@ class UserService {
         return userData;
       } else {
         console.log('USER.SERVICE: response to backend');
-        const responseUserData = await userAPI
-          .getUserData(userId)
-          .catch(err => err.response);
-        if (responseUserData.status == 200) {
-          const userInfo = new UserInfo(responseUserData.data);
-          // TODO: Сделать проверку ответа
-          ValidateResponse(userInfo, responseUserData.data);
-          this.setDataCash(responseUserData.data);
-          return responseUserData.data;
-        }
+        const response = await userAPI.getUserById(userId);
+        const userData = new User(response.data);
+        this.setDataCash(userData);
+        return userData;
       }
     } catch (e) {
-      console.log(e);
+      console.log('ERROR.USER.SERVICE: getUserInfoById\n', e);
+    }
+  }
+
+  async getUserDataByUsername(username) {
+    try {
+      if (this.haveCash()) {
+        console.log('USER.SERVICE: response to cash');
+        const userData = this.getDataCash();
+        return userData;
+      } else {
+        console.log('USER.SERVICE: response to backend');
+        const response = await userAPI.getUserByUsername(username);
+        // TODO: Добавить проверку на успешный ответ
+        const userData = new User(response.data);
+        this.setDataCash(userData);
+        return userData;
+      }
+    } catch (e) {
+      console.log('ERROR.USER.SERVICE: getUserInfoById\n', e);
     }
   }
 
   async updateDataUser(user_id, dataJSON) {
-    // Need data For update
-    // {
-    //   role: role,
-    //   first_name: first_name,
-    //   last_name: last_name,
-    //   team_id: team_id
-    // };
     console.log('UPDATE USER');
     console.log(user_id);
     console.log(dataJSON);

@@ -1,4 +1,4 @@
-import ValidationError from '@/errors/errors.validation';
+import ValidationError from '@/errors/error.validate';
 
 export default function validateUndefined(model) {
   for (let propertyName in model) {

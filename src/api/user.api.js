@@ -6,12 +6,12 @@ class userAPI {
     return instance.get(this.subdomain);
   }
 
-  getUserData(userId) {
+  getUserById(userId) {
     console.log('get data ');
     return instance.get(this.subdomain + userId);
   }
-  getUserByName(username) {
-    return instance.get(this.subdomain + '/name/' + username);
+  getUserByUsername(username) {
+    return instance.get(this.subdomain + 'name/' + username);
   }
   updateUser(user_id, data) {
     return instance.put(this.subdomain + user_id, data);
@@ -25,4 +25,3 @@ class userAPI {
 }
 
 export default new userAPI();
-
