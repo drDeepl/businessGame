@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 import {createModelFromResponseData} from '@/helpers/helper.model';
 
 export default class User {
-=======
-export class UserInfo {
->>>>>>> 4ae8519 (exit)
   properties = [
     'id',
     'last_login',
