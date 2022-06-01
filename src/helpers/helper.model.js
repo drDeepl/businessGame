@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import ValidateError from '@/errors/error.validate';
 
 export function createModelFromResponseData(Class, data) {
@@ -22,3 +23,13 @@ export function createModelFromResponseData(Class, data) {
   }
   return Class;
 }
+=======
+export function validateResponse(property, response){
+    // property is Object and response is Object
+    const responseProps = Object.getOwnPropertyNames(response)
+    for(let i in responseProps){
+        const responseProp = responseProps[i]
+        
+    }
+}
+>>>>>>> 4ae8519 (exit)

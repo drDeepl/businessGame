@@ -103,6 +103,7 @@ export default {
   async created() {
     // TODO: Перенести логику в store
     if (this.$store.state.auth.status.loggedIn) {
+<<<<<<< HEAD
       console.log(links);
       const username = this.currentUser.username;
       console.log('Get STORE');
@@ -110,6 +111,9 @@ export default {
         'user/getUserDataByUsName',
         username
       )(
+=======
+      console.log(links)(
+>>>>>>> 4ae8519 (exit)
         'Что должно происходить здесь\
     0.Проверка на авторизацию\
     1.Получение access токена\
