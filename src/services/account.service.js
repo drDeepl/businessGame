@@ -1,10 +1,18 @@
 import accountAPI from '@/api/account.api';
+import Account from '../models/model.account';
+import AccountNotFound from '@/errors/error.exist';
 
-class accountService {
-  async getBalance(accountId) {
-    console.log('ACCOUNT.SERVICE.getBalance');
-    const dataAccount = await accountAPI.getAccount(accountId);
-    return dataAccount.data.balance;
+class AccountService {
+  async getAccount(accountId) {
+    console.log('ACCOUNT.SERVICE.getAccount');
+    const response = await accountAPI.getAccount(accountId);
+    console.warn(response);
+    if (response.status == 200) {
+      const accountInfo = new Account(response.data);
+      return accountInfo;
+    } else {
+      throw new AccountNotFound('Account Not Exists');
+    }
   }
 
   async getListAccounts() {
@@ -13,4 +21,4 @@ class accountService {
   }
 }
 
-export default new accountService();
+export default new AccountService();

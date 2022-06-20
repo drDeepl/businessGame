@@ -2,6 +2,7 @@ import userAPI from '@/api/user.api';
 import jwt_decode from 'jwt-decode';
 import {userInfo} from '@/_config';
 import User from '@/models/model.user';
+
 // import {checkObjNullUndef} from '@/helpers/data.helper';
 
 class UserService {
@@ -67,7 +68,7 @@ class UserService {
       } else {
         console.log('USER.SERVICE: response to backend');
         const response = await userAPI.getUserByUsername(username);
-        // TODO: Добавить проверку на успешный ответ
+
         const userData = new User(response.data);
         this.setDataCash(userData);
         return userData;

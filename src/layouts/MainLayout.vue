@@ -102,25 +102,26 @@ export default {
   },
   async created() {
     // TODO: Перенести логику в store
-    if (this.$store.state.auth.status.loggedIn) {
-      console.log(links);
-      const username = this.currentUser.username;
-      console.log('Get STORE');
-      this.$store.dispatch(
-        'user/getUserDataByUsName',
-        username
-      )(
-        'Что должно происходить здесь\
+    ('Что должно происходить здесь\
     0.Проверка на авторизацию\
     1.Получение access токена\
     2.Извлечение из него id пользователя\
     3.Получение информации о пользователе для отображения её в сайдбаре\
     4.Если админ, то показать панель админа\
-    5.Отобразить имя, команду, баланс пользователя'
-      );
+    5.Отобразить имя, команду, баланс пользователя');
+    if (this.$store.state.auth.status.loggedIn) {
+      console.log(links);
+      const username = this.currentUser.username;
+      console.log('Get STORE');
+      await this.$store.dispatch('user/getUserDataByUsName', username);
+      const accountId = this.$store.getters['user/GET_USER_INFO'].account;
+      await this.$store.dispatch('account/getAccountById', accountId);
+      const balance = this.$store.getters['account/GET_BALANCE'];
+      console.warn(balance);
+      // TODO: сделать получение названия команды
+      console.log();
     } else {
       this.$router.push('/');
-      console.log('Нахер отсюда!');
     }
   },
   computed: {
