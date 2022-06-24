@@ -1,6 +1,6 @@
 import TokenAPI from '@/api/token.api';
 import TokenService from '@/services/token.service';
-import validatePropertyResponse from '@/helpers/api.helper';
+import{ validatePropertyResponse} from '@/helpers/api.helper';
 import ModelObtainToken from '@/models/model.token';
 class AuthService {
   async login(formData) {

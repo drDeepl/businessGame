@@ -106,21 +106,21 @@ export default {
       console.log(links);
       const username = this.currentUser.username;
       console.log('Get STORE');
-      this.$store.dispatch(
-        'user/getUserDataByUsName',
-        username
-      )(
-        'Что должно происходить здесь\
-    0.Проверка на авторизацию\
-    1.Получение access токена\
-    2.Извлечение из него id пользователя\
-    3.Получение информации о пользователе для отображения её в сайдбаре\
-    4.Если админ, то показать панель админа\
-    5.Отобразить имя, команду, баланс пользователя'
-      );
+      await this.$store.dispatch('user/getUserDataByUsName', username);
+      console.log('MAINLAYOUT: dataUsers from state');
+      const dataUser = this.$store.state.user.dataUsers.userData;
+      console.log(dataUser);
+      // TODO: Сделать вывод баланса, названия команды
+      //     'Что должно происходить здесь\
+      // 0.Проверка на авторизацию\
+      // 1.Получение access токена\
+      // 2.Извлечение из него id пользователя\
+      // 3.Получение информации о пользователе для отображения её в сайдбаре\
+      // 4.Если админ, то показать панель админа\
+      // 5.Отобразить имя, команду, баланс пользователя'
     } else {
       this.$router.push('/');
-      console.log('Нахер отсюда!');
+      console.log('Ты какой-то неизвестный. Иди отсюда..');
     }
   },
   computed: {

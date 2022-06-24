@@ -68,7 +68,8 @@ export default {
       if (this.$v.form.$error) {
         console.log('Login.vue: error validate');
       } else {
-        console.log('Is Errors? ' + this.$v.form.$error);
+        console.log('Errors ' + this.$v.form.$error);
+        console.log('DATA FORM', this.form);
         try {
           const user = new LoginForm(this.form);
           console.log(this.$store.state.auth.user);

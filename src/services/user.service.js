@@ -40,7 +40,6 @@ class UserService {
   }
 
   async getUserDataById(userId) {
-    // TODO: Почему функция возвращает промис???
     try {
       if (this.haveCash()) {
         console.log('USER.SERVICE: response to cash');
@@ -59,21 +58,19 @@ class UserService {
   }
 
   async getUserDataByUsername(username) {
-    try {
-      if (this.haveCash()) {
-        console.log('USER.SERVICE: response to cash');
-        const userData = this.getDataCash();
-        return userData;
-      } else {
-        console.log('USER.SERVICE: response to backend');
-        const response = await userAPI.getUserByUsername(username);
-        // TODO: Добавить проверку на успешный ответ
-        const userData = new User(response.data);
-        this.setDataCash(userData);
-        return userData;
-      }
-    } catch (e) {
-      console.log('ERROR.USER.SERVICE: getUserInfoById\n', e);
+    if (this.haveCash()) {
+      console.log('USER.SERVICE: response to cash');
+      const userData = this.getDataCash();
+      return userData;
+    } else {
+      console.log('USER.SERVICE: response to backend');
+      const response = await userAPI.getUserByUsername(username);
+      // TODO: Добавить проверку на успешный ответ
+      console.log('USER.SERVICE:getUserDataByUsername');
+      console.log(response);
+      const userData = new User(response.data);
+      this.setDataCash(userData);
+      return userData;
     }
   }
 
