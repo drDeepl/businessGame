@@ -2,8 +2,7 @@ import userAPI from '@/api/user.api';
 import jwt_decode from 'jwt-decode';
 import {userInfo} from '@/_config';
 import User from '@/models/model.user';
-
-// import {checkObjNullUndef} from '@/helpers/data.helper';
+import {createModelFromResponseData} from '@/helpers/helper.model';
 
 class UserService {
   cashDataUser = userInfo;
@@ -31,8 +30,12 @@ class UserService {
   }
 
   async getUsersList() {
-    const users = await userAPI.getUsers();
-    return users.data;
+    const response = await userAPI.getUsers();
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      throw new Error('Get Users List Status code' + response.status);
+    }
   }
 
   getUserId(access) {
@@ -41,40 +44,38 @@ class UserService {
   }
 
   async getUserDataById(userId) {
-    // TODO: Почему функция возвращает промис???
-    try {
-      if (this.haveCash()) {
-        console.log('USER.SERVICE: response to cash');
-        const userData = this.getDataCash();
-        return userData;
-      } else {
-        console.log('USER.SERVICE: response to backend');
-        const response = await userAPI.getUserById(userId);
-        const userData = new User(response.data);
-        this.setDataCash(userData);
-        return userData;
-      }
-    } catch (e) {
-      console.log('ERROR.USER.SERVICE: getUserInfoById\n', e);
+    if (this.haveCash()) {
+      console.log('USER.SERVICE: response to cash');
+      const userData = this.getDataCash();
+      return userData;
+    } else {
+      console.log('USER.SERVICE: response to backend');
+      const response = await userAPI.getUserById(userId);
+      const userData = new User(response.data);
+      this.setDataCash(userData);
+      return userData;
     }
   }
 
   async getUserDataByUsername(username) {
-    try {
-      if (this.haveCash()) {
-        console.log('USER.SERVICE: response to cash');
-        const userData = this.getDataCash();
+    if (this.haveCash()) {
+      console.log('USER.SERVICE: response to cash');
+      const userData = this.getDataCash();
+      return userData;
+    } else {
+      console.log('USER.SERVICE: response to backend');
+      const response = await userAPI.getUserByUsername(username);
+      if (response.status == 200) {
+        const userModel = new User();
+        const userData = createModelFromResponseData(userModel, response.data);
+        // this.setDataCash(userData);
         return userData;
       } else {
-        console.log('USER.SERVICE: response to backend');
-        const response = await userAPI.getUserByUsername(username);
-
-        const userData = new User(response.data);
-        this.setDataCash(userData);
-        return userData;
+        throw new Error(
+          'USER.SERVICE: getUserDataByUsername. Response Status: ' +
+            response.status
+        );
       }
-    } catch (e) {
-      console.log('ERROR.USER.SERVICE: getUserInfoById\n', e);
     }
   }
 

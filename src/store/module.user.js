@@ -2,28 +2,28 @@ import UserService from '@/services/user.service';
 export const user = {
   namespaced: true,
   state: {
-    userInfo: null
+    // userInfo: {
+    //   'username': userData,
+    // }
+    userInfo: {}
   },
   actions: {
     async getUserDataByUsName(context, username) {
       console.log('MODULE.USER: getUserData');
       console.log(context, username + '\n______________');
       const userData = await UserService.getUserDataByUsername(username);
-      context.commit('SET_USERINFO', userData);
-      return;
+      context.commit('SET_USER_INFO', userData);
     }
   },
   getters: {
-    GET_USER_INFO: state => {
-      return state.userInfo;
-    },
-    SIDEBAR_USER_INFO: state => {
-      console.error(state);
+    GET_USER_INFO_BY_USERNAME: state => username => {
+      console.log(username);
+      return state.userInfo[username];
     }
   },
   mutations: {
-    SET_USERINFO: (state, payload) => {
-      state.userInfo = payload;
+    SET_USER_INFO: function(state, userData) {
+      state.userInfo[userData.username] = userData;
     }
   }
 };

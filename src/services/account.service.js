@@ -1,14 +1,15 @@
 import accountAPI from '@/api/account.api';
-import Account from '../models/model.account';
 import AccountNotFound from '@/errors/error.exist';
+import {createModelFromResponseData} from '@/helpers/helper.model';
+import Account from '@/models/model.account';
 
 class AccountService {
   async getAccount(accountId) {
     console.log('ACCOUNT.SERVICE.getAccount');
     const response = await accountAPI.getAccount(accountId);
-    console.warn(response);
     if (response.status == 200) {
-      const accountInfo = new Account(response.data);
+      const accountInfo = createModelFromResponseData(new Account(), response.data);
+      console.warn(accountInfo);
       return accountInfo;
     } else {
       throw new AccountNotFound('Account Not Exists');

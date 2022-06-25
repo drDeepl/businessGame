@@ -3,12 +3,15 @@ import AccountService from '@/services/account.service';
 export const account = {
   namespaced: true,
   state: {
-    accountInfo: null
+    accInfoByUsername: {
+      // username: data
+    }
   },
   actions: {
     async getAccountById(context, id) {
       console.log('MODULE.ACCOUNT: getAccountById');
       const accountData = await AccountService.getAccount(id);
+      console.warn(accountData);
       context.commit('SET_ACCOUNT_INFO', accountData);
     }
   },
