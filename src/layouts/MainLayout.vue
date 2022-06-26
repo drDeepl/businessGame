@@ -114,11 +114,30 @@ export default {
       console.log(links);
       const username = this.currentUser.username;
       console.error('MAINLAYOUT: created');
-      await this.$store.dispatch('user/getUserDataByUsName', username);
-      const userData = this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](
+      let userData = this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](
         username
       );
-      await this.$store.dispatch('account/getAccountById', userData.account)
+      if (userData == false) {
+        await this.$store.dispatch('user/getUserDataByUsName', username);
+        userData = this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](
+          username
+        );
+      }
+      let accountData = this.$store.getters['account/GET_ACC_INFO_BY_UsName'](
+        username
+      );
+      if (accountData == false) {
+        await this.$store.dispatch('account/getAccountById', {
+          username: username,
+          accountId: userData.account
+        });
+        accountData = this.$store.getters['account/GET_ACC_INFO_BY_UsName'](
+          username
+        );
+      }
+      const balance = accountData.balance;
+      console.error(balance);
+      // TODO: Сделать получение название команды
     } else {
       this.$router.push('/');
     }
