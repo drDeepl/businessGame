@@ -113,34 +113,32 @@ export default {
     if (this.$store.state.auth.status.loggedIn) {
       console.log(links);
       const username = this.currentUser.username;
-      console.error('MAINLAYOUT: created');
-      let userData = this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](
+      console.warn('MAINLAYOUT: created');
+      await this.$store.dispatch('user/getUserDataByUsName', username);
+      const userData = this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](
         username
       );
-      if (userData == false) {
-        await this.$store.dispatch('user/getUserDataByUsName', username);
-        userData = this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](
-          username
-        );
-      }
-      let accountData = this.$store.getters['account/GET_ACC_INFO_BY_UsName'](
-        username
-      );
-      if (accountData == false) {
-        await this.$store.dispatch('account/getAccountById', {
-          username: username,
-          accountId: userData.account
-        });
-        accountData = this.$store.getters['account/GET_ACC_INFO_BY_UsName'](
-          username
-        );
-      }
-      const balance = accountData.balance;
-      console.error(balance);
-      // TODO: Сделать получение название команды
+      console.log(userData);
+      // TODO: Сделать получение названия команды
+      const teamId = userData.team;
+      await this.$store.dispatch('team/getTeamData', teamId);
+      // TODO: сделать получение данных команды из $store
+      // await this.$store.dispatch('account/getAccountById', {
+      //   username: username,
+      //   accountId: userData.account
+      // });
+      // let accountData = this.$store.getters['account/GET_ACC_INFO_BY_UsName'](
+      //   username
+      // );
+      // const balance = accountData.balance;
+      // console.error(balance);
     } else {
       this.$router.push('/');
     }
+  },
+  mounted() {
+    const username = this.currentUser.username;
+    this.sidebarUserInfo.username = username;
   },
   computed: {
     currentUser() {

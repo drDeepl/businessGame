@@ -5,7 +5,7 @@ export const account = {
   namespaced: true,
   state: {
     accInfo: {
-      // username: data
+      // team: data
     }
   },
   actions: {

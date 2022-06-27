@@ -1,57 +1,29 @@
-import teamAPI from '@/api/team.api'
-import {teamInfo} from '@/_config'
+import teamAPI from '@/api/team.api';
+import Team from '@/models/model.team';
+import {createModelFromResponseData} from '@/helpers/helper.model';
 
-class teamService{
-    cashDataTeam = teamInfo
-    // teamInfo = {id: integer
-    //            name: string
-    //            account: integer
-    //            }
-    
-    haveCash(){
-        for(let property in this.cashDataTeam){
-          if(this.cashDataTeam[property] == null){
-            return false
-          }
-        }
-        return true
-      }
-  
-      getDataCash(){
-        console.log('TEAM.SERVICE.getDataCash')
-        console.log(this.cashDataTeam)
-        return this.cashDataTeam
-      }
+class teamService {
+  async getDataTeam(teamId) {
+    console.warn('TEAM.SERVICE: getDataTeam');
+    const response = await teamAPI.getTeamInfo(teamId);
+    if (response.status == 200) {
+      let model = new Team();
+      const dataTeam = createModelFromResponseData(model, response.data);
+      return dataTeam;
+    } else {
+      throw new Error(
+        'TEAM.SERVICE.getDataTeam: Status Code ' + response.status
+      );
+    }
+    // return dataTeam.data;
+    // this.setDataCash(dataTeam)
+    // return dataTeam.data
+  }
 
-      async getDataTeam(teamId){
-          if(this.haveCash()){
-            console.log(this.cashDataTeam)
-            console.log('TEAM.SERVICE.getDataTeam: to cash')
-            return this.getDataCash()
-          }
-          else{
-            console.log('TEAM.SERVICE.getDataTeam: to backend')
-              const dataTeam = await teamAPI.getTeamInfo(teamId)
-              return dataTeam.data
-              // this.setDataCash(dataTeam)
-              // return dataTeam.data
-          }
-      }
-
-      async getTeams(){
-        const teams = await teamAPI.getTeams()
-        return teams.data
-      }
-
-      setDataCash(dataTeam){
-        console.log('teamService: setDataCash')
-        console.log(dataTeam)
-        for(let property in this.cashDataTeam){
-          this.cashDataTeam[property] = dataTeam[property]
-        }
-        console.log('teamService: setDataCash complete')
-        console.log(this.cashDataTeam)
-      }
+  async getTeams() {
+    const teams = await teamAPI.getTeams();
+    return teams.data;
+  }
 }
 
 export default new teamService();
