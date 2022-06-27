@@ -117,6 +117,14 @@ export default {
       await this.$store.dispatch('user/getUserDataByUsName', username);
       const userData = this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](
         username
+      )(
+        'Что должно происходить здесь\
+    0.Проверка на авторизацию\
+    1.Получение access токена\
+    2.Извлечение из него id пользователя\
+    3.Получение информации о пользователе для отображения её в сайдбаре\
+    4.Если админ, то показать панель админа\
+    5.Отобразить имя, команду, баланс пользователя'
       );
       console.log(userData);
       // TODO: Сделать получение названия команды
