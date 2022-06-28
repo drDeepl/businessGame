@@ -4,7 +4,8 @@ import validatePropertyResponse from '@/helpers/api.helper';
 import ModelObtainToken from '@/models/model.token';
 class AuthService {
   async login(formData) {
-    console.log('Auth.Service: login');
+    console.warn('Auth.Service: login');
+    console.log(formData);
     const response = await TokenAPI.pair(formData);
     const obtainToken = new ModelObtainToken(response.data);
     console.log('Obtain.Token');

@@ -1,43 +1,41 @@
 import AccountService from '@/services/account.service';
-import {isExist} from '@/services/utils.service';
-// TODO: Сделатть хранилище счетов
 export const account = {
   namespaced: true,
   state: {
-    accInfo: {
-      // team: data
+    dataByIdTeam: {
+      // idTeam: dataAccount
     }
   },
   actions: {
-    async getAccountById(context, modelAccount) {
-      // modelAccount состоит из
-      // {username: string,
-      //  accountId: Integer}
+    async getAccountById(context, model) {
+      // getAccountById получает на  вход объект model
+      // model = {idAccount: Integer, idTeam: Integer}\
+      // По idAccount получает данные о счете\
+      // Создает модель для хранения данных dataAccountByIdTeam
+      // После сохраняет данные в state в виде {idTeam:dataAccount}\
       console.warn('MODULE.ACCOUNT: getAccountById');
-      const accountId = modelAccount.accountId;
-      const accountData = await AccountService.getAccount(accountId);
-      const modelAccInfo = {
-        username: modelAccount.username,
-        accountData: accountData
+      console.log(model);
+      console.log('Context\n', context);
+      const dataAccount = await AccountService.getAccount(model.idAccount);
+      console.log(dataAccount);
+      const setAccountData = {
+        idTeam: model.idTeam,
+        dataAccount: dataAccount
       };
-      context.commit('SET_ACCOUNT_INFO', modelAccInfo);
+      context.commit('SET_ACCOUNT_DATA', setAccountData);
     }
   },
   getters: {
-    GET_ACC_INFO_BY_UsName: state => username => {
-      const accountData = state.accInfo[username];
-      if (isExist(accountData)) {
-        return accountData;
-      } else {
-        console.error('ACCOUNT DATA IS NOT EXIST IN STORE');
-        return false;
-      }
+    GET_DATA_BY_ID_TEAM: state => idTeam => {
+      return state.dataByIdTeam[idTeam];
     }
   },
   mutations: {
-    SET_ACCOUNT_INFO: (state, modelAccInfo) => {
-      console.warn('MODULE.ACCOUNT: SET_ACCOUNT_INFO');
-      state.accInfo[modelAccInfo.username] = modelAccInfo.accountData;
+    SET_ACCOUNT_DATA: (state, data) => {
+      console.warn('MODULE.ACCOUNT: SET_ACCOUNT_DATA');
+      console.log(state);
+      console.log(data);
+      state.dataByIdTeam[data.idTeam] = data.dataAccount;
     }
   }
 };

@@ -64,6 +64,7 @@ export default {
   },
   methods: {
     async onLogIn() {
+      console.warn('Login.vue: onLogin');
       this.$v.form.$touch();
       if (this.$v.form.$error) {
         console.log('Login.vue: error validate');

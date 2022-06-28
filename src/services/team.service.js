@@ -15,9 +15,6 @@ class teamService {
         'TEAM.SERVICE.getDataTeam: Status Code ' + response.status
       );
     }
-    // return dataTeam.data;
-    // this.setDataCash(dataTeam)
-    // return dataTeam.data
   }
 
   async getTeams() {

@@ -4,12 +4,14 @@
       <div class="container">
         <p id="sidebar-tittle" class="user-info">{{ title }}</p>
         <ul class="user-info">
-          <li
-            v-for="row in Object.keys(sidebarUserInfo)"
-            :key="row.username"
-            :id="row"
-          >
-            {{ sidebarUserInfo[row] }}
+          // TODO: Оформить красивый вывод информации
+          <li v-for="row in Object.keys(sidebarUserInfo)" :key="row" :id="row">
+            <span class="sidebar-user-info title">{{
+              sidebarUserInfo[row].title
+            }}</span>
+            <span class="sidebar-user-info value">{{
+              sidebarUserInfo[row].value
+            }}</span>
           </li>
         </ul>
         <hr id="sideBarWrapper" />
@@ -81,9 +83,9 @@ export default {
       title: app.title,
       userId: 0,
       sidebarUserInfo: {
-        team: '',
-        username: '',
-        balance: ''
+        username: {title: 'Имя пользователя', value: ''},
+        team: {title: 'Команда', value: ''},
+        balance: {title: 'Баланс', value: ''}
       },
       sideBar: {
         isActive: false,
@@ -101,15 +103,13 @@ export default {
     };
   },
   async created() {
-    // 'Что должно происходить здесь\
-
-    // 0.Проверка на авторизацию\
-    // 1.Получение access токена\
-    // 2.Извлечение из него id пользователя\
-    // 3.Получение информации о пользователе для отображения её в сайдбаре\
-    // 4.Если админ, то показать панель админа\
-    // 5.Отобразить имя, команду, баланс пользователя');
-    // TODO: Перенести логику в store
+    // 'Что должно происходить здесь
+    // 0.Проверка на авторизацию
+    // 1.Получение access токена
+    // 2.Извлечение из него id пользователя
+    // 3.Получение информации о пользователе для отображения её в сайдбаре
+    // 4.Если админ, то показать панель админа
+    // 5.Отобразить имя, команду, баланс пользователя'
     if (this.$store.state.auth.status.loggedIn) {
       console.log(links);
       const username = this.currentUser.username;
@@ -117,37 +117,39 @@ export default {
       await this.$store.dispatch('user/getUserDataByUsName', username);
       const userData = this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](
         username
-      )(
-        'Что должно происходить здесь\
-    0.Проверка на авторизацию\
-    1.Получение access токена\
-    2.Извлечение из него id пользователя\
-    3.Получение информации о пользователе для отображения её в сайдбаре\
-    4.Если админ, то показать панель админа\
-    5.Отобразить имя, команду, баланс пользователя'
       );
       console.log(userData);
-      // TODO: Сделать получение названия команды
-      const teamId = userData.team;
-      await this.$store.dispatch('team/getTeamData', teamId);
-      // TODO: сделать получение данных команды из $store
-      // await this.$store.dispatch('account/getAccountById', {
-      //   username: username,
-      //   accountId: userData.account
-      // });
-      // let accountData = this.$store.getters['account/GET_ACC_INFO_BY_UsName'](
-      //   username
-      // );
-      // const balance = accountData.balance;
-      // console.error(balance);
+      const idTeam = userData.team;
+      await this.$store.dispatch('team/getTeamData', {
+        username: username,
+        idTeam: idTeam
+      });
+      const dataTeam = this.$store.getters['team/GET_DATA_TEAM_BY_ID'](idTeam);
+      console.log(dataTeam);
+      await this.$store.dispatch('account/getAccountById', {
+        idAccount: dataTeam.account,
+        idTeam: idTeam
+      });
+      const dataAccountByTeam = this.$store.getters[
+        'account/GET_DATA_BY_ID_TEAM'
+      ](idTeam);
+      console.log(dataAccountByTeam);
+      // TODO: Сделать проверку на роль пользователя
+      this.sidebarUserInfo.username.value = username;
+      this.sidebarUserInfo.team.value = dataTeam.name;
+      this.sidebarUserInfo.balance.value = dataAccountByTeam.balance;
     } else {
       this.$router.push('/');
     }
   },
-  mounted() {
-    const username = this.currentUser.username;
-    this.sidebarUserInfo.username = username;
-  },
+  // mounted() {
+  //   console.error('MAINLAYOUT.vue: mounted');
+  //   const username = this.currentUser.username;
+  //   const nameTeam = this.$store.getters['team/GET_DATA_TEAM_BY_USERNAME'](
+  //     username
+  //   );
+  //   console.log(nameTeam);
+  // },
   computed: {
     currentUser() {
       return this.$store.state.auth.user;

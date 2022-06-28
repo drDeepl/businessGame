@@ -10,8 +10,8 @@ export const auth = {
   state: initialState,
   actions: {
     async login(context, user) {
-      console.log('Module.Auth.Login');
-      const resp = await AuthService.login(user).catch(err => err.response);
+      console.warn('Module.Auth.Login');
+      const resp = await AuthService.login(user)
       if (resp.status == 200) {
         context.commit('loginSuccess', user);
       } else {
