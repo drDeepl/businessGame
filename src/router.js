@@ -34,6 +34,11 @@ export const router = new Router({
           path: '/admin',
           name: 'admin',
           component: () => import('@/views/Admin.vue')
+        },
+        {
+          path: '/:pathMathc(.*)*',
+          name: 'NotFound',
+          component: () => import('@/views/NotFound.vue')
         }
       ]
     }

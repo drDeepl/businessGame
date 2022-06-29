@@ -1,10 +1,23 @@
 import UserService from '@/services/user.service';
 import {isExist} from '@/services/utils.service';
+import {
+  adminSidebarLinks,
+  playerSidebarLinks,
+  manufacturerSidebarLinks
+} from '@/_config';
+
 export const user = {
   namespaced: true,
   state: {
     userInfo: {
-      // 'username': userData,
+      // INFO: 'username': userData,
+    },
+    linksSidebarByRole: {
+      // INFO: role: [{title: String, url: String,}]
+      PLAYER: playerSidebarLinks,
+      MANUFACTURER: manufacturerSidebarLinks,
+      CUSTOMER: [],
+      SUPERUSER: adminSidebarLinks
     }
   },
   actions: {
@@ -13,6 +26,11 @@ export const user = {
       console.log(context, username + '\n______________');
       const userData = await UserService.getUserDataByUsername(username);
       context.commit('SET_USER_INFO', userData);
+    },
+    async getRolesUser(context) {
+      const roles = await UserService.getRoles();
+      console.log(context);
+      return roles;
     }
   },
   getters: {
@@ -24,6 +42,12 @@ export const user = {
       } else {
         return false;
       }
+    },
+
+    GET_SIDEBAR_LINKS_BY_ROLE: state => role => {
+      console.warn('MODULE.USER: GET_SIDEBAR_LINKS_BY_ROLE');
+      const sidebarLinks = state.linksSidebarByRole[role];
+      return sidebarLinks;
     }
   },
   mutations: {

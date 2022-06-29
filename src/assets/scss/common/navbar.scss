@@ -6,13 +6,18 @@
   position: fixed;
   width: 0;
   height: 100%;
-  overflow-y: hidden;
+  overflow-y: scroll;
+  overflow-x: hidden;
   background: $menuBackground;
   opacity: 0.9;
   transition: all 0.5s;
   display: flex;
   flex-direction: column;
 }
+
+// .aside-sidebar {
+//   overflow: scroll;
+// }
 
 #username,
 #balance,
@@ -53,10 +58,6 @@
 
 #wrapper.menuDisplayed #page-content-wrapper {
   padding-left: 250px;
-}
-
-.sidebar-container {
-  overflow: scroll;
 }
 
 /* Sidebar styling */
@@ -104,10 +105,6 @@
 
 .sidebar-nav li:hover {
   background: $menuHover;
-}
-
-.sidebar-nav {
-  overflow: scroll;
 }
 
 .nav-bar {

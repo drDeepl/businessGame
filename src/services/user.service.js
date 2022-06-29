@@ -13,22 +13,6 @@ class UserService {
       return false;
     }
   }
-
-  haveCash() {
-    console.log('USER.SERVICE.haveCash:');
-    for (let property in this.cashDataUser) {
-      if (this.cashDataUser[property] == null) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  getDataCash() {
-    console.log('USER.SERVICE.getDataCash: ');
-    return this.cashDataUser;
-  }
-
   async getUsersList() {
     const response = await userAPI.getUsers();
     if (response.status == 200) {
@@ -44,58 +28,45 @@ class UserService {
   }
 
   async getUserDataById(userId) {
-    if (this.haveCash()) {
-      console.log('USER.SERVICE: response to cash');
-      const userData = this.getDataCash();
-      return userData;
-    } else {
-      console.log('USER.SERVICE: response to backend');
-      const response = await userAPI.getUserById(userId);
-      const userData = new User(response.data);
-      this.setDataCash(userData);
-      return userData;
-    }
+    console.warn('USER.SERVICE: getUserDataById');
+    const response = await userAPI.getUserById(userId);
+    const userData = new User(response.data);
+    return userData;
   }
 
   async getUserDataByUsername(username) {
-    if (this.haveCash()) {
-      console.log('USER.SERVICE: response to cash');
-      const userData = this.getDataCash();
+    console.log('USER.SERVICE: response to backend');
+    const response = await userAPI.getUserByUsername(username);
+    if (response.status == 200) {
+      const userModel = new User();
+      const userData = createModelFromResponseData(userModel, response.data);
+      // this.setDataCash(userData);
       return userData;
     } else {
-      console.log('USER.SERVICE: response to backend');
-      const response = await userAPI.getUserByUsername(username);
-      if (response.status == 200) {
-        const userModel = new User();
-        const userData = createModelFromResponseData(userModel, response.data);
-        // this.setDataCash(userData);
-        return userData;
-      } else {
-        throw new Error(
-          'USER.SERVICE: getUserDataByUsername. Response Status: ' +
-            response.status
-        );
-      }
+      throw new Error(
+        'USER.SERVICE: getUserDataByUsername. Response Status: ' +
+          response.status
+      );
+    }
+  }
+
+  async getRoles() {
+    console.warn('USER.SERVICE: getRoles');
+    const response = await userAPI.getRoles();
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      throw new Error('TEST ERROR');
     }
   }
 
   async updateDataUser(user_id, dataJSON) {
-    console.log('UPDATE USER');
+    console.warn('USER.SERVICE: updateDataUser');
     console.log(user_id);
     console.log(dataJSON);
     const updatedData = await userAPI.updateUser(user_id, dataJSON);
     this.setDataCash(updatedData);
     return updatedData;
-  }
-
-  setDataCash(userData) {
-    console.log('USER.SERVICE: setDataCash');
-    console.log(userInfo);
-    for (let property in this.cashDataUser) {
-      this.cashDataUser[property] = userData[property];
-    }
-    console.log('USER.SERVICE: setDataCash complete');
-    console.log(this.cashDataUser);
   }
 }
 

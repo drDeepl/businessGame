@@ -1,26 +1,32 @@
-export const links = [
-  {title: 'Склад', url: '/storage', icon: 'warehouse'},
-  {title: 'Магазин', url: '/shop', icon: 'shopping-cart'},
-  {title: 'Обо мне', url: '/profile', icon: 'address-card'}
-];
-
-export const adminSidebar = [
+// INFO: sidebar links
+export const adminSidebarLinks = [
   {
-    title: 'Панель администратора',
-    url: '/admin',
-    icon: 'chart-line'
+    title: 'Пользователи',
+    url: '/users'
   },
   {
-    title: 'Информация о пользователях\n УДАЛИТЬ',
-    url: '/users',
-    icon: 'user'
+    title: 'Счета',
+    url: '/accounts'
+  },
+  {
+    title: 'Транзакции',
+    url: '/transactions'
   }
 ];
 
-export const adminLinks = [
-  {title: 'Управление пользователями', url: '/users', icon: 'users'},
-  {title: 'Управление командами', url: '/users', icon: 'users'},
-  {title: 'Управление счетами', url: '/users', icon: 'users'}
+export const playerSidebarLinks = [
+  {title: 'Склад', url: '/storage'},
+  {title: 'Предложения', url: '/shop'},
+  {title: 'Обо мне', url: '/profile'}
+];
+
+export const manufacturerSidebarLinks = [
+  {title: 'Добавить продукт', url: '/storage'},
+  {title: 'Продать продукт', url: '/shop'}
+];
+
+export const customerSidebarLinks = [
+  {title: 'Купить продуктовый набор', url: '/storage'}
 ];
 
 export const rowUpdateUser = {
@@ -43,25 +49,6 @@ export const selectUpdateUser = [
 
 export const app = {
   title: 'Деловая игра'
-};
-
-export const userInfo = {
-  account: null,
-  date_joined: null,
-  email: null,
-  first_name: null,
-  id: null,
-  is_superuser: null,
-  last_name: null,
-  role: null,
-  team: null,
-  username: null
-};
-
-export const teamInfo = {
-  id: null,
-  name: null,
-  account: null
 };
 
 export const usersTableHeader = {

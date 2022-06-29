@@ -1,10 +1,10 @@
 <template>
-  <div :class="sideBar.className" id="wrapper">
-    <aside id="sidebar-wrapper">
+  <div :class="sidebar.className" id="wrapper">
+    <aside id="sidebar-wrapper" class="aside-sidebar">
       <div class="container">
         <p id="sidebar-tittle" class="user-info">{{ title }}</p>
         <ul class="user-info">
-          // TODO: Оформить красивый вывод информации
+          <!-- TODO: Оформить красивый вывод информации -->
           <li v-for="row in Object.keys(sidebarUserInfo)" :key="row" :id="row">
             <span class="sidebar-user-info title">{{
               sidebarUserInfo[row].title
@@ -18,13 +18,13 @@
       </div>
       <ul class="sidebar-nav">
         <li
-          v-for="link in sideBar.links"
+          v-for="link in sidebar.links"
           :key="link.url"
           @click.prevent="onClickTab"
         >
           <span @click.prevent="setActiveTab(link.title)">
             <router-link :to="link.url">
-              <font-awesome-icon :icon="link.icon" />
+              <!-- <font-awesome-icon :icon="link.icon" /> -->
               {{ link.title }}
             </router-link>
           </span>
@@ -37,7 +37,7 @@
       </ul>
     </aside>
 
-    <!-- Page Content -->
+    <!-- INFO: Page Content -->
     <div id="page-content-wrapper">
       <nav class="nav-bar">
         <a href="#" id="menu-toggle" @click.prevent="onClickMenu">
@@ -64,7 +64,7 @@
           <div class="row">
             <div class="col-lg-12">
               <div class="content-wrapper">
-                <router-view />
+                <router-view @click.prevent="onClickLayout()" />
               </div>
             </div>
           </div>
@@ -87,7 +87,7 @@ export default {
         team: {title: 'Команда', value: ''},
         balance: {title: 'Баланс', value: ''}
       },
-      sideBar: {
+      sidebar: {
         isActive: false,
         className: 'sidebar-container',
         template: 'Деловая игра',
@@ -103,6 +103,8 @@ export default {
     };
   },
   async created() {
+    // [29.06.2022]: TODO: Сделать страницы для админа
+
     // 'Что должно происходить здесь
     // 0.Проверка на авторизацию
     // 1.Получение access токена
@@ -134,7 +136,18 @@ export default {
         'account/GET_DATA_BY_ID_TEAM'
       ](idTeam);
       console.log(dataAccountByTeam);
-      // TODO: Сделать проверку на роль пользователя
+      // NOTE: После разработки удалить
+      let roleUser;
+      if (userData.is_superuser) {
+        roleUser = 'SUPERUSER';
+      } else {
+        roleUser = userData.role;
+      }
+      // NOTE: =======================
+      const sidebarLinks = this.$store.getters[
+        'user/GET_SIDEBAR_LINKS_BY_ROLE'
+      ](roleUser);
+      this.sidebar.links = sidebarLinks;
       this.sidebarUserInfo.username.value = username;
       this.sidebarUserInfo.team.value = dataTeam.name;
       this.sidebarUserInfo.balance.value = dataAccountByTeam.balance;
@@ -142,14 +155,7 @@ export default {
       this.$router.push('/');
     }
   },
-  // mounted() {
-  //   console.error('MAINLAYOUT.vue: mounted');
-  //   const username = this.currentUser.username;
-  //   const nameTeam = this.$store.getters['team/GET_DATA_TEAM_BY_USERNAME'](
-  //     username
-  //   );
-  //   console.log(nameTeam);
-  // },
+
   computed: {
     currentUser() {
       return this.$store.state.auth.user;
@@ -174,17 +180,23 @@ export default {
   },
   methods: {
     async onClickMenu() {
-      this.sideBar.isActive = !this.sideBar.isActive;
-      if (this.sideBar.isActive) {
-        console.log('Open Menu');
-        this.sideBar.className = 'menuDisplayed';
+      this.sidebar.isActive = !this.sidebar.isActive;
+      if (this.sidebar.isActive) {
+        console.warn('MAINLAYOUT: onClickMenu');
+        this.sidebar.className = 'menuDisplayed';
       } else {
-        this.sideBar.className = '';
+        this.sidebar.className = '';
+      }
+    },
+    // TODO: Сделать закрытие меню по нажатию на основной слой
+    onClickLayout() {
+      if (this.sidebar.isActive) {
+        this.sidebar.className = '';
       }
     },
     onClickTab() {
-      this.sideBar.className = 'sidebar-container';
-      this.sideBar.isActive = !this.sideBar.isActive;
+      this.sidebar.className = 'sidebar-container';
+      this.sidebar.isActive = !this.sidebar.isActive;
     },
     setActiveTab(title) {
       return (this.tab.activeTab = title);

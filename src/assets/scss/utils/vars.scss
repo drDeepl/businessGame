@@ -1,11 +1,12 @@
-// main-colors
+// INFO: main-colors
 $color-purple: #5c27fe;
 $color-white: #fff;
 $color-black: #111;
-// Font
+$color-yellow: #ffc03d;
+// INFO: Font
 $mainFont: 'Montserrat', Helvetica, Arial, sans-serif;
 
-// Size
+// INFO:Size
 
 $mainFontColor: #101010;
 $mainFontSize: 18px;
@@ -20,38 +21,39 @@ $smTableWidth: 640px;
 $phoneWidth: 480px;
 $smPhoneWidth: 320px;
 
-// Main color
-$bodyBackground: #cfd8e3;
-$menuBackground: #1a202e;
+// INFO: Main color
+$bodyBackground: #eff1f3;
+$menuBackground: #1a202e; //
 $menuHover: #121620;
 $navColor: #ffffff;
 $mainLayoutColor: #ffffff;
 
-// sidebar Color
-$balanceColor: #06c17f;
+// INFO: sidebar Color
+$balanceColor: #00d1a4;
+$scrollbar-color: #6a8fb3;
 
-// Sidebar margin
+// INFO: Sidebar margin
 $sidebarNav: 1rem;
 $userInfoTop: 5.8rem;
 $userInfoBalance: 2rem;
 
-// Sidebar Tittle
+// INFO: Sidebar Tittle
 $tittlePadding: 1.5rem 0 0 1rem; /* Сверху | Справа | Снизу | Слева */
 
-// letter
+// INFO: letter
 $letter-spacing: 0.1rem;
 
-// wrappers
+// INFO: wrappers
 $WrapperMargin: 2em 0.5em;
 
-// padding
+// INFO: padding
 $cardPadding: 2rem;
 
-// TABS
+// INFO: TABS
 $tab-bg: #fff;
 $tab-hover-bg: $color-purple;
 $tab-color: #000;
 $tab-hover-color: #fff;
 
-// shadow
+// INFO: shadow
 $shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
