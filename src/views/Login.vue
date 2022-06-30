@@ -10,7 +10,7 @@
           :error-messages="errorMessages"
           :succes-messages="succesMessages"
           successr-messages
-          color="#6b4ee6"
+          :color="styles.form.color"
           required
         ></v-text-field>
       </v-row>
@@ -22,7 +22,7 @@
           :succes-messages="succesMessages"
           required
           :rules="rules"
-          color="#6b4ee6"
+          :color="styles.form.color"
           type="password"
         ></v-text-field>
       </v-row>
@@ -30,7 +30,7 @@
         class="login-btn"
         elevation="4"
         outlined
-        color="#6b4ee6"
+        :color="styles.form.color"
         type="submit"
         >Войти</v-btn
       >
@@ -42,6 +42,7 @@
 import {validationMixin} from 'vuelidate';
 import {required} from 'vuelidate/lib/validators';
 import LoginForm from '@/models/model.login.form';
+import {card} from '@/_config';
 export default {
   mixins: [validationMixin],
   data() {
@@ -53,6 +54,11 @@ export default {
       form: {
         username: '',
         password: ''
+      },
+      styles: {
+        form: {
+          color: card.color
+        }
       }
     };
   },
