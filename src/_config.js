@@ -1,9 +1,11 @@
 // INFO: sidebar links
-export const adminSidebarLinks = {
-  title: 'Панель администратора',
-  url: '/admin',
-  titleCards: ['создать пользователя', 'список пользователей']
-};
+export const adminSidebarLinks = [
+  {
+    title: 'Панель администратора',
+    url: '/admin',
+    titleCards: ['создать пользователя', 'список пользователей']
+  }
+];
 // INFO: Styles for component
 export const card = {
   color: '#6c63ff'

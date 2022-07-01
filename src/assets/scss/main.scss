@@ -9,6 +9,7 @@
 @import 'common/adminTab';
 @import 'common/modalWindow';
 @import 'common/login';
+@import 'common/card';
 body,
 #app {
   font-family: Montserrat;
@@ -29,6 +30,6 @@ body,
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: $color-yellow;
+  background-color: $color-purple;
   border-radius: 6px;
 }

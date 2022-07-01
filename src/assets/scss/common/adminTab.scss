@@ -1,3 +1,22 @@
-.v-sheet {
-  color: 'red';
+.admin-wrapper {
+  display: flex;
+}
+.admin-layout {
+  border: 1px solid $color-purple;
+  border-radius: 5px;
+  margin: 1.2rem;
+  max-width: 18rem;
+  box-shadow: 14px 4px 15px rgba(108, 99, 255, 0.55);
+}
+
+.admin-layout:hover,
+.active-tab {
+  color: $color-white;
+  background-color: $color-purple;
+}
+
+.admin-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  color: $color-purple;
 }

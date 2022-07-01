@@ -64,7 +64,7 @@
           <div class="row">
             <div class="col-lg-12">
               <div class="content-wrapper">
-                <router-view @click.prevent="onClickLayout()" />
+                <router-view />
               </div>
             </div>
           </div>
@@ -189,12 +189,7 @@ export default {
         this.sidebar.className = '';
       }
     },
-    // TODO: Сделать закрытие меню по нажатию на основной слой
-    onClickLayout() {
-      if (this.sidebar.isActive) {
-        this.sidebar.className = '';
-      }
-    },
+
     onClickTab() {
       this.sidebar.className = 'sidebar-container';
       this.sidebar.isActive = !this.sidebar.isActive;
