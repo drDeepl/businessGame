@@ -1,4 +1,4 @@
-.admin-wrapper {
+.tab-wrapper {
   display: flex;
 }
 .admin-layout {
@@ -17,6 +17,10 @@
 
 .admin-form {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   color: $color-purple;
+}
+
+.admin-btn-form {
+  grid-row-start: 5;
 }

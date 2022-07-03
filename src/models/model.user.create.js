@@ -1,13 +1,13 @@
 export default class ModelUserCreate {
   constructor() {
-    this.props = [
-      'username',
-      'first_name',
-      'last_name',
-      'email',
-      'role',
-      'password',
-      'team_id'
-    ];
+    this.props = {
+      'Имя пользователя': 'username',
+      Имя: 'first_name',
+      Фамилия: 'last_name',
+      'Электронная почта': 'email',
+      'Роль пользователя': 'role',
+      Пароль: 'password',
+      'Идентификатор команды': 'team_id'
+    };
   }
 }

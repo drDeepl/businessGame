@@ -12,33 +12,58 @@
       <v-window v-model="tab">
         <v-window-item v-if="models.user != null" :value="1">
           <form class="admin-form">
-            <v-text-field
-              class="ma-3 admin-field"
-              color="indigo"
-              v-for="textField in models.user.props"
-              :key="textField"
-              v-model="models.user[textField]"
-              :counter="10"
-              :label="textField"
-              required
-            ></v-text-field>
-            <v-btn color="indigo" @click.prevent="onClickApplyUpdate()"
-              >Создать пользователя</v-btn
+            <div
+              v-for="textField in Object.keys(models.user.props)"
+              :key="models.user.props[textField]"
+            >
+              <v-text-field
+                v-if="models.user.props[textField] != 'role'"
+                class="ma-3 admin-field"
+                color="indigo"
+                v-model="models.user[textField]"
+                :counter="10"
+                :label="textField"
+                required
+              ></v-text-field>
+              <v-select
+                v-if="models.user.props[textField] == 'role'"
+                v-model="models.user[textField]"
+                :items="models.usersRole"
+                :label="textField"
+                required
+              >
+              </v-select>
+            </div>
+            <v-btn
+              class="admin-btn-form"
+              color="green light"
+              @click.prevent="onClickApplyUpdate()"
+            >
+              <span class="admin-btn-form-text text-white"
+                >Создать пользователя</span
+              ></v-btn
             >
           </form>
         </v-window-item>
         <v-window-item :value="2"> Step 2</v-window-item>
       </v-window>
-      <v-btn @click="next()">next</v-btn>
     </div>
   </div>
 </template>
 
 <script>
 // import Form from '@/UI/Form'
+import UserService from '@/services/user.service';
+import TeamService from '@/services/team.service';
 // [01.07.2022] TODO: Сделать отправку данных формы после создания пользователя
+// [03.07.2022] TODO:  Сделать вывод существующих команд
 import ModelUserCreate from '@/models/model.user.create';
 export default {
+  async created() {
+    this.models.usersRole = await UserService.getRoles();
+    this.models.listTeams = await TeamService.getTeams();
+    console.log(this.models.listTeams);
+  },
   data() {
     return {
       tab: 0,
@@ -46,7 +71,9 @@ export default {
         'SUPERUSER'
       )[0],
       models: {
-        user: null
+        user: null,
+        usersRole: null,
+        listTeams: null
       }
     };
   },
