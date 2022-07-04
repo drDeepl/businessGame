@@ -18,6 +18,9 @@ export const user = {
       MANUFACTURER: manufacturerSidebarLinks,
       CUSTOMER: [],
       SUPERUSER: adminSidebarLinks
+    },
+    arrays: {
+      users: null
     }
   },
   actions: {
@@ -31,6 +34,11 @@ export const user = {
       const roles = await UserService.getRoles();
       console.log(context);
       return roles;
+    },
+    async getUsers(context) {
+      const users = await UserService.getUsersList();
+      context.commit('SET_USERS_LIST', users);
+      return users;
     }
   },
   getters: {
@@ -48,12 +56,22 @@ export const user = {
       console.warn('MODULE.USER: GET_SIDEBAR_LINKS_BY_ROLE');
       const sidebarLinks = state.linksSidebarByRole[role];
       return sidebarLinks;
+    },
+    GET_LIST_USERS: state => {
+      console.warn('MODULE.USERS: GET_LIST_USERS');
+      if (state.arrays.users == null) {
+        return false;
+      }
     }
   },
   mutations: {
     SET_USER_INFO: function(state, userData) {
       console.warn('MODULE.USER: SET_USER_INFO');
       state.userInfo[userData.username] = userData;
+    },
+    SET_USERS_LIST: function(state, users) {
+      console.warn('MODULE.USER: SET_USERS_LIST');
+      state.arrays.users = users;
     }
   }
 };

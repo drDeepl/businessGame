@@ -3,7 +3,12 @@ export const adminSidebarLinks = [
   {
     title: 'Панель администратора',
     url: '/admin',
-    titleCards: ['создать пользователя', 'список пользователей']
+    titleCards: [
+      {id: 1, value: 'создать пользователя'},
+      {id: 2, value: 'создать команду'},
+      {id: 3, value: 'создать счет команды'},
+      {id: 4, value: 'список пользователей'}
+    ]
   }
 ];
 // INFO: Styles for component

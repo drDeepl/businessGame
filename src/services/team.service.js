@@ -21,6 +21,12 @@ class teamService {
     const teams = await teamAPI.getTeams();
     return teams.data;
   }
+
+  async getIdTeams() {
+    console.warn('TEAM.SERVICE: getIdTeams');
+    const arrayTeams = await this.getTeams();
+    console.log(arrayTeams);
+  }
 }
 
 export default new teamService();

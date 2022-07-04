@@ -1,5 +1,6 @@
 .tab-wrapper {
   display: flex;
+  justify-content: row;
 }
 .admin-layout {
   border: 1px solid $color-purple;
@@ -9,7 +10,6 @@
   box-shadow: 14px 4px 15px rgba(108, 99, 255, 0.55);
 }
 
-.admin-layout:hover,
 .active-tab {
   color: $color-white;
   background-color: $color-purple;
@@ -24,3 +24,25 @@
 .admin-btn-form {
   grid-row-start: 5;
 }
+
+.admin-card-wrapper {
+  display: flex;
+}
+
+.admin-row-user-card {
+  display: flex !important;
+  justify-content: space-around !important;
+  border: 1px solid rgba(108, 99, 255, 0.55) !important;
+  box-shadow: none !important;
+  align-items: center !important;
+}
+.admin-header-users {
+  border: none !important;
+}
+// .admin-row-user-btn {
+//   border: 1px solid #31c48d !important;
+//   border-radius: 19px !important;
+//   *:hover {
+//     background-color: #31c48d !important;
+//   }
+// }

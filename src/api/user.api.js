@@ -3,7 +3,7 @@ import instance from '@/api/main';
 class userAPI {
   subdomain = 'users/';
   getUsers() {
-    return instance.get(this.subdomain);
+    return instance.get('users');
   }
 
   getUserById(userId) {

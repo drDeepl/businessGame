@@ -22,8 +22,6 @@
 
 <script>
 export default {
-  data() {
-    model:
-  }
+  data() {}
 };
 </script>
