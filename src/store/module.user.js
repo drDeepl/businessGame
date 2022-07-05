@@ -20,7 +20,9 @@ export const user = {
       SUPERUSER: adminSidebarLinks
     },
     arrays: {
-      users: null
+      // INFO: [JSON User]
+      users: null,
+      usersById: {} // INFO: idUsers: dataUsers
     }
   },
   actions: {
@@ -38,7 +40,12 @@ export const user = {
     async getUsers(context) {
       const users = await UserService.getUsersList();
       context.commit('SET_USERS_LIST', users);
+      
       return users;
+    },
+    async createUser(context, modelCreateUser) {
+      const updatedUser = await UserService.createUser(modelCreateUser);
+      context.commit('SET_UPDATED_USER', updatedUser);
     }
   },
   getters: {
@@ -72,6 +79,9 @@ export const user = {
     SET_USERS_LIST: function(state, users) {
       console.warn('MODULE.USER: SET_USERS_LIST');
       state.arrays.users = users;
+    },
+    SET_UPDATED_USER: function(state, updatedUser) {
+      state.arrays.users.push(updatedUser);
     }
   }
 };

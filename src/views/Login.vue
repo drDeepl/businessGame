@@ -87,6 +87,7 @@ export default {
           console.log(this.$store.state.auth.status);
         } catch (e) {
           console.log('Login.vue: Error');
+          console.error(e);
           this.errorMessages.push('Неправильный логин или пароль!');
         }
       }

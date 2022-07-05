@@ -17,32 +17,55 @@
 
 .admin-form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   color: $color-purple;
 }
 
 .admin-btn-form {
-  grid-row-start: 5;
+  margin-top: 1rem !important;
+  //   grid-row-start: 5;
 }
 
 .admin-card-wrapper {
   display: flex;
 }
 
+.admin-list-users-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
 .admin-row-user-card {
-  display: flex !important;
-  justify-content: space-around !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   border: 1px solid rgba(108, 99, 255, 0.55) !important;
   box-shadow: none !important;
   align-items: center !important;
 }
-.admin-header-users {
+
+.admin-users-text {
+  text-align: center;
+}
+
+.list-users-header {
   border: none !important;
 }
-// .admin-row-user-btn {
-//   border: 1px solid #31c48d !important;
-//   border-radius: 19px !important;
-//   *:hover {
-//     background-color: #31c48d !important;
-//   }
+
+.admin-form-edit-user {
+  overflow-y: scroll !important;
+  background-color: $color-white;
+}
+
+.admin-list-users-wrapper {
+  overflow-y: scroll !important;
+}
+.admin-edit-user {
+  background-color: $color-white !important;
+  padding: 1rem !important;
+}
+
+// .edit-user-text {
+//   background-color: $color-white !important;
+//   color: black !important;
+//   z-index: 0 !important;
 // }

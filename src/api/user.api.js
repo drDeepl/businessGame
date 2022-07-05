@@ -2,6 +2,9 @@ import instance from '@/api/main';
 
 class userAPI {
   subdomain = 'users/';
+  createUser(user) {
+    return instance.post('users', user);
+  }
   getUsers() {
     return instance.get('users');
   }
