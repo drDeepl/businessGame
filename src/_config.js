@@ -4,9 +4,9 @@ export const adminSidebarLinks = [
     title: 'Панель администратора',
     url: '/admin',
     titleCards: [
-      {id: 1, value: 'создать пользователя'},
-      {id: 2, value: 'создать команду'},
-      {id: 3, value: 'создать счет команды'},
+      {id: 1, value: 'Создание пользователя', form: 'formCreateUser'},
+      {id: 2, value: 'создать команду', form: 'createTeam'},
+      {id: 3, value: 'создать счет команды', form: 'createAccountTeam'},
       {id: 4, value: 'список пользователей'}
     ]
   }

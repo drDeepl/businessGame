@@ -7,7 +7,7 @@ export default class ModelUserCreate {
       email: 'Электронная почта',
       role: 'Роль пользователя',
       password: 'Пароль',
-      team_id: 'Идентификатор команды'
+      team_id: 'Команда'
     };
   }
 }

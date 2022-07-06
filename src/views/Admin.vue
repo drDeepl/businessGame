@@ -6,7 +6,9 @@
           class="admin-layout"
           v-for="objectTab in titles.titleCards"
           :key="objectTab.id"
-          @click.prevent="onClickAdminTab(objectTab.id)"
+          @click.prevent="
+            onClickAdminTab(objectTab.value, objectTab.form, objectTab.id)
+          "
         >
           <v-card-title class="text-caption">{{
             objectTab.value
@@ -17,24 +19,32 @@
 
     <div>
       <v-window class="admin-content" v-model="currentTab">
-        <!-- // INFO: Вкладка создать пользователя -->
+        <!-- NOTE: Вкладка создать пользователя -->
         <v-window-item v-if="models.modelCreateUser != null" :value="1">
-          <form class="admin-form">
+          <!-- // INFO: бэкап формы <form ref="createUser" class="admin-form">
             <div
               v-for="textField in Object.keys(models.modelCreateUser.props)"
               :key="textField"
             >
               <v-text-field
                 v-if="(textField != 'role') & (textField != 'team_id')"
-                class="ma-3 admin-field"
+                class="pr-2 pl-2 ma-1 admin-field"
                 v-model="models.modelCreateUser[textField]"
                 :label="models.modelCreateUser.props[textField]"
+                :rules="forms.rules.field"
                 required
               ></v-text-field>
               <v-select
+                v-else-if="textField == 'team_id'"
+                v-model="models.modelCreateUser[textField]"
+                :items="arrays.team"
+                :label="models.modelCreateUser.props[textField]"
+                required
+              ></v-select>
+              <v-select
                 v-else
                 v-model="models.modelCreateUser[textField]"
-                :items="arrays[textField]"
+                :items="arrays.role"
                 :label="models.modelCreateUser.props[textField]"
                 required
               >
@@ -58,12 +68,37 @@
             >
               Создать рандомного пользователя
             </v-btn>
-          </form>
+          </form> -->
+          <v-dialog v-model="forms.formCreateUser.active" max-width="45%">
+            <Form
+              :title="titleCurrentTab"
+              :model="models.modelCreateUser"
+              :select="{role: arrays.role, team_id: arrays.team}"
+              :parentFunction="onClickCreateUser"
+              :cancelForm="onClickCancelForm"
+            >
+              <v-alert
+                border="right"
+                colored-border
+                type="error"
+                elevation="2"
+                v-if="forms.formCreateUser.errors.length > 0"
+                class="form-error-container"
+                >Неправильно введены поля:
+                <small
+                  class="form-error-text"
+                  v-for="message in forms.formCreateUser.errors"
+                  :key="message"
+                  >{{ message }}</small
+                >
+              </v-alert>
+            </Form>
+          </v-dialog>
         </v-window-item>
-        <!-- INFO: Вкладка "список пользователей" -->
+        <!-- NOTE: Вкладка "список пользователей" -->
         <v-window-item :value="4">
           <div class="admin-list-users-wrapper">
-            <v-card class="ma-2 pa-3 admin-row-user-card list-users-header">
+            <v-card class="ma-1 pa-1 admin-row-user-card list-users-header">
               <span
                 class="admin-users-text"
                 v-for="title in Object.keys(listUsersHeaders)"
@@ -94,6 +129,7 @@
               >
             </v-card>
             <v-dialog v-model="forms.formEditUser.active" max-width="45%">
+              <!-- INFO: Диалогове окно редактирования-->
               <v-form ref="form" v-model="valid" class="admin-edit-user">
                 <div v-for="field in forms.formEditUser.fields" :key="field">
                   <v-text-field
@@ -139,14 +175,17 @@
 </template>
 
 <script>
+import {validationMixin} from 'vuelidate';
+import {required, minLength, email} from 'vuelidate/lib/validators';
 import UserService from '@/services/user.service';
 import {createRandomUser} from '@/helpers/helper.fake';
-// [05.07.2022] TODO: Решить проблему свойства team_id во вкладке создания пользователя
-// [05.07.2022] TODO:  Сделать вывод существующих команд
-// [05.07.2022] TODO: Сделать отправку запроса на изменение пользователя
+// [06.07.2022] TODO: Решить проблему свойства team_id во вкладке создания пользователя
+// [06.07.2022] TODO:  Сделать вывод существующих команд
+// [06.07.2022] TODO: Сделать отправку запроса на изменение пользователя
 import ModelUserCreate from '@/models/model.user.create';
 import UpdateUser from '@/models/model.user.update';
 import User from '@/models/model.user';
+import Form from '@/UI/Form.vue';
 export default {
   async created() {
     this.arrays.role = await UserService.getRoles();
@@ -162,6 +201,7 @@ export default {
   },
   data() {
     return {
+      titleCurrentTab: '',
       currentTab: 0,
       titles: this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](
         'SUPERUSER'
@@ -170,7 +210,8 @@ export default {
       models: {
         user: new User(),
         modelCreateUser: new ModelUserCreate(),
-        modelUpdateUser: new UpdateUser()
+        modelUpdateUser: new UpdateUser(),
+        validateModel: null
       },
       arrays: {
         role: null,
@@ -178,9 +219,15 @@ export default {
         users: null
       },
       forms: {
+        formActive: '', // INFO: titleTab из onClickAdminTab
+        formCreateUser: {
+          active: false,
+          errors: []
+        },
         formEditUser: {
           active: false,
-          fields: null
+          fields: null,
+          errors: []
         }
       },
       // INFO: listUsersHeader отображает данные,
@@ -188,23 +235,65 @@ export default {
       listUsersHeaders: {id: true, username: true, role: true, team: true}
     };
   },
+  mixins: [validationMixin],
+  validations: {
+    models: {
+      validateModel: {
+        username: {required, minLength: minLength(1)},
+        first_name: {required, minLength: minLength(1)},
+        last_name: {required, minLength: minLength(1)},
+        email: {required, email},
+        role: {required},
+        password: {required, minLength: minLength(6)},
+        team_id: {required}
+      }
+    }
+  },
   methods: {
     // [04.07.2022] TODO: Добавить обновление БД с пользователями
-    onClickAdminTab(id) {
+    onClickAdminTab(titleTab, formTitle, id) {
       console.warn('ADMIN.VUE: onClickAdminTab');
-      this.currentTab = id;
-      console.log(id);
+      this.titleCurrentTab = titleTab;
+      this.forms.formActive = titleTab;
+      if (
+        this.forms[formTitle] == null ||
+        this.forms[formTitle] == 'undefined'
+      ) {
+        this.currentTab = id;
+      } else {
+        this.forms[formTitle].active = true;
+        console.log(id);
+      }
     },
-    async onClickCreateUser() {
-      console.warn('ADMIN.VUE: onClickApplyUpdate');
-      const team_id = this.$store.getters['team/GET_DATA_TEAM_BY_TeamName'](
-        this.models.modelCreateUser.team_id
-      ).id;
-      this.models.modelCreateUser.team_id = team_id;
-      await this.$store.dispatch(
-        'user/createUser',
-        this.models.modelCreateUser
-      );
+    onClickCancelForm() {
+      // [06.07.2022] TODO: Сделать закрытие формы
+    },
+    async onClickCreateUser(modelCreateUser) {
+      this.forms.formCreateUser.errors = [];
+      console.warn('ADMIN.VUE: onClickCreateUser');
+      this.models.validateModel = modelCreateUser;
+      if (this.$v.models.validateModel.$invalid) {
+        console.error('FORM INVALID');
+        console.log(this.$v.models.validateModel);
+        for (let i in this.models.modelCreateUser.props) {
+          let validateProp = this.$v.models.validateModel[i];
+          if (validateProp.$invalid) {
+            const errorField = this.models.modelCreateUser.props[
+              i
+            ].toLowerCase();
+            this.forms.formCreateUser.errors.push(errorField);
+          }
+        }
+      } else {
+        const team_id = this.$store.getters['team/GET_DATA_TEAM_BY_TeamName'](
+          modelCreateUser.team_id
+        ).id;
+        const newUser = modelCreateUser;
+        newUser.team_id = team_id;
+        console.error('NEW USER\n', newUser);
+
+        await this.$store.dispatch('user/createUser', newUser);
+      }
     },
     onClickEditUser(user) {
       console.warn('Admin.vue: onClickEditUser');
@@ -227,6 +316,9 @@ export default {
       const newModel = createRandomUser(this.models.modelCreateUser);
       this.models.modelCreateUser = newModel;
     }
+  },
+  components: {
+    Form
   }
 };
 </script>

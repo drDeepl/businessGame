@@ -17,12 +17,14 @@
 
 .admin-form {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 25rem;
   color: $color-purple;
+  justify-content: center;
 }
 
 .admin-btn-form {
-  margin-top: 1rem !important;
+  display: flex;
+
   //   grid-row-start: 5;
 }
 
@@ -63,7 +65,25 @@
   background-color: $color-white !important;
   padding: 1rem !important;
 }
+.form-error-container {
+  color: $color-grey !important;
+  :first-child {
+    padding-top: 0.5rem;
+  }
+  .form-error-text {
+    display: flex;
+    margin-bottom: 0.5rem !important;
+    color: $color-red;
+    border-radius: 5px;
+    padding-left: 1rem;
+    padding-bottom: 0.1rem !important;
+    line-height: 1rem;
+  }
+}
 
+.admin-form {
+  background-color: $color-white !important;
+}
 // .edit-user-text {
 //   background-color: $color-white !important;
 //   color: black !important;
