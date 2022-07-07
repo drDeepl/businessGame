@@ -1,6 +1,5 @@
 import userAPI from '@/api/user.api';
 import jwt_decode from 'jwt-decode';
-import {modelToJSON} from '@/helpers/api.helper';
 import {userInfo} from '@/_config';
 import User from '@/models/model.user';
 import {createModelFromResponseData} from '@/helpers/helper.model';
@@ -67,9 +66,8 @@ class UserService {
     const updatedData = await userAPI.updateUser(user_id, dataJSON);
     return updatedData;
   }
-  async createUser(modelCreateUser) {
+  async createUser(user) {
     console.warn('USER.SERVICE: createUser');
-    const user = modelToJSON(modelCreateUser);
     const response = await userAPI.createUser(user);
     return response.data;
   }

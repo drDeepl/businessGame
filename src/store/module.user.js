@@ -40,12 +40,14 @@ export const user = {
     async getUsers(context) {
       const users = await UserService.getUsersList();
       context.commit('SET_USERS_LIST', users);
-      
+
       return users;
     },
-    async createUser(context, modelCreateUser) {
-      const updatedUser = await UserService.createUser(modelCreateUser);
-      context.commit('SET_UPDATED_USER', updatedUser);
+    async createUser(context, newUser) {
+      console.warn('MODULE.USER: createUser');
+      const user = await UserService.createUser(newUser);
+      console.error(user, context);
+      context.commit('SET_USER_INFO', user);
     }
   },
   getters: {

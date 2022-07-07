@@ -23,6 +23,7 @@
     "popper.js": "^1.16.1",
     "sass": "^1.49.9",
     "sass-loader": "^10.2.1",
+    "validator": "^13.7.0",
     "vee-validate": "^2.2.15",
     "vue": "^2.6.11",
     "vue-jwt-decode": "^0.1.0",

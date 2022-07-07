@@ -1,6 +1,6 @@
 export default class UpdateUser {
   constructor() {
-    this.titleProps = {
+    this.props = {
       first_name: 'Имя',
       last_name: 'Фамилия',
       role: 'Роль',
