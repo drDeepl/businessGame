@@ -1,6 +1,6 @@
-.tab-wrapper {
-  display: flex;
-  justify-content: row;
+.admin-card-wrapper {
+  display: flex !important;
+  flex-direction: column;
 }
 .admin-layout {
   border: 1px solid $color-purple;
@@ -29,7 +29,8 @@
 }
 
 .admin-card-wrapper {
-  display: flex;
+  display: flex !important;
+  justify-content: row !important;
 }
 
 .admin-list-users-wrapper {

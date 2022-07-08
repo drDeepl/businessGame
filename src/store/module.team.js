@@ -34,6 +34,7 @@ export const team = {
       console.warn('MODULE.TEAM: getTeams');
       const listTeams = await TeamService.getTeams();
       context.commit('SET_TEAM_DATA_BY_NAME', listTeams);
+      return listTeams;
     }
   },
   getters: {
@@ -46,9 +47,8 @@ export const team = {
     },
     GET_LIST_NAMES_TEAMS: state => {
       console.warn('MODULE.TEAM: GET_LIST_NAMES_TEAMS');
-      // INFO: Функция возвращает список ключей объекта state.dataTeam.dataByName
-      const listNames = state.dataTeam.dataByName;
-      return Object.keys(listNames);
+      // INFO: Функция возвращает  объект с команлами
+      return state.dataTeam.dataByName;
     },
     GET_DATA_TEAM_BY_TeamName: state => teamName => {
       return state.dataTeam.dataByName[teamName];
@@ -64,7 +64,7 @@ export const team = {
     },
     SET_TEAM_DATA_BY_NAME: function(state, listDataTeams) {
       console.warn('MODULE.TEAM: SET_TEAM_DATA_BY_NAME');
-      console.log(state);
+      console.log(listDataTeams);
       for (let i in listDataTeams) {
         let teamName = listDataTeams[i].name;
         state.dataTeam.dataByName[teamName] = listDataTeams[i];

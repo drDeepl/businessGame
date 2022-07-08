@@ -1,10 +1,10 @@
-export default class UpdateUser {
+export default class ModelUpdateUser {
   constructor() {
     this.props = {
       first_name: 'Имя',
       last_name: 'Фамилия',
       role: 'Роль',
-      team: 'Команда'
+      team_id: 'Команда'
     };
   }
 }

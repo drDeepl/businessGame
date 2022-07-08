@@ -48,6 +48,11 @@ export const user = {
       const user = await UserService.createUser(newUser);
       console.error(user, context);
       context.commit('SET_USER_INFO', user);
+    },
+    async updateUser(context, updatedUser) {
+      // [08.07.2022] TODO: UserService.updateDataUser(user_id, updatedUser);
+      await UserService.updateDataUser(updatedUser);
+      context.commit('SET_USER_INFO', updatedUser);
     }
   },
   getters: {
@@ -68,9 +73,7 @@ export const user = {
     },
     GET_LIST_USERS: state => {
       console.warn('MODULE.USERS: GET_LIST_USERS');
-      if (state.arrays.users == null) {
-        return false;
-      }
+      return state.arrays.users;
     }
   },
   mutations: {
@@ -81,9 +84,6 @@ export const user = {
     SET_USERS_LIST: function(state, users) {
       console.warn('MODULE.USER: SET_USERS_LIST');
       state.arrays.users = users;
-    },
-    SET_UPDATED_USER: function(state, updatedUser) {
-      state.arrays.users.push(updatedUser);
     }
   }
 };

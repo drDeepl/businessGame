@@ -45,6 +45,7 @@
           >{{ message }}</small
         >
       </v-alert>
+      <slot></slot>
       <div class="admin-btn-form">
         <v-btn
           outlined
@@ -103,6 +104,7 @@ export default {
       console.error(resValidateForm.length);
       if (resValidateForm.length == 0) {
         console.warn('FORM SUCCESS');
+        this.form.errors = [];
         return await this.parentFunction(this.createModel);
       } else {
         console.error("FORM IS'N SUCCESS");

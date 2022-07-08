@@ -63,8 +63,13 @@ class UserService {
     console.warn('USER.SERVICE: updateDataUser');
     console.log(user_id);
     console.log(dataJSON);
-    const updatedData = await userAPI.updateUser(user_id, dataJSON);
-    return updatedData;
+    let data = {};
+    for (let i in dataJSON) {
+      data[i] = dataJSON[i];
+    }
+    console.error(data);
+    // const updatedData = await userAPI.updateUser(user_id, dataJSON);
+    // return updatedData;
   }
   async createUser(user) {
     console.warn('USER.SERVICE: createUser');
