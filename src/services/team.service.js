@@ -3,6 +3,12 @@ import Team from '@/models/model.team';
 import {createModelFromResponseData} from '@/helpers/helper.model';
 
 class teamService {
+  async createTeam(dataForCreate) {
+    console.warn('TEAM.SERVICE: createTeam');
+    dataForCreate.balance = Number.parseInt(dataForCreate.balance);
+    const dataTeam = await teamAPI.createTeam(dataForCreate);
+    return dataTeam;
+  }
   async getDataTeam(teamId) {
     console.warn('TEAM.SERVICE: getDataTeam');
     const response = await teamAPI.getTeamInfo(teamId);

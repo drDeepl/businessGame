@@ -2,7 +2,11 @@
   <div class="admin-wrapper">
     <div class=" tab-wrapper">
       <div class="admin-card-wrapper">
-        <v-tabs>
+        <v-tabs
+          next-icon="mdi-arrow-right-bold-box-outline"
+          prev-icon="mdi-arrow-left-bold-box-outline"
+          show-arrows
+        >
           <v-tab
             v-for="objectTab in titles.titleTabs"
             :key="objectTab.form"
@@ -25,12 +29,12 @@
           <!-- // INFO: Форма создания команды -->
           <v-tab-item>
             <Form
-              :activate="forms.formCreateUser.active"
+              :activate="forms.formCreateTeam.active"
               :title="titleCurrentForm"
-              :model="forms.formCreateUser.model"
-              :select="{role: arrays.role, team_id: arrays.team}"
+              :model="forms.formCreateTeam.model"
+              :types="forms.formCreateTeam.model.types"
               :cancelForm="onClickCancelForm"
-              :parentFunction="onClickCreateUser"
+              :parentFunction="onClickCreateTeam"
             >
             </Form>
           </v-tab-item>
@@ -106,6 +110,7 @@ import {createRandomUser} from '@/helpers/helper.fake';
 // [06.07.2022] TODO: Сделать отправку запроса на изменение пользователя
 import ModelUserCreate from '@/models/model.user.create';
 import ModelUpdateUser from '@/models/model.user.update';
+import ModelCreateTeam from '@/models/model.team.create';
 import User from '@/models/model.user';
 import Form from '@/UI/Form.vue';
 export default {
@@ -151,11 +156,13 @@ export default {
         formUpdateUser: {
           active: false,
           model: new ModelUpdateUser(),
-          select: {role: [], team_id: []}
+          select: {role: [], team_id: []},
+          dataUser: null
         },
         formCreateTeam: {
           active: false,
-          model: {}
+          model: new ModelCreateTeam(),
+          errors: []
         },
         formCreateAccountTeam: {
           active: false,
@@ -167,12 +174,7 @@ export default {
       listUsersHeaders: {id: true, username: true, role: true, team: true}
     };
   },
-  watch: {
-    arrays(change) {
-      console.error('arrays change\n', change);
-    },
-    deep: true
-  },
+
   methods: {
     onClickAdminTab(formTitle, titleTab) {
       console.warn('ADMIN.VUE: onClickAdminTab');
@@ -199,19 +201,28 @@ export default {
       console.error('NEW USER\n', newUser);
       await this.$store.dispatch('user/createUser', newUser);
     },
+    async onClickCreateTeam(model) {
+      console.warn('ADMIN.vue: onCLickCretaeTeam');
+      console.error(model);
+      await this.$store.dispatch('team/createTeam', model);
+    },
     onClickEditUser(user) {
       console.warn('Admin.vue: onClickEditUser');
       console.error('USER FROM ROW:\n', user);
+      this.forms.formUpdateUser.dataUser = user;
       this.titleCurrentForm = 'Редактирование пользователя';
       this.forms.formActive = 'formUpdateUser';
       this.forms.formUpdateUser.active = true;
     },
-    async onClickUpdateUser(user) {
+    async onClickUpdateUser(updatedDataUser) {
       // [07.07.2022] TODO: Сделать функцию обновления даных пользователя
       console.warn('ADMIN.vue: onClickUpdateUser');
-      console.error(user);
-      await this.$store.dispatch('user/updateUser', user);
-      await this.$store.dispatch('user/getUsers');
+      console.error(updatedDataUser);
+      // console.error(user);
+      // let dataForUpdateUser = {userId: user.id, data: user};
+      // console.error(dataForUpdateUser);
+      // await this.$store.dispatch('user/updateUser', dataForUpdateUser);
+      // await this.$store.dispatch('user/getUsers');
     },
     // onCancelEditUser() {
     //   this.forms.formUpdateUser.active = false;

@@ -26,5 +26,18 @@ export default class User {
       account: 'Счет',
       is_superuser: 'Администратор'
     };
+    this.types = {
+      id: 'integer',
+      last_login: 'string',
+      username: 'string',
+      first_name: 'string',
+      last_name: 'string',
+      email: 'string',
+      date_joined: 'string',
+      role: 'string',
+      team: 'integer',
+      account: 'integer',
+      is_superuser: 'boolean'
+    };
   }
 }

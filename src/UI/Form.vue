@@ -1,9 +1,5 @@
 <template>
-  <v-dialog
-    v-model="activate"
-    max-width="45%"
-    @click.prevent="onClickCancelForm"
-  >
+  <v-dialog v-model="activate" persistent @click.prevent="onClickCancelForm">
     <v-form class="admin-form pt-2 pb-2">
       <div class="form-title">{{ title }}</div>
       <div v-for="textField in Object.keys(model.props)" :key="textField">
@@ -16,6 +12,7 @@
           v-model="createModel[textField]"
           :label="model.props[textField]"
           :rules="form.rules.field"
+          :value="placeholder[textField]"
           required
         ></v-text-field>
         <div v-else>
@@ -79,9 +76,21 @@ export default {
     title: String,
     titleForm: String,
     model: Object,
-    select: Object, // INFO: {key in model: items}
+    placeholder: {
+      type: Object,
+      default() {
+        return {};
+      }
+    },
+    select: {
+      types: Object,
+      default() {
+        return {};
+      }
+    }, // INFO: {key in model: items}
     parentFunction: Function,
-    cancelForm: Function
+    cancelForm: Function,
+    types: Object // NOTE: {Название ключа модели : Тип}
   },
   data() {
     return {
@@ -99,9 +108,14 @@ export default {
     async onClickApplyForm() {
       // [07.07.2022] TODO: Решить ошибку выполнения
       console.warn('FORM.vue: OnClickApplyForm');
+      console.warn(this.createModel);
       const propsCreateModel = this.model.props;
-      const resValidateForm = formIsValid(propsCreateModel, this.createModel);
-      console.error(resValidateForm.length);
+      const resValidateForm = formIsValid(
+        propsCreateModel,
+        this.createModel,
+        this.types
+      );
+      console.warn(resValidateForm);
       if (resValidateForm.length == 0) {
         console.warn('FORM SUCCESS');
         this.form.errors = [];

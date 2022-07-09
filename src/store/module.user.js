@@ -49,10 +49,15 @@ export const user = {
       console.error(user, context);
       context.commit('SET_USER_INFO', user);
     },
-    async updateUser(context, updatedUser) {
+    async updateUser(context, dataForUpdateUser) {
       // [08.07.2022] TODO: UserService.updateDataUser(user_id, updatedUser);
-      await UserService.updateDataUser(updatedUser);
-      context.commit('SET_USER_INFO', updatedUser);
+      console.error(dataForUpdateUser);
+      console.log(context);
+      // await UserService.updateDataUser(
+      //   dataForUpdateUser.userId,
+      //   dataForUpdateUser.data
+      // );
+      // context.commit('SET_USER_INFO', dataForUpdateUser.data);
     }
   },
   getters: {

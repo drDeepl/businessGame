@@ -1,6 +1,6 @@
 import validator from 'validator';
 
-export function formIsValid(fields, modelWithData) {
+export function formIsValid(fields, modelWithData, types) {
   // INFO: fields {key: 'value label in form'}
   // INFO: modelWithData {key: valie input form}
   // NOTE: Функция принимает на вход объект поля поля ввода из формы fields
@@ -14,13 +14,21 @@ export function formIsValid(fields, modelWithData) {
   console.warn('HELPER.FORM: formIsValid');
   console.warn(fields);
   console.log(modelWithData);
+  console.error(types);
   for (let key in fields) {
     const value = modelWithData[key];
     if (value == null || value == 'indefined') {
       errors.push(fields[key]);
+    } else if (validator.isEmpty(value)) {
+      errors.push(fields[key]);
     } else if (key.toLowerCase() == 'email') {
       if (!validator.isEmail(value)) {
         errors.push(fields[key]);
+      }
+    }
+    if (types[value] == 'integer') {
+      if (!validator.isInt(value)) {
+        errors.push(value + ' не является числом');
       }
     }
   }

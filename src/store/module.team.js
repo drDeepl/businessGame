@@ -35,6 +35,13 @@ export const team = {
       const listTeams = await TeamService.getTeams();
       context.commit('SET_TEAM_DATA_BY_NAME', listTeams);
       return listTeams;
+    },
+    async createTeam(context, dataForCreate) {
+      console.warn('MODULE.TEAM: createTeam');
+      console.error(dataForCreate);
+      const dataTeam = await TeamService.createTeam(dataForCreate);
+      context.commit('SET_TEAM_DATA', dataTeam);
+      context.commit('SET_TEAM_DATA_BY_NAME', [dataTeam]);
     }
   },
   getters: {
