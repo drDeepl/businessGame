@@ -53,11 +53,11 @@ export const user = {
       // [08.07.2022] TODO: UserService.updateDataUser(user_id, updatedUser);
       console.error(dataForUpdateUser);
       console.log(context);
-      // await UserService.updateDataUser(
-      //   dataForUpdateUser.userId,
-      //   dataForUpdateUser.data
-      // );
-      // context.commit('SET_USER_INFO', dataForUpdateUser.data);
+      await UserService.updateDataUser(
+        dataForUpdateUser.userId,
+        dataForUpdateUser.data
+      );
+      context.commit('SET_USER_INFO', dataForUpdateUser.data);
     }
   },
   getters: {

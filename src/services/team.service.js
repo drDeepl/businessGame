@@ -1,6 +1,7 @@
 import teamAPI from '@/api/team.api';
 import Team from '@/models/model.team';
 import {createModelFromResponseData} from '@/helpers/helper.model';
+import teamApi from '../api/team.api';
 
 class teamService {
   async createTeam(dataForCreate) {
@@ -32,6 +33,10 @@ class teamService {
     console.warn('TEAM.SERVICE: getIdTeams');
     const arrayTeams = await this.getTeams();
     console.log(arrayTeams);
+  }
+
+  async deleteTeam(teamId) {
+    return await teamApi.removeTeam(teamId);
   }
 }
 

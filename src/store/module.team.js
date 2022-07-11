@@ -42,6 +42,11 @@ export const team = {
       const dataTeam = await TeamService.createTeam(dataForCreate);
       context.commit('SET_TEAM_DATA', dataTeam);
       context.commit('SET_TEAM_DATA_BY_NAME', [dataTeam]);
+    },
+    async deleteTeam(context, teamId) {
+      console.warn('TEAM.MODULE: deleteTeam');
+      console.log(context);
+      return TeamService.deleteTeam(teamId);
     }
   },
   getters: {

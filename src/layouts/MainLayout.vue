@@ -6,9 +6,9 @@
         <ul class="user-info">
           <!-- TODO: Оформить красивый вывод информации -->
           <li v-for="row in Object.keys(sidebarUserInfo)" :key="row" :id="row">
-            <span class="sidebar-user-info title">{{
-              sidebarUserInfo[row].title
-            }}</span>
+            <span class="sidebar-user-info title">
+              <small>{{ sidebarUserInfo[row].title.toLowerCase() }}</small>
+            </span>
             <span class="sidebar-user-info value">{{
               sidebarUserInfo[row].value
             }}</span>
@@ -103,7 +103,7 @@ export default {
     };
   },
   async created() {
-    // [29.06.2022]: TODO: Сделать страницы для админа
+    // [11.07.2022]: TODO: Сделать страницу для поставщика
 
     // NOTE: 'Что должно происходить здесь
     // NOTE: 0.Проверка на авторизацию
@@ -137,13 +137,13 @@ export default {
         'account/GET_DATA_BY_ID_TEAM'
       ](idTeam);
       console.log(dataAccountByTeam);
+      let roleUser = userData.role;
       // NOTE: После разработки удалить
-      let roleUser;
-      if (userData.is_superuser) {
-        roleUser = 'SUPERUSER';
-      } else {
-        roleUser = userData.role;
-      }
+      // if (userData.is_superuser) {
+      //   roleUser = 'SUPERUSER';
+      // } else {
+      //   roleUser = userData.role;
+      // }
       // NOTE: =======================
       const sidebarLinks = this.$store.getters[
         'user/GET_SIDEBAR_LINKS_BY_ROLE'

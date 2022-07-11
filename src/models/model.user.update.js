@@ -6,5 +6,11 @@ export default class ModelUpdateUser {
       role: 'Роль',
       team_id: 'Команда'
     };
+    this.typesProps = {
+      first_name: 'string',
+      last_name: 'string',
+      role: 'string',
+      team_id: 'integer'
+    };
   }
 }

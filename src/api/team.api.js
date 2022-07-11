@@ -18,7 +18,7 @@ class teamAPI {
     console.error(request);
     return instance.post('teams/', request);
   }
-  deleteTeam(teamId) {
+  removeTeam(teamId) {
     return instance.delete('teams/' + teamId);
   }
 

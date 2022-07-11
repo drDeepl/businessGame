@@ -9,5 +9,14 @@ export default class ModelUserCreate {
       password: 'Пароль',
       team_id: 'Команда'
     };
+    this.typesProps = {
+      username: 'string',
+      first_name: 'string',
+      last_name: 'string',
+      email: 'string',
+      role: 'string',
+      password: 'string',
+      team_id: 'integer'
+    };
   }
 }

@@ -127,3 +127,11 @@ svg.button-toggle {
 .user-info li:last-child {
   line-height: $userInfoBalance;
 }
+
+.sidebar-user-info {
+  display: flex;
+}
+
+.sidebar-user-info.title {
+  font-size: small;
+}

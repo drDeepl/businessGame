@@ -4,7 +4,7 @@ export default class ModelCreateTeam {
       name: 'Название команды',
       balance: 'Стартовый баланс команды'
     };
-    this.types = {
+    this.typesProps = {
       name: 'string',
       balance: 'integer'
     };
