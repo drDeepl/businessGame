@@ -1,31 +1,38 @@
 <template>
   <div :class="sidebar.className" id="wrapper">
     <aside id="sidebar-wrapper" class="aside-sidebar">
-      <div class="container">
+      <div class="sidebar-container">
         <p id="sidebar-tittle" class="user-info">{{ title }}</p>
-        <ul class="user-info">
-          <!-- TODO: Оформить красивый вывод информации -->
-          <li v-for="row in Object.keys(sidebarUserInfo)" :key="row" :id="row">
+        <ul class="user-info" v-if="sidebarUserInfo.role.value == 'player'">
+          TODO: Оформить красивый вывод информации
+          <li
+            :id="row"
+            class="user-info-row"
+            v-for="row in Object.keys(sidebarUserInfo)"
+            :key="row"
+          >
             <span class="sidebar-user-info title">
               <small>{{ sidebarUserInfo[row].title.toLowerCase() }}</small>
             </span>
-            <span class="sidebar-user-info value">{{
-              sidebarUserInfo[row].value
+            <span class="sidebar-user-info value" :id="row">{{
+              sidebarUserInfo[row].value.toLowerCase()
             }}</span>
           </li>
         </ul>
         <hr id="sideBarWrapper" />
       </div>
       <ul class="sidebar-nav">
+        {{
+          sidebar.links
+        }}
         <li
-          v-for="link in sidebar.links"
-          :key="link.url"
+          v-for="key in sidebar.links"
+          :key="key.url"
           @click.prevent="onClickTab"
         >
-          <span @click.prevent="setActiveTab(link.title)">
-            <router-link :to="link.url">
-              <!-- <font-awesome-icon :icon="link.icon" /> -->
-              {{ link.title }}
+          <span @click.prevent="setActiveTab(key.title)">
+            <router-link :to="key.url">
+              {{ key.title }}
             </router-link>
           </span>
         </li>
@@ -75,7 +82,7 @@
 </template>
 
 <script>
-import {links, adminSidebar, app} from '@/_config';
+import {app} from '@/_config';
 export default {
   data() {
     return {
@@ -84,6 +91,7 @@ export default {
       userId: 0,
       sidebarUserInfo: {
         username: {title: 'Имя пользователя', value: ''},
+        role: {title: 'Роль', value: ''},
         team: {title: 'Команда', value: ''},
         balance: {title: 'Баланс', value: ''}
       },
@@ -92,10 +100,6 @@ export default {
         className: 'sidebar-container',
         template: 'Деловая игра',
         links: ''
-      },
-      admin: {
-        isAdmin: false,
-        adminLinks: adminSidebar
       },
       tab: {
         activeTab: ''
@@ -114,49 +118,47 @@ export default {
     // NOTE: 5.Отобразить имя, команду, баланс пользователя'
 
     if (this.$store.state.auth.status.loggedIn) {
-      console.log(links);
       const username = this.currentUser.username;
       console.warn('MAINLAYOUT: created');
       await this.$store.dispatch('user/getUserDataByUsName', username);
       const userData = this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](
         username
       );
-      console.log(userData);
-      const idTeam = userData.team;
-      await this.$store.dispatch('team/getTeamData', {
-        username: username,
-        idTeam: idTeam
-      });
-      const dataTeam = this.$store.getters['team/GET_DATA_TEAM_BY_ID'](idTeam);
-      console.log(dataTeam);
-      await this.$store.dispatch('account/getAccountById', {
-        idAccount: dataTeam.account,
-        idTeam: idTeam
-      });
-      const dataAccountByTeam = this.$store.getters[
-        'account/GET_DATA_BY_ID_TEAM'
-      ](idTeam);
-      console.log(dataAccountByTeam);
       let roleUser = userData.role;
-      // NOTE: После разработки удалить
-      // if (userData.is_superuser) {
-      //   roleUser = 'SUPERUSER';
-      // } else {
-      //   roleUser = userData.role;
-      // }
-      // NOTE: =======================
-      const sidebarLinks = this.$store.getters[
-        'user/GET_SIDEBAR_LINKS_BY_ROLE'
-      ](roleUser);
-      this.sidebar.links = sidebarLinks;
-      this.sidebarUserInfo.username.value = username;
-      this.sidebarUserInfo.team.value = dataTeam.name;
-      this.sidebarUserInfo.balance.value = dataAccountByTeam.balance;
+      console.log(userData);
+      const sidebarTabs = this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](
+        roleUser
+      );
+      console.error(sidebarTabs);
+      this.sidebar.links = sidebarTabs;
+      if (userData.role.toLowerCase() == 'player') {
+        const idTeam = userData.team;
+        await this.$store.dispatch('team/getTeamData', {
+          username: username,
+          idTeam: idTeam
+        });
+        const dataTeam = this.$store.getters['team/GET_DATA_TEAM_BY_ID'](
+          idTeam
+        );
+        console.log(dataTeam);
+        await this.$store.dispatch('account/getAccountById', {
+          idAccount: dataTeam.account,
+          idTeam: idTeam
+        });
+        const dataAccountByTeam = this.$store.getters[
+          'account/GET_DATA_BY_ID_TEAM'
+        ](idTeam);
+        console.log(dataAccountByTeam);
+
+        this.sidebarUserInfo.username.value = username;
+        this.sidebarUserInfo.role.value = userData.role.toLowerCase();
+        this.sidebarUserInfo.team.value = dataTeam.name;
+        this.sidebarUserInfo.balance.value = dataAccountByTeam.balance;
+      }
     } else {
       this.$router.push('/');
     }
   },
-
   computed: {
     currentUser() {
       return this.$store.state.auth.user;

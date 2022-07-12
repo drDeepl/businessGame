@@ -319,12 +319,15 @@ export default {
       if (errors.length > 0) {
         this.forms.formCreateTeam.errors = errors;
       } else {
-        const teams = await this.$store.dispatch('team/getTeams');
-        console.warn(teams);
         // // TODO: Проверить результат кода
         // console.warn('ADMIN.vue: onCLickCretaeTeam');
         // console.error(modelCreateTeam);
-        // await this.$store.dispatch('team/createTeam', modelCreateTeam);
+        await this.$store.dispatch('team/createTeam', modelCreateTeam);
+        const JSON_namesTeams = this.$store.getters[
+          'team/GET_LIST_NAMES_TEAMS'
+        ];
+        const listNamesTeams = Object.keys(JSON_namesTeams);
+        this.arrays.team = listNamesTeams;
       }
     },
     onClickUpdateUser(user) {

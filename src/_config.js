@@ -22,8 +22,8 @@ export const playerSidebarLinks = [
 ];
 
 export const manufacturerSidebarLinks = [
-  {title: 'Добавить продукт', url: '/storage'},
-  {title: 'Продать продукт', url: '/shop'}
+  {title: 'Добавить продукт', url: '/manufacturer/add-product'},
+  {title: 'Продать продукт', url: '/manufacturer/sell-product'}
 ];
 
 export const customerSidebarLinks = [

@@ -1,0 +1,24 @@
+.products-cards {
+  display: grid;
+  grid-template-columns: 22rem 22rem;
+  padding: 0;
+  margin: 0;
+}
+
+.product-card {
+  //   width: 30em;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  justify-self: center !important;
+  align-items: center;
+  border: 1px solid $color-purple !important;
+  border-radius: 7px !important;
+}
+
+.product-group-button {
+  display: flex;
+}
+.product-card-text {
+  font-size: 0.8em;
+}

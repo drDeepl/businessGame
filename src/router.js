@@ -13,27 +13,39 @@ export const router = new Router({
     },
     {
       path: '/',
-      component: () => import('./layouts/MainLayout.vue'),
+      component: () => import('@/layouts/MainLayout.vue'),
       children: [
         {
           path: '/profile',
           name: 'profile',
-          component: () => import('./views/Profile.vue')
-        },
-        {
-          path: '/shop',
-          name: 'shop',
-          component: () => import('./views/Shop.vue')
-        },
-        {
-          path: '/storage',
-          name: 'storage',
-          component: () => import('./views/Storage.vue')
+          component: () => import('@/views/Profile.vue')
         },
         {
           path: '/admin',
           name: 'admin',
           component: () => import('@/views/Admin.vue')
+        },
+        {
+          path: '/manufacturer',
+          name: 'manufacturer',
+          component: () => import('@/views/Manufacturer.vue'),
+          children: [
+            {
+              path: '/products',
+              name: 'products',
+              component: () => import('@/views/Admin.vue')
+            }
+          ]
+        },
+        {
+          path: '/player',
+          name: 'player',
+          component: () => import('@/views/Player.vue')
+        },
+        {
+          path: '/customer',
+          name: 'customer',
+          component: () => import('@/views/Customer.vue')
         },
         {
           path: '/:pathMathc(.*)*',

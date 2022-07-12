@@ -5,6 +5,7 @@ import {auth} from './module.auth';
 import {user} from './module.user';
 import {account} from './module.account';
 import {team} from './module.team';
+import {products} from './module.products';
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -12,6 +13,7 @@ export default new Vuex.Store({
     auth,
     user,
     account,
-    team
+    team,
+    products
   }
 });

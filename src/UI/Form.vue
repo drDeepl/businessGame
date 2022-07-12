@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="activate" persistent>
-    <v-form class="admin-form pt-2 pb-2">
+    <v-form ref="form" class="admin-form pt-2 pb-2" @>
       <div class="form-title">{{ title }}</div>
       <div v-for="textField in Object.keys(model.props)" :key="textField">
         <!-- // NOTE: Если свойство модели совпадает со свойством select -->
@@ -12,7 +12,7 @@
           v-model="createdModel[textField]"
           :label="model.props[textField]"
           :rules="form.rules.field"
-          :hint="'Предыдущее значение ' + values[textField]"
+          :hint="values[textField]"
           required
         ></v-text-field>
         <div v-else>
@@ -83,7 +83,6 @@ export default {
       }
     };
   },
-
   methods: {
     async onClickApplyForm() {
       // [07.07.2022] TODO: Решить ошибку выполнения
@@ -95,6 +94,8 @@ export default {
       console.warn('FORM.vue: onClickCancelForm');
       this.createdModel = new Object();
       this.form.errors = [];
+      this.$refs.form.reset();
+      this.$refs.form.resetValidation();
       return this.cancelForm();
     }
   }

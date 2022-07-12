@@ -19,17 +19,9 @@
 //   overflow: scroll;
 // }
 
-#username,
-#balance,
-#team {
-  color: $navColor;
-  font-weight: bold;
-  padding: 0.5rem;
-  font-size: 1.2rem;
-}
-
 #balance {
   font-weight: normal;
+  font-size: 1.1em;
   color: $balanceColor;
 }
 
@@ -69,7 +61,6 @@
 }
 
 .sidebar-nav {
-  margin-top: $sidebarNav;
   list-style: none;
   transition: all 0.5s;
   width: 100%;
@@ -94,7 +85,6 @@
   color: white;
   font-size: 1.3rem;
   align-items: right;
-  padding-top: 1.1rem;
 }
 
 .sidebar-nav li a {
@@ -120,18 +110,23 @@ svg.button-toggle {
 .user-info {
   display: flex;
   flex-direction: column;
-  padding-top: $userInfoTop;
+  text-align: center;
   line-height: 1rem;
 }
 
-.user-info li:last-child {
-  line-height: $userInfoBalance;
+.user-info-row {
+  padding-top: 0.6rem;
 }
 
 .sidebar-user-info {
-  display: flex;
+  line-height: 1rem;
+  display: block;
 }
 
-.sidebar-user-info.title {
-  font-size: small;
+.sidebar-user-info.title small {
+  font-size: 0.9rem;
+}
+.sidebar-user-info.value {
+  font-weight: bold;
+  color: $color-white;
 }

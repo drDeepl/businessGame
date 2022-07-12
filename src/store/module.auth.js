@@ -11,9 +11,11 @@ export const auth = {
   actions: {
     async login(context, user) {
       console.warn('Module.Auth.Login');
-      const resp = await AuthService.login(user)
+      const resp = await AuthService.login(user);
       if (resp.status == 200) {
         context.commit('loginSuccess', user);
+        const userToken = resp.data;
+        return userToken;
       } else {
         context.commit('loginFailure');
         throw new UserNotFound('Status Code: ' + resp.status);

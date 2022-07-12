@@ -1,11 +1,9 @@
 import userAPI from '@/api/user.api';
 import jwt_decode from 'jwt-decode';
-import {userInfo} from '@/_config';
 import User from '@/models/model.user';
 import {createModelFromResponseData} from '@/helpers/helper.model';
 
 class UserService {
-  cashDataUser = userInfo;
   isAdmin(role) {
     if (role.toLowerCase() === 'admin') {
       return true;

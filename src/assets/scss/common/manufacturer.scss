@@ -1,0 +1,14 @@
+.manufacturer-layout {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.manufacturer-action {
+  justify-content: space-between;
+}
+
+.manufacturer-tabs {
+  overflow-y: scroll !important;
+}

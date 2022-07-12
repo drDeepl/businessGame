@@ -80,10 +80,17 @@ export default {
           const user = new LoginForm(this.form);
           console.log(this.$store.state.auth.user);
           console.log('onLogin:' + this.$store.state.auth.status.loggedIn);
-          await this.$store.dispatch('auth/login', user);
+          const userToken = await this.$store.dispatch('auth/login', user);
+          const username = userToken.username;
+          console.error(username);
           this.succesMessages.push('Успешно!');
-          this.$router.push('/profile');
-          console.log('Post Profile');
+          await this.$store.dispatch('user/getUserDataByUsName', username);
+          const userData = this.$store.getters[
+            'user/GET_USER_INFO_BY_USERNAME'
+          ](username);
+          const role = userData.role.toLowerCase();
+          this.$router.push('/' + role);
+          console.log('After Login');
           console.log(this.$store.state.auth.status);
         } catch (e) {
           console.log('Login.vue: Error');

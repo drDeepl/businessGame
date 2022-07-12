@@ -1,11 +1,11 @@
-import instance from 'main';
+import instance from './main';
 
-class productAPI {
+class ProductAPI {
   createProduct(name) {
     return instance.post('products', name);
   }
 
-  getAllProducts() {
+  getProducts() {
     return instance.get('products');
   }
 
@@ -18,4 +18,4 @@ class productAPI {
   }
 }
 
-export default productAPI;
+export default new ProductAPI();
