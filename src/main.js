@@ -21,11 +21,11 @@ import {
   faTag,
   faAddressCard,
   faUsers,
-  faChartLine
+  faChartLine,
+  faTimesCircle
 } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from './layouts/MainLayout.vue';
 import setupInterceptors from './services/setupInterceptors';
-
 library.add(
   faHome,
   faUser,
@@ -37,7 +37,8 @@ library.add(
   faTag,
   faAddressCard,
   faUsers,
-  faChartLine
+  faChartLine,
+  faTimesCircle
 );
 
 Vue.config.productionTip = false;

@@ -5,10 +5,30 @@
   align-items: center !important;
 }
 
-.manufacturer-action {
-  justify-content: space-between;
+.manufacturer-actions {
+  display: grid !important;
+  grid-template-columns: max-content;
+  // 10em 15em
 }
 
 .manufacturer-tabs {
   overflow-y: scroll !important;
+}
+
+.manufacturer-action-text {
+  font-size: 0.7em;
+}
+
+.product-group-button {
+  display: flex !important;
+  flex-direction: row !important;
+}
+.product-delete {
+  color: #ee4540;
+  cursor: pointer !important;
+  flex-grow: 1;
+  position: relative;
+  left: -7.1em;
+  top: -0.57em;
+  margin-bottom: -1.8em;
 }

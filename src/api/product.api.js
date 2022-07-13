@@ -14,7 +14,9 @@ class ProductAPI {
   }
 
   deleteProduct(productId) {
-    instance.delete('products/' + productId);
+    console.warn('PRODUCT.API: deleteProduct');
+    console.log('productId ', productId);
+    return instance.delete('products/' + productId);
   }
 }
 

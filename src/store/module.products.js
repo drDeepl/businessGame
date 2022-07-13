@@ -7,7 +7,8 @@ export const products = {
     arrays: {
       tabsAction: [
         {form: 'formAddProduct', label: 'Добавить продукт'},
-        {form: 'formSellProduct', label: 'Продать продукт'}
+        // {form: 'formSellProduct', label: 'Продать продукт'},
+        {form: 'formSellProductKit', label: 'Продать продуктовый набор'}
       ],
       tabsView: [
         {view: 'product', label: 'Продукты'},
@@ -28,6 +29,18 @@ export const products = {
       const listProducts = await ProductService.getListProducts();
       context.commit('SET_LIST_PRODUCTS', listProducts);
       return listProducts;
+    },
+    async deleteProduct(context, productId) {
+      console.warn('MODULE.PRODUCTS: deleteProduct');
+      const detailDelete = await ProductService.deleteProduct(productId);
+      console.log(detailDelete);
+      return context.dispatch('getListProducts');
+    },
+    async productCreate(context, createdProduct) {
+      console.warn('MODULE.PRODUCTS: createProduct');
+      const product = await ProductService.createProduct(createdProduct);
+      context.commit('SET_PRODUCT_ARRAY', product);
+      return product;
     }
   },
   getters: {
@@ -42,10 +55,21 @@ export const products = {
     GET_LIST_PRODUCTS: state => {
       console.warn('MODULE.PRODUCTS: GET_LIST_PRODUCTS');
       return state.products;
+    },
+    GET_LIST_NAME_PRODUCT: state => {
+      console.warn('MODULE.PRODUCTS:GET_LIST_NAME_PRODUCT');
+      let listNameProduct = [];
+      for (let key in state.products) {
+        console.error(key);
+        listNameProduct.push(state.products[key].name);
+      }
+      return listNameProduct;
     }
   },
   mutations: {
     SET_PRODUCT_ARRAY: function(state, createdProduct) {
+      console.warn('MODULE.PRODUCTS: SET_PRDOUCT_ARRAY');
+      console.error(createdProduct);
       state.products[createdProduct.id] = createdProduct;
     },
     SET_LIST_PRODUCTS: function(state, listProducts) {

@@ -5,17 +5,7 @@
       <div v-for="textField in Object.keys(model.props)" :key="textField">
         <!-- // NOTE: Если свойство модели совпадает со свойством select -->
         <!-- // NOTE: То текстовое поле не отображается -->
-        <v-text-field
-          color="#6c63ff"
-          v-if="Object.keys(select).indexOf(textField) < 0"
-          class="pr-2 pl-2 ma-1 admin-field"
-          v-model="createdModel[textField]"
-          :label="model.props[textField]"
-          :rules="form.rules.field"
-          :hint="values[textField]"
-          required
-        ></v-text-field>
-        <div v-else>
+        <div v-if="Object.keys(select).indexOf(textField) >= 0">
           <v-select
             color="#6c63ff"
             class="pr-2 pl-2 ma-1"
@@ -25,6 +15,31 @@
             required
           >
           </v-select>
+        </div>
+        <div
+          v-else-if="
+            disableFields[textField] != null ||
+              disableFields[textField] != undefined
+          "
+        >
+          <v-text-field
+            class="pr-2 pl-2 ma-1 admin-field"
+            :label="model.props[textField]"
+            disabled
+            color="#6c63ff"
+            :value="disableFields[textField]"
+            required
+          ></v-text-field>
+        </div>
+        <div v-else>
+          <v-text-field
+            color="#6c63ff"
+            class="pr-2 pl-2 ma-1 admin-field"
+            v-model="createdModel[textField]"
+            :label="model.props[textField]"
+            :rules="form.rules[model.ruleValidate[textField]]"
+            required
+          ></v-text-field>
         </div>
       </div>
 
@@ -56,6 +71,7 @@ export default {
     title: String,
     titleForm: String,
     model: Object,
+    // TODO: выбор значения для поля
     values: {
       type: Object,
       default() {
@@ -63,32 +79,61 @@ export default {
       }
     },
     select: {
+      // NOTE: {textField: array of values}
       types: Object,
       default() {
         return {};
       }
-    }, // INFO: {key in model: items}
+    },
+    disableFields: {
+      types: Object,
+      default() {
+        return {};
+      }
+    },
     parentFunction: Function,
     cancelForm: Function,
-    types: Object // NOTE: {Название ключа модели : Тип}
+    successValidate: Boolean
   },
   data() {
     return {
       createdModel: new Object(),
       form: {
+        // NOTE: Что, если правила проверки будут зависеть от типа данных в модели?
         rules: {
-          field: [v => !!v || 'Поле не может быть пустым']
+          field: [v => !!v || 'Поле не может быть пустым'],
+          email: [
+            v => !!v || 'Поле не может быть пустым',
+            v => /.+@.+\..+/.test(v) || 'Неправильно указана электронная почта'
+          ],
+          // TODO: Добавить проверку поля на число
+          integer: [
+            v => !!v || 'Поле не может быть пустым',
+            v => /^[0-9]+$/.test(v) || 'Поле может состоять только из цифр'
+          ]
         },
         errors: []
       }
     };
+  },
+  watch: {
+    successValidate(value) {
+      console.warn('FORM.VUE: watch succes validate');
+      if (value) {
+        this.$refs.form.reset();
+      }
+    }
   },
   methods: {
     async onClickApplyForm() {
       // [07.07.2022] TODO: Решить ошибку выполнения
       console.warn('FORM.vue: OnClickApplyForm');
       console.warn(this.createdModel);
-      return this.parentFunction(this.createdModel);
+      if (this.$refs.form.validate()) {
+        return this.parentFunction(this.createdModel);
+      } else {
+        console.error('FORM INVALID');
+      }
     },
     onClickCancelForm() {
       console.warn('FORM.vue: onClickCancelForm');
