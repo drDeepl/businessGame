@@ -15,6 +15,10 @@ export const productKit = {
       context.commit('SET_PRODUCT_KIT', createdProductKit);
       console.error(createdProductKit);
       return createdProductKit;
+    },
+    async getProductsKit(context) {
+      console.warn('MODULE.PRODUCT_KIT');
+      console.log(context);
     }
   },
   getters: {

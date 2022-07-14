@@ -1,5 +1,11 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import VuexORM from '@vuex-orm/core';
+// import User from './models/User';
+// import Team from './models/Team';
+// import Account from './models/Account';
+import Product from './models/Product';
+import ProductKit from './models/ProductKit';
 
 import {auth} from './module.auth';
 import {user} from './module.user';
@@ -8,6 +14,15 @@ import {team} from './module.team';
 import {products} from './module.products';
 import {productKit} from './module.productKit';
 Vue.use(Vuex);
+// INFO: create a new instance of Database
+const database = new VuexORM.Database();
+
+// INFO: Register model to Doatabase
+// database.register(User);
+// database.register(Team);
+// database.register(Account);
+database.register(Product);
+database.register(ProductKit);
 
 export default new Vuex.Store({
   modules: {
@@ -17,5 +32,6 @@ export default new Vuex.Store({
     team,
     products,
     productKit
-  }
+  },
+  plugins: [VuexORM.install(database)]
 });

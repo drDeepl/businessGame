@@ -91,19 +91,23 @@
 // TODO: [13.07.22]: Сделать функию создания продуктового набора
 // TODO: [13.07.22]: добавление продуктового набора в бд
 // TODO: [13.07.22]: продажу продуктовых наборов
+// TODO: [14.07.22]: Переписать все запросы через ORM
 
 import CreateProduct from '@/models/model.create.product';
 import CreateProductKit from '@/models/model.productKit.create';
 import Form from '@/UI/Form.vue';
+import Product from '@/store/models/Product';
 export default {
   async created() {
-    await this.$store.dispatch('products/getListProducts');
+    const productsList = await this.$store.dispatch('products/getListProducts');
     const listProducts = this.$store.getters['products/GET_LIST_PRODUCTS'];
     const listProductKits = this.$store.getters[
       'productKit/GET_LIST_PRODUCT_KITS'
     ];
     this.arrays.products = listProducts;
     this.arrays.productKits = listProductKits;
+    Product.insert({data: productsList});
+    console.error(this.$store.state.entities);
   },
   data() {
     return {
@@ -159,6 +163,10 @@ export default {
         createdProduct
       );
       console.error(product);
+      Product.insert({data: product});
+      console.warn(this.$store.state.entities);
+      const products = Product.all();
+      console.warn(products);
     },
     async onClickCreateProductKit(product) {
       console.warn('MANUFACTURER.VUE: onClickCreateProductKit');
@@ -169,18 +177,24 @@ export default {
     },
     async onClickApplyCreateProductKit(productKit) {
       console.warn('MANUFACTURER.vue: onClickApplyCreateProduct');
-      const productName = productKit['product_id'];
-      console.warn(productName);
-      const product = this.$store.getters['products/GET_PRODUCT_BY_NAME'](
-        productName
-      );
+      console.error(productKit);
+      const prod = Product.query()
+        .where('name', productKit['product_id'])
+        .get();
+      console.error(prod);
+      // TODO: переписать через ORM
+      // const productName = productKit['product_id'];
+      // console.warn(productName);
+      // const product = this.$store.getters['products/GET_PRODUCT_BY_NAME'](
+      //   productName
+      // );
 
-      productKit['product_id'] = product.id;
-      await this.$store.dispatch('productKit/createProductKit', productKit);
-      const listProductKits = this.$store.getters[
-        'productKit/GET_LIST_PRODUCT_KITS'
-      ];
-      console.error(listProductKits);
+      // productKit['product_id'] = product.id;
+      // await this.$store.dispatch('productKit/createProductKit', productKit);
+      // const listProductKits = this.$store.getters[
+      //   'productKit/GET_LIST_PRODUCT_KITS'
+      // ];
+      // console.error(listProductKits);
     },
     async onClickDeleteProduct(product) {
       console.warn('MANUFACTURER.VUE: onClickDeleteProduct');
