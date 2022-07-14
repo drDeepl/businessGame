@@ -27,12 +27,10 @@
       :activate="forms.formAddProductKit.active"
       :title="forms.titleForm"
       :model="forms.formAddProductKit.model"
-      :disableFields="forms.formAddProductKit.disableFields"
-      :parentFunction="onClickCreateProductKit"
+      :select="forms.formAddProductKit.select"
+      :parentFunction="onClickApplyCreateProductKit"
       :cancelForm="onClickCancelForm"
     >
-      {{ arrays.products }}
-      {{ forms.formAddProductKit.select }}
     </Form>
     <div>
       <v-tabs
@@ -43,8 +41,6 @@
           {{ tab.label }}
         </v-tab>
         <!-- INFO: список готовых продуктов -->
-
-        <!-- INFO: список готовых продуктовых ноборов -->
         <v-tab-item class="mt-2">
           <div class="products-cards">
             <v-card
@@ -78,16 +74,23 @@
             </v-card>
           </div>
         </v-tab-item>
-        <v-tab-item> </v-tab-item>
+        <!-- INFO: список готовых продуктовых ноборов -->
+        <v-tab-item>
+          <div class="productKit-cards">
+            <v-card v-for="productKit in arrays.productKits" :key="productKit">
+              {{ productKit }}
+            </v-card>
+          </div>
+        </v-tab-item>
       </v-tabs>
     </div>
   </div>
 </template>
 
 <script>
-// [13.07.22] TODO: Сделать функию создания продуктового набора
-// [13.07.22] TODO: добавление продуктового набора в бд
-// [13.07.22] TODO: продажу продуктовых наборов
+// TODO: [13.07.22]: Сделать функию создания продуктового набора
+// TODO: [13.07.22]: добавление продуктового набора в бд
+// TODO: [13.07.22]: продажу продуктовых наборов
 
 import CreateProduct from '@/models/model.create.product';
 import CreateProductKit from '@/models/model.productKit.create';
@@ -96,7 +99,11 @@ export default {
   async created() {
     await this.$store.dispatch('products/getListProducts');
     const listProducts = this.$store.getters['products/GET_LIST_PRODUCTS'];
+    const listProductKits = this.$store.getters[
+      'productKit/GET_LIST_PRODUCT_KITS'
+    ];
     this.arrays.products = listProducts;
+    this.arrays.productKits = listProductKits;
   },
   data() {
     return {
@@ -105,7 +112,8 @@ export default {
         tabsView: this.$store.getters['products/GET_LIST_TABS_VIEW']
       },
       arrays: {
-        products: null
+        products: null,
+        productKits: null
       },
       forms: {
         activeForm: '',
@@ -118,8 +126,8 @@ export default {
         formAddProductKit: {
           active: false,
           model: new CreateProductKit(),
-          validate: false,
-          select: [],
+          select: {},
+          values: {},
           disableFields: {} // NOTE: {disable textField: value}
         },
         formSellProduct: {
@@ -153,16 +161,26 @@ export default {
       console.error(product);
     },
     async onClickCreateProductKit(product) {
-      // TODO:
       console.warn('MANUFACTURER.VUE: onClickCreateProductKit');
       this.forms.activeForm = 'formAddProductKit';
       this.forms.titleForm = 'Создать продуктовый набор';
-      this.forms.formAddProductKit.disableFields['product_id'] = product.name;
+      this.forms.formAddProductKit.select['product_id'] = [product.name];
       this.forms.formAddProductKit.active = true;
-      console.error(product);
     },
-    async onClickApplyCreateProductKit() {
-      // TODO:
+    async onClickApplyCreateProductKit(productKit) {
+      console.warn('MANUFACTURER.vue: onClickApplyCreateProduct');
+      const productName = productKit['product_id'];
+      console.warn(productName);
+      const product = this.$store.getters['products/GET_PRODUCT_BY_NAME'](
+        productName
+      );
+
+      productKit['product_id'] = product.id;
+      await this.$store.dispatch('productKit/createProductKit', productKit);
+      const listProductKits = this.$store.getters[
+        'productKit/GET_LIST_PRODUCT_KITS'
+      ];
+      console.error(listProductKits);
     },
     async onClickDeleteProduct(product) {
       console.warn('MANUFACTURER.VUE: onClickDeleteProduct');

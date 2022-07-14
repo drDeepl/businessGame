@@ -11,5 +11,10 @@ export default class Team {
       name: 'string',
       account: 'string'
     };
+    this.ruleValidate = {
+      id: 'integer',
+      name: 'field',
+      account: 'field'
+    };
   }
 }

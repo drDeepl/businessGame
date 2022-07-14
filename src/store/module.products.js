@@ -3,6 +3,7 @@ export const products = {
   namespaced: true,
   state: {
     products: {}, // NOTE: {productId: data}
+    productsByName: {}, // NOTE: {product_name: data}
     productKits: {}, // NOTE: {productKit_id: data}
     arrays: {
       tabsAction: [
@@ -64,11 +65,15 @@ export const products = {
         listNameProduct.push(state.products[key].name);
       }
       return listNameProduct;
+    },
+    GET_PRODUCT_BY_NAME: state => name => {
+      console.warn('MODULE.PRODUCTS: GET_PRODUCT_BY_NAME', name);
+      return state.productsByName[name];
     }
   },
   mutations: {
     SET_PRODUCT_ARRAY: function(state, createdProduct) {
-      console.warn('MODULE.PRODUCTS: SET_PRDOUCT_ARRAY');
+      console.warn('MODULE.PRODUCTS: SET_PRODUCT_ARRAY');
       console.error(createdProduct);
       state.products[createdProduct.id] = createdProduct;
     },
@@ -77,6 +82,7 @@ export const products = {
       for (let key in listProducts) {
         const product = listProducts[key];
         state.products[product.id] = product;
+        state.productsByName[product.name] = product;
       }
     }
   }

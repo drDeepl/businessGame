@@ -16,21 +16,6 @@
           >
           </v-select>
         </div>
-        <div
-          v-else-if="
-            disableFields[textField] != null ||
-              disableFields[textField] != undefined
-          "
-        >
-          <v-text-field
-            class="pr-2 pl-2 ma-1 admin-field"
-            :label="model.props[textField]"
-            disabled
-            color="#6c63ff"
-            :value="disableFields[textField]"
-            required
-          ></v-text-field>
-        </div>
         <div v-else>
           <v-text-field
             color="#6c63ff"
@@ -85,12 +70,6 @@ export default {
         return {};
       }
     },
-    disableFields: {
-      types: Object,
-      default() {
-        return {};
-      }
-    },
     parentFunction: Function,
     cancelForm: Function,
     successValidate: Boolean
@@ -130,7 +109,7 @@ export default {
       console.warn('FORM.vue: OnClickApplyForm');
       console.warn(this.createdModel);
       if (this.$refs.form.validate()) {
-        return this.parentFunction(this.createdModel);
+        return await this.parentFunction(this.createdModel);
       } else {
         console.error('FORM INVALID');
       }

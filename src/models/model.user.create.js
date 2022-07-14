@@ -18,5 +18,14 @@ export default class ModelUserCreate {
       password: 'string',
       team_id: 'integer'
     };
+    this.ruleValidate = {
+      username: 'field',
+      first_name: 'field',
+      last_name: 'field',
+      email: 'email',
+      role: 'field',
+      password: 'field',
+      team_id: 'integer'
+    };
   }
 }

@@ -8,5 +8,9 @@ export default class ModelCreateTeam {
       name: 'string',
       balance: 'integer'
     };
+    this.ruleValidate = {
+      name: 'field',
+      balance: 'integer'
+    };
   }
 }

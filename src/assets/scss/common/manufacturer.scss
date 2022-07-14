@@ -32,3 +32,8 @@
   top: -0.57em;
   margin-bottom: -1.8em;
 }
+
+div[class*='disabled'] label[class*='disabled'],
+input[disabled] {
+  color: $color-green !important;
+}
