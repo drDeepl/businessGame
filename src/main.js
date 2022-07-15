@@ -8,6 +8,7 @@ import './assets/scss/main.scss';
 import VeeValidate from 'vee-validate';
 import Vuex from 'vuex';
 import vuetify from '@/plugins/vuetify';
+import Close from 'vue-material-design-icons/Close.vue';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {
@@ -22,7 +23,7 @@ import {
   faAddressCard,
   faUsers,
   faChartLine,
-  faTimesCircle
+  faTimesCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from './layouts/MainLayout.vue';
 import setupInterceptors from './services/setupInterceptors';
@@ -46,6 +47,7 @@ Vue.config.productionTip = false;
 Vue.use(VeeValidate);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
+Vue.component('close-icon', Close);
 Vue.use(Vuex);
 
 Vue.use(MainLayout);
@@ -56,5 +58,5 @@ new Vue({
   router,
   store,
   vuetify,
-  render: h => h(App)
+  render: (h) => h(App),
 }).$mount('#app');

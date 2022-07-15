@@ -1,7 +1,14 @@
 import jwt_decode from 'jwt-decode';
 
-const parseJWT = function(jwt) {
+export const parseJWT = function (jwt) {
   return jwt_decode(jwt);
 };
 
-export default parseJWT;
+export const createAuthHeader = function (jwt) {
+  const config = {
+    headers: {
+      Authorization: 'Bearer ' + jwt,
+    },
+  };
+  return config;
+};

@@ -1,21 +1,26 @@
 .products-cards {
   display: grid;
-  grid-template-columns: 22rem 22rem;
+  grid-template-columns: 18rem 18rem;
   padding: 0;
   margin: 0;
 }
 
 .product-card {
   //   width: 30em;
+  min-width: 12em;
   display: flex !important;
   flex-direction: column !important;
   justify-content: center !important;
   justify-self: center !important;
   align-items: center;
   border: 1px solid $color-purple !important;
-  border-radius: 7px !important;
+  border-radius: 17px !important;
+  box-shadow: 0.4em -0.2em 1.2em rgba(108, 99, 255, 0.6) !important;
 }
 
 .product-card-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center;
   font-size: 0.8em;
 }

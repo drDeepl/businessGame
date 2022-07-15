@@ -27,12 +27,16 @@ export const auth = {
     },
     refresh({commit}, access) {
       commit('refresh', access);
-    }
+    },
   },
   getters: {
-    initState: state => {
+    initState: (state) => {
       return state;
-    }
+    },
+    getRequestConfig: (state) => {
+      this.$store.state.auth.user.access;
+      return state.initialState;
+    },
   },
   mutations: {
     loginSuccess(state, user) {
@@ -53,6 +57,6 @@ export const auth = {
     refresh(state, access) {
       state.status.loggedIn = true;
       state.user = {...state.user, access: access};
-    }
-  }
+    },
+  },
 };

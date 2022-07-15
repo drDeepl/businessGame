@@ -1,19 +1,26 @@
+import axios from 'axios';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import VuexORM from '@vuex-orm/core';
+import VuexORMAxios from '@vuex-orm/plugin-axios';
 // import User from './models/User';
 // import Team from './models/Team';
 // import Account from './models/Account';
 import Product from './models/Product';
 import ProductKit from './models/ProductKit';
-
 import {auth} from './module.auth';
 import {user} from './module.user';
 import {account} from './module.account';
 import {team} from './module.team';
 import {products} from './module.products';
 import {productKit} from './module.productKit';
+
 Vue.use(Vuex);
+VuexORM.use(VuexORMAxios, {
+  axios,
+  headers: {'Content-Type': 'application/json'},
+  baseURL: 'https://api.economic.fisting.tech/api/',
+});
 // INFO: create a new instance of Database
 const database = new VuexORM.Database();
 
@@ -31,7 +38,7 @@ export default new Vuex.Store({
     account,
     team,
     products,
-    productKit
+    productKit,
   },
-  plugins: [VuexORM.install(database)]
+  plugins: [VuexORM.install(database)],
 });

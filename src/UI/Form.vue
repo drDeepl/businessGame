@@ -12,7 +12,7 @@
             v-model="createdModel[textField]"
             :items="select[textField]"
             :label="model.props[textField]"
-            required
+            :rules="form.rules.field"
           >
           </v-select>
         </div>
@@ -61,18 +61,18 @@ export default {
       type: Object,
       default() {
         return {};
-      }
+      },
     },
     select: {
       // NOTE: {textField: array of values}
       types: Object,
       default() {
         return {};
-      }
+      },
     },
     parentFunction: Function,
     cancelForm: Function,
-    successValidate: Boolean
+    successValidate: Boolean,
   },
   data() {
     return {
@@ -80,19 +80,20 @@ export default {
       form: {
         // NOTE: Что, если правила проверки будут зависеть от типа данных в модели?
         rules: {
-          field: [v => !!v || 'Поле не может быть пустым'],
+          field: [(v) => !!v || 'Поле не может быть пустым'],
           email: [
-            v => !!v || 'Поле не может быть пустым',
-            v => /.+@.+\..+/.test(v) || 'Неправильно указана электронная почта'
+            (v) => !!v || 'Поле не может быть пустым',
+            (v) =>
+              /.+@.+\..+/.test(v) || 'Неправильно указана электронная почта',
           ],
           // TODO: Добавить проверку поля на число
           integer: [
-            v => !!v || 'Поле не может быть пустым',
-            v => /^[0-9]+$/.test(v) || 'Поле может состоять только из цифр'
-          ]
+            (v) => !!v || 'Поле не может быть пустым',
+            (v) => /^[0-9]+$/.test(v) || 'Поле может состоять только из цифр',
+          ],
         },
-        errors: []
-      }
+        errors: [],
+      },
     };
   },
   watch: {
@@ -101,7 +102,7 @@ export default {
       if (value) {
         this.$refs.form.reset();
       }
-    }
+    },
   },
   methods: {
     async onClickApplyForm() {
@@ -109,7 +110,9 @@ export default {
       console.warn('FORM.vue: OnClickApplyForm');
       console.warn(this.createdModel);
       if (this.$refs.form.validate()) {
-        return await this.parentFunction(this.createdModel);
+        await this.parentFunction(this.createdModel);
+        this.$refs.form.reset();
+        this.$refs.form.resetValidation();
       } else {
         console.error('FORM INVALID');
       }
@@ -121,7 +124,7 @@ export default {
       this.$refs.form.reset();
       this.$refs.form.resetValidation();
       return this.cancelForm();
-    }
-  }
+    },
+  },
 };
 </script>
