@@ -3,9 +3,7 @@
     <v-card elevation="0" class="pa-2 ma-2">
       <div v-for="key in Object.keys(item)" :key="key">
         <v-card-text class="product-card-text pa-1" v-if="key != 'id'">
-          <small v-if="showLabel">{{
-            modelItem.props[key].toLowerCase()
-          }}</small>
+          <small v-if="showLabel">{{ modelItem.props[key] }}</small>
           <span class="">{{ item[key] }}</span>
         </v-card-text>
       </div>

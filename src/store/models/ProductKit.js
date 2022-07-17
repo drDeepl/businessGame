@@ -1,7 +1,5 @@
 import {Model} from '@vuex-orm/core';
-import Product from './Product';
 import {createAuthHeader} from '@/helpers/JWT.helper';
-
 console.warn('MODEL.PRODUCT_KIT');
 
 export default class ProductKit extends Model {
@@ -9,7 +7,7 @@ export default class ProductKit extends Model {
   static fields() {
     return {
       id: this.attr(null),
-      product_id: this.hasMany(Product, 'id'),
+      product: this.attr(null),
       count: this.attr(null),
       time: this.attr(null),
     };

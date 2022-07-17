@@ -43,18 +43,6 @@
         <!-- INFO: список готовых продуктов -->
         <v-tab-item class="mt-2">
           <div class="products-cards">
-            <!-- <v-card
-              v-for="product in arrays.products"
-              :key="product.id"
-              class="product-card pa-3 ma-2"
-            >
-              <span
-                class="product-delete"
-                @click="onClickDeleteProduct(product)"
-                ><close-icon class="card-close-icon"
-              /></span>
-              <v-spacer></v-spacer> -->
-
             <ProductCard
               v-for="product in arrays.products"
               :key="product.id"
@@ -62,34 +50,37 @@
               :modelItem="modelsCard.product"
               :showLabel="true"
             >
-              <v-btn
-                outlined
-                rounded
-                color="#ee5544"
-                class="product-group-button mb-2 mr-2 ml-2"
-                @click.prevent="onClickCreateProductKit(product)"
-              >
-                <span>действия</span>
-              </v-btn>
+              <v-menu bottom>
+                <template v-slot:activator="{on, attrs}">
+                  <v-btn
+                    outlined
+                    rounded
+                    color="#ee5544"
+                    class="product-group-button mb-2 mr-2 ml-2"
+                    v-bind="attrs"
+                    v-on="on"
+                    @click.prevent="onClickCardActions(product)"
+                  >
+                    <span>действия</span>
+                  </v-btn>
+                </template>
+                <v-list flat class="container-card-actions">
+                  <v-list-item
+                    class="card-action"
+                    @click.prevent="onClickCreateProductKit(product)"
+                  >
+                    <span>Создать продуктовый набор</span>
+                  </v-list-item>
+                  <v-list-item
+                    class="card-action"
+                    @click.prevent="onClickDeleteProduct(product)"
+                  >
+                    <span>Удалить</span>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
             </ProductCard>
             <!-- NOTE: id - мнимая часть этой карточки <span>{{ product.id }}</span> -->
-            <!-- <span class="grey--text">{{ product.name }}</span>
-              <div class="group-button">
-                <v-btn
-                  outlined
-                  rounded
-                  color="#31c48d"
-                  class="product-group-button ma-2 pa-2"
-                  @click.prevent="onClickCreateProductKit(product)"
-                >
-                  <div class="product-group-button">
-                    <span class="product-card-text">Создать</span
-                    ><span class="product-card-text">продуктовый</span>
-                    <span class="product-card-text">набор</span>
-                  </div>
-                </v-btn>
-              </div>
-            </v-card> -->
           </div>
         </v-tab-item>
         <!-- INFO: список готовых продуктовых ноборов -->
@@ -135,29 +126,26 @@ export default {
   async created() {
     console.warn('MANUFACTURER.VUE: CREATED');
     const jwt = this.$store.state.auth.user.access;
-    const listProducts = await Product.api().getListProducts(jwt);
-    const listProductKits = await ProductKit.api().getListProductKits(jwt);
-    console.error(listProducts.response.data);
-    console.error('listProductKits:\n', listProductKits);
+    await Product.api().getListProducts(jwt);
+    await ProductKit.api().getListProductKits(jwt);
+    this.arrays.products = Product.all();
+    this.arrays.productKits = ProductKit.all();
+    // console.error(listProducts.response.data);
+    // console.error('listProductKits:\n', listProductKits.response.data);
     // NOTE: Что, если добавить хэлпер, которые заменит в наборе
     // NOTE: product_id на product_name
-
-    this.arrays.products = listProducts.response.data;
+    // FIX: Ошибка при изменении колонки в ProductKit product_id
+    // FIX: на product
+    // this.arrays.products = listProducts.response.data;
     // TODO: [15.07.2022] упростить функцию ниже
-    const productKits = listProductKits.response.data;
-    for (let key in productKits) {
-      const productKit = productKits[key];
-      const product = Product.query().where('id', productKit.product).get();
-      const productName = product[0].name;
-      productKit.product = productName;
-    }
-    this.arrays.productKits = listProductKits.response.data;
-    // const listProductKits =
-    //   this.$store.getters['productKit/GET_LIST_PRODUCT_KITS'];
-    // this.arrays.products = listProducts;
-    // this.arrays.productKits = listProductKits;
-    // Product.insert({data: productsList});
-    // console.error(this.$store.state.entities);
+    // const productKits = listProductKits.response.data;
+    // for (let key in productKits) {
+    //   const productKit = productKits[key];
+    //   const product = Product.query().where('id', productKit.product).get();
+    //   const productName = product[0].name;
+    //   productKit.product = productName;
+    // }
+    // this.arrays.productKits = listProductKits.response.data;
   },
   data() {
     return {
@@ -216,6 +204,10 @@ export default {
       this.forms.titleForm = title;
       this.forms[form].active = true;
     },
+    onClickCardActions(product) {
+      console.warn('MANUFACTURER.VUE: onClickCardActions');
+      console.error(product);
+    },
     async onClickCreateProduct(createdProduct) {
       console.warn('MANUFACTURER.VUE: onClickCreateProduct');
       console.log(createdProduct);
@@ -241,6 +233,9 @@ export default {
       productKit.product_id = productId;
       console.error(productKit);
       await ProductKit.api().createProductKit(productKit, this.getJWT);
+      const arrayPK = ProductKit.all();
+      console.log(arrayPK);
+      console.log(this.arrays.productKits);
       this.arrays.productKits = ProductKit.all();
     },
     async onClickDeleteProduct(product) {

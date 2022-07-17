@@ -24,3 +24,10 @@
   align-items: center;
   font-size: 0.8em;
 }
+
+.card-action {
+  cursor: pointer;
+  :hover {
+    color: rgba(108, 99, 255, 0.6);
+  }
+}
