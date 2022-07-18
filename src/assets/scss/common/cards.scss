@@ -24,10 +24,18 @@
   align-items: center;
   font-size: 0.8em;
 }
-
+.product-card-text-main {
+  font-size: 1.16em;
+}
 .card-action {
   cursor: pointer;
   :hover {
     color: rgba(108, 99, 255, 0.6);
   }
+}
+
+.card-action-btn {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center;
 }

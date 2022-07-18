@@ -10,7 +10,6 @@ export const products = {
       tabsAction: [
         {form: 'formAddProduct', label: 'Добавить продукт'},
         // {form: 'formSellProduct', label: 'Продать продукт'},
-        {form: 'formSellProductKit', label: 'Продать продуктовый набор'},
       ],
       tabsView: [
         {view: 'product', label: 'Продукты'},

@@ -4,7 +4,7 @@
       <div class="sidebar-container">
         <p id="sidebar-tittle" class="user-info">{{ title }}</p>
         <ul class="user-info" v-if="sidebarUserInfo.role.value == 'player'">
-          TODO: Оформить красивый вывод информации
+          <!-- TODO: Оформить красивый вывод информации -->
           <li
             :id="row"
             class="user-info-row"
@@ -22,9 +22,6 @@
         <hr id="sideBarWrapper" />
       </div>
       <ul class="sidebar-nav">
-        {{
-          sidebar.links
-        }}
         <li
           v-for="key in sidebar.links"
           :key="key.url"
@@ -83,6 +80,9 @@
 
 <script>
 import {app} from '@/_config';
+import User from '@/store/models/User';
+import Team from '@/store/models/Team';
+import Account from '@/store/models/Account';
 export default {
   data() {
     return {
@@ -93,17 +93,17 @@ export default {
         username: {title: 'Имя пользователя', value: ''},
         role: {title: 'Роль', value: ''},
         team: {title: 'Команда', value: ''},
-        balance: {title: 'Баланс', value: ''}
+        balance: {title: 'Баланс', value: ''},
       },
       sidebar: {
         isActive: false,
         className: 'sidebar-container',
         template: 'Деловая игра',
-        links: ''
+        links: [{title: 'Магазин', url: 'shop'}],
       },
       tab: {
-        activeTab: ''
-      }
+        activeTab: '',
+      },
     };
   },
   async created() {
@@ -119,41 +119,38 @@ export default {
 
     if (this.$store.state.auth.status.loggedIn) {
       const username = this.currentUser.username;
+      const jwt = this.currentUser.access;
+      await User.api().getListUsers(jwt);
+      await Team.api().getListTeams(jwt);
+      await Account.api().getListAccounts(jwt);
       console.warn('MAINLAYOUT: created');
-      await this.$store.dispatch('user/getUserDataByUsName', username);
-      const userData = this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](
-        username
-      );
+      const users = User.all();
+      console.error(users);
+      const userData = User.query().where('username', username).first();
       let roleUser = userData.role;
-      console.log(userData);
-      const sidebarTabs = this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](
-        roleUser
-      );
-      console.error(sidebarTabs);
-      this.sidebar.links = sidebarTabs;
+      const links =
+        this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
+      this.sidebar.links = links;
       if (userData.role.toLowerCase() == 'player') {
-        const idTeam = userData.team;
-        await this.$store.dispatch('team/getTeamData', {
-          username: username,
-          idTeam: idTeam
-        });
-        const dataTeam = this.$store.getters['team/GET_DATA_TEAM_BY_ID'](
-          idTeam
-        );
-        console.log(dataTeam);
-        await this.$store.dispatch('account/getAccountById', {
-          idAccount: dataTeam.account,
-          idTeam: idTeam
-        });
-        const dataAccountByTeam = this.$store.getters[
-          'account/GET_DATA_BY_ID_TEAM'
-        ](idTeam);
-        console.log(dataAccountByTeam);
+        const teamId = userData.team;
+        const teamName = this.$store
+          .$db()
+          .model('teams')
+          .query()
+          .where('id', teamId)
+          .first().name;
+        console.error(teamName);
+        const teamBalance = this.$store
+          .$db()
+          .model('accounts')
+          .query()
+          .where('id', userData.account)
+          .first().balance;
 
         this.sidebarUserInfo.username.value = username;
-        this.sidebarUserInfo.role.value = userData.role.toLowerCase();
-        this.sidebarUserInfo.team.value = dataTeam.name;
-        this.sidebarUserInfo.balance.value = dataAccountByTeam.balance;
+        this.sidebarUserInfo.role.value = roleUser;
+        this.sidebarUserInfo.team.value = teamName;
+        this.sidebarUserInfo.balance.value = teamBalance;
       }
     } else {
       this.$router.push('/');
@@ -166,20 +163,15 @@ export default {
     currentTab() {
       return this.$route.params;
     },
-    showAdminBoard() {
-      if (this.currentUser && this.currentUser.roles) {
-        return this.currentUser.roles.includes('ROLE_ADMIN');
-      }
 
-      return false;
+    users() {
+      return this.$store.$db().model('users').all();
     },
-    showModeratorBoard() {
-      if (this.currentUser && this.currentUser.roles) {
-        return this.currentUser.roles.includes('ROLE_MODERATOR');
-      }
-
-      return false;
-    }
+    sidebarLinks() {
+      return this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](
+        this.sidebarUserInfo.role
+      );
+    },
   },
   methods: {
     async onClickMenu() {
@@ -205,7 +197,7 @@ export default {
     },
     onMyProfile() {
       this.$router.push('/profile');
-    }
-  }
+    },
+  },
 };
 </script>

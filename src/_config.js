@@ -7,33 +7,33 @@ export const adminSidebarLinks = [
       {title: 'Создание пользователя', form: 'formCreateUser'},
       {title: 'создать команду', form: 'formCreateTeam'},
       {title: 'создать счет команды', form: 'formCreateAccountTeam'},
-      {title: 'список пользователей', form: null}
-    ]
-  }
+      {title: 'список пользователей', form: null},
+    ],
+  },
 ];
 // INFO: Styles for component
 export const card = {
-  color: '#6c63ff'
+  color: '#6c63ff',
 };
 export const playerSidebarLinks = [
   {title: 'Склад', url: '/storage'},
   {title: 'Предложения', url: '/shop'},
-  {title: 'Обо мне', url: '/profile'}
+  {title: 'Обо мне', url: '/profile'},
 ];
 
 export const manufacturerSidebarLinks = [
-  {title: 'Добавить продукт', url: '/manufacturer/add-product'},
-  {title: 'Продать продукт', url: '/manufacturer/sell-product'}
+  {title: 'Склад', url: '/manufacturer'},
+  {title: 'Магазин', url: '/shop'},
 ];
 
 export const customerSidebarLinks = [
-  {title: 'Купить продуктовый набор', url: '/storage'}
+  {title: 'Купить продуктовый набор', url: '/storage'},
 ];
 
 export const rowUpdateUser = {
   first_name: 'Имя',
   last_name: 'Фамилия',
-  team_name: 'Название команды'
+  team_name: 'Название команды',
 };
 
 export const selectUpdateUser = [
@@ -43,13 +43,13 @@ export const selectUpdateUser = [
     options: {
       manufacturer: 'Поставщик',
       player: 'Игрок',
-      customer: 'Клиент'
-    }
-  }
+      customer: 'Клиент',
+    },
+  },
 ];
 
 export const app = {
-  title: 'Деловая игра'
+  title: 'Деловая игра',
 };
 
 export const usersTableHeader = {
@@ -63,26 +63,26 @@ export const usersTableHeader = {
   data_joined: 'Дата создания аккаунта',
   last_login: 'Последняя авторизация',
   first_name: 'Имя',
-  last_name: 'Фамилия'
+  last_name: 'Фамилия',
 };
 
 export const accountsTableHeader = {
   id: 'id',
   balance: 'Баланс',
-  is_unlimited: 'Безлимитный'
+  is_unlimited: 'Безлимитный',
 };
 
 export const transactionsTableHeader = {
   from_account: 'Отправитель',
   to_account: 'Получатель',
   amount: 'Сумма',
-  timestamp: 'Дата'
+  timestamp: 'Дата',
 };
 
 export const teamsTableHeader = {
   id: 'id',
   name: 'Название',
-  account: 'Счёт'
+  account: 'Счёт',
 };
 
 export const adminTabs = [
@@ -91,10 +91,10 @@ export const adminTabs = [
   {title: 'Счета', url: 'accounts'},
   {
     title: 'Транзакции',
-    url: 'transactions'
-  }
+    url: 'transactions',
+  },
 ];
 
 export const colors = {
-  purple: '#6b4ee6'
+  purple: '#6b4ee6',
 };

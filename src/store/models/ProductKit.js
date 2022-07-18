@@ -21,7 +21,7 @@ export default class ProductKit extends Model {
         return this.post('product-kits', productKit, config);
       },
       async getListProductKits(jwt) {
-        console.warn('SOTE.MODEL.PRODUCT_KIT: getListProductKits');
+        console.warn('STORE.MODEL.PRODUCT_KIT: getListProductKits');
         const config = createAuthHeader(jwt);
         return this.get('product-kits', config);
       },

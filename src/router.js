@@ -9,7 +9,7 @@ export const router = new Router({
   routes: [
     {
       path: '/',
-      component: Login
+      component: Login,
     },
     {
       path: '/',
@@ -18,12 +18,12 @@ export const router = new Router({
         {
           path: '/profile',
           name: 'profile',
-          component: () => import('@/views/Profile.vue')
+          component: () => import('@/views/Profile.vue'),
         },
         {
           path: '/admin',
           name: 'admin',
-          component: () => import('@/views/Admin.vue')
+          component: () => import('@/views/Admin.vue'),
         },
         {
           path: '/manufacturer',
@@ -33,28 +33,33 @@ export const router = new Router({
             {
               path: '/products',
               name: 'products',
-              component: () => import('@/views/Admin.vue')
-            }
-          ]
+              component: () => import('@/views/Admin.vue'),
+            },
+          ],
         },
         {
           path: '/player',
           name: 'player',
-          component: () => import('@/views/Player.vue')
+          component: () => import('@/views/Player.vue'),
         },
         {
           path: '/customer',
           name: 'customer',
-          component: () => import('@/views/Customer.vue')
+          component: () => import('@/views/Customer.vue'),
+        },
+        {
+          path: '/shop',
+          name: 'store',
+          component: () => import('@/views/Shop.vue'),
         },
         {
           path: '/:pathMathc(.*)*',
           name: 'NotFound',
-          component: () => import('@/views/NotFound.vue')
-        }
-      ]
-    }
-  ]
+          component: () => import('@/views/NotFound.vue'),
+        },
+      ],
+    },
+  ],
 });
 
 // router.beforeEach((to, from, next) => {

@@ -13,6 +13,7 @@
             :items="select[textField]"
             :label="model.props[textField]"
             :rules="form.rules.field"
+            :input="textField"
           >
           </v-select>
         </div>
@@ -63,8 +64,9 @@ export default {
         return {};
       },
     },
+    applySucces: Boolean,
     select: {
-      // NOTE: {textField: array of values}
+      // NOTE: {textField: {label: string, value: string}}
       types: Object,
       default() {
         return {};
@@ -72,7 +74,7 @@ export default {
     },
     parentFunction: Function,
     cancelForm: Function,
-    successValidate: Boolean,
+    disableFields: {}, // NOTE: {key: boolean}
   },
   data() {
     return {
@@ -97,7 +99,7 @@ export default {
     };
   },
   watch: {
-    successValidate(value) {
+    applySucces(value) {
       console.warn('FORM.VUE: watch succes validate');
       if (value) {
         this.$refs.form.reset();
@@ -110,7 +112,8 @@ export default {
       console.warn('FORM.vue: OnClickApplyForm');
       console.warn(this.createdModel);
       if (this.$refs.form.validate()) {
-        await this.parentFunction(this.createdModel);
+        const createdModel = Object.assign({}, this.createdModel);
+        await this.parentFunction(createdModel);
         this.$refs.form.reset();
         this.$refs.form.resetValidation();
       } else {
@@ -124,6 +127,10 @@ export default {
       this.$refs.form.reset();
       this.$refs.form.resetValidation();
       return this.cancelForm();
+    },
+    onClickSelect(textField) {
+      console.warn('FORM.VUE: onClickSelect');
+      console.error(textField);
     },
   },
 };
