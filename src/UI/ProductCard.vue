@@ -11,8 +11,8 @@
           }}</span>
         </v-card-text>
       </div>
+      <slot></slot>
     </v-card>
-    <slot></slot>
   </div>
 </template>
 

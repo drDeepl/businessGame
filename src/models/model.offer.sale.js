@@ -2,19 +2,35 @@ export default class SaleOffer {
   constructor() {
     this.props = {
       id: 'id',
-      trader: 'Продавец',
-      price: 'Цена',
-      timestamp: 'Создан',
-      state: 'Статус предложения',
       product_kit: 'Продуктовый набор',
+      price: 'Цена',
+      trader: 'Продавец',
+      timestamp: 'Создан',
+      state: 'Статус',
     };
     this.ruleValidate = {
-      id: 'integer',
-      trader: 'integer',
-      price: 'integer',
+      id: 'number',
+      trader: 'number',
+      price: 'number',
       timestamp: 'field',
       state: 'field',
-      product_kit: 'integer',
+      product_kit: 'number',
+    };
+    this.types = {
+      id: 'number',
+      trader: 'number',
+      price: 'number',
+      timestamp: 'string',
+      state: 'string',
+      product_kit: 'number',
+    };
+    this.data = {
+      id: '',
+      trader: '',
+      price: 0,
+      timestamp: '',
+      state: '',
+      product_kit: '',
     };
   }
 }

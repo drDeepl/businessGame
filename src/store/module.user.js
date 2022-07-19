@@ -3,12 +3,13 @@ import {isExist} from '@/services/utils.service';
 import {
   adminSidebarLinks,
   playerSidebarLinks,
-  manufacturerSidebarLinks
+  manufacturerSidebarLinks,
 } from '@/_config';
 
 export const user = {
   namespaced: true,
   state: {
+    updateUser: {}, // NOTE: {username: status}
     userInfo: {
       // INFO: 'username': userData,
     },
@@ -17,13 +18,13 @@ export const user = {
       PLAYER: playerSidebarLinks,
       MANUFACTURER: manufacturerSidebarLinks,
       CUSTOMER: [],
-      SUPERUSER: adminSidebarLinks
+      SUPERUSER: adminSidebarLinks,
     },
     arrays: {
       // INFO: [JSON User]
       users: null,
-      usersById: {} // INFO: idUsers: dataUsers
-    }
+      usersById: {}, // INFO: idUsers: dataUsers
+    },
   },
   actions: {
     async getUserDataByUsName(context, username) {
@@ -58,10 +59,10 @@ export const user = {
         dataForUpdateUser.data
       );
       context.commit('SET_USER_INFO', dataForUpdateUser.data);
-    }
+    },
   },
   getters: {
-    GET_USER_INFO_BY_USERNAME: state => username => {
+    GET_USER_INFO_BY_USERNAME: (state) => (username) => {
       console.warn('MODULE.USER: GET_USER_INFO_BY_USERNAME');
       const userData = state.userInfo[username];
       if (isExist(userData)) {
@@ -71,24 +72,43 @@ export const user = {
       }
     },
 
-    GET_SIDEBAR_LINKS_BY_ROLE: state => role => {
+    GET_SIDEBAR_LINKS_BY_ROLE: (state) => (role) => {
       console.warn('MODULE.USER: GET_SIDEBAR_LINKS_BY_ROLE');
       const sidebarLinks = state.linksSidebarByRole[role];
       return sidebarLinks;
     },
-    GET_LIST_USERS: state => {
+    GET_LIST_USERS: (state) => {
       console.warn('MODULE.USERS: GET_LIST_USERS');
       return state.arrays.users;
-    }
+    },
+    GET_USER_ID_UPDATE: (state) => {
+      console.warn('MODULE.USER: GET_USER_ID_UPDATE');
+      for (let userId in state.updateUser) {
+        if (state[userId] == 'UPDATE') {
+          return userId;
+        }
+      }
+    },
   },
   mutations: {
-    SET_USER_INFO: function(state, userData) {
+    // FIX: Неизвестный тип мутации
+    STATE_UPDATE_USER: function (state, userId) {
+      console.warn('MODULE.USER: stateUpdateUser');
+      state.updateUser[userId] = 'UPDATE';
+    },
+    SET_USER_INFO: function (state, userData) {
       console.warn('MODULE.USER: SET_USER_INFO');
       state.userInfo[userData.username] = userData;
     },
-    SET_USERS_LIST: function(state, users) {
+    SET_USERS_LIST: function (state, users) {
       console.warn('MODULE.USER: SET_USERS_LIST');
       state.arrays.users = users;
-    }
-  }
+    },
+    SET_STATE_USER_UPDATE: function (state, userId) {
+      state.updateUser[userId] = 'UPDATE';
+    },
+    SET_STATE_USER_UPDATED: function (state, userId) {
+      state.updateUser[userId] = 'UPDATED';
+    },
+  },
 };

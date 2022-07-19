@@ -43,6 +43,7 @@ import {validationMixin} from 'vuelidate';
 import {required} from 'vuelidate/lib/validators';
 import LoginForm from '@/models/model.login.form';
 import {card} from '@/_config';
+import User from '@/store/models/User';
 export default {
   mixins: [validationMixin],
   data() {
@@ -50,23 +51,23 @@ export default {
       test: true,
       errorMessages: [],
       succesMessages: [],
-      rules: [value => (value ? !!value : 'Поле не может быть пустым')],
+      rules: [(value) => (value ? !!value : 'Поле не может быть пустым')],
       form: {
         username: '',
-        password: ''
+        password: '',
       },
       styles: {
         form: {
-          color: card.color
-        }
-      }
+          color: card.color,
+        },
+      },
     };
   },
   validations: {
     form: {
       username: {required},
-      password: {required}
-    }
+      password: {required},
+    },
   },
   methods: {
     async onLogIn() {
@@ -83,12 +84,10 @@ export default {
           const userToken = await this.$store.dispatch('auth/login', user);
           const username = userToken.username;
           console.error(username);
-          this.succesMessages.push('Успешно!');
-          await this.$store.dispatch('user/getUserDataByUsName', username);
-          const userData = this.$store.getters[
-            'user/GET_USER_INFO_BY_USERNAME'
-          ](username);
+          const response = await User.api().getUserByUsername(username);
+          const userData = response.response.data;
           const role = userData.role.toLowerCase();
+          console.warn(this.$http);
           this.$router.push('/' + role);
           console.log('After Login');
           console.log(this.$store.state.auth.status);
@@ -98,7 +97,7 @@ export default {
           this.errorMessages.push('Неправильный логин или пароль!');
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>

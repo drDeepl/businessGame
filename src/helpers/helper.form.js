@@ -1,15 +1,28 @@
-export function validateForm(validateModel) {
-  // NOTE: Функция принимает на вход модель vuevalidate
-  // NOTE: Проходит по всем значениям $param
-  // NOTE: Проверяет их на валидность
-  // NOTE: Названия невалидных свойств отправляет в массив errors
-  // NOTE: =========================================================
+export function prepareTypes(model, modelTypes, passed) {
+  // NOTE: Функция принимает на вход заполненую модель с данными из формы
+  // NOTE: и модель с типами данных
+  // NOTE: Где каждому свойству из model соответствует тип данных из modelTypes
+  // NOTE: toDispatcherType является словарём
+  // NOTE: который приводит значения из model к типу в modelType
   console.warn('HELPER.FORM: validateForm');
-  let errors = [];
-  for (let key in validateModel.$params) {
-    if (validateModel[key].$invalid) {
-      errors.push(key);
+  console.log(modelTypes);
+  const result = {};
+  const toDispatcherType = {
+    number: Number.parseInt,
+  };
+  for (let key in model) {
+    const type = typeof model[key];
+    if (passed.indexOf(key) < 0) {
+      if (type != modelTypes[key]) {
+        const newValueType = toDispatcherType[modelTypes[key]](model[key]);
+        result[key] = newValueType;
+      } else {
+        result[key] = model[key];
+      }
+    } else {
+      result[key] = model[key];
     }
   }
-  return errors;
+  console.warn('PREAPRED COMPLETE', model);
+  return result;
 }

@@ -4,13 +4,25 @@ export default class ModelUpdateUser {
       first_name: 'Имя',
       last_name: 'Фамилия',
       role: 'Роль',
-      team_id: 'Команда'
+      team_id: 'Команда',
     };
-    this.typesProps = {
+    this.ruleValidate = {
+      first_name: 'field',
+      last_name: 'field',
+      role: 'field',
+      team_id: 'number',
+    };
+    this.types = {
       first_name: 'string',
       last_name: 'string',
       role: 'string',
-      team_id: 'integer'
+      team_id: 'number',
+    };
+    this.data = {
+      first_name: '',
+      last_name: '',
+      role: '',
+      team_id: '',
     };
   }
 }

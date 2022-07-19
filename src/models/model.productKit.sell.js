@@ -4,13 +4,17 @@ export default class CreateSellOffer {
       price: 'Стоимость',
       product_kit_id: 'Продуктовый набор для продукта',
     };
-    this.typesProps = {
-      price: 'integer',
-      product_kit_id: 'integer',
+    this.types = {
+      price: 'number',
+      product_kit_id: 'number',
     };
     this.ruleValidate = {
-      price: 'integer',
+      price: 'number',
       product_kit_id: 'field',
+    };
+    this.data = {
+      price: '',
+      product_kit_id: '',
     };
   }
 }

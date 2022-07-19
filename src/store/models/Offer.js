@@ -1,57 +1,52 @@
 import {Model} from '@vuex-orm/core';
-import {createAuthHeader} from '@/helpers/JWT.helper';
+import TokenService from '@/services/token.service';
 
 export default class Offer extends Model {
   static entity = 'offers';
   static fields() {
     return {
       id: this.attr(null),
-      trader: this.attr(null),
+      product_kit: this.attr(null),
       price: this.attr(null),
+      trader: this.attr(null),
       timestamp: this.attr(''),
       state: this.attr(''),
-      product_kit: this.attr(null),
     };
   }
   static apiConfig = {
+    headers: {
+      Authorization: TokenService.getLocalAccessToken(),
+    },
     actions: {
-      async getListSaleOffers(jwt) {
+      async getListSaleOffers() {
         console.warn('MODEL.OFFER: getListSaleOffers');
-        const config = createAuthHeader(jwt);
-        return this.get('offers/sale/list', config);
+
+        return this.get('offers/sale/list');
       },
-      async offerSalePlace(modelPlaceOffer, jwt) {
+      async offerSalePlace(modelPlaceOffer) {
         console.warn('MODEL.OFFER: offerSalePlace');
-        const config = createAuthHeader(jwt);
-        this.post('offers/sale/place', modelPlaceOffer, config);
+
+        return this.post('offers/sale/place', modelPlaceOffer);
       },
-      async offerSaleAcquire(modelOfferSaleAcquire, jwt) {
+      async offerSaleAcquire(modelOfferSaleAcquire) {
         console.warn('MODEL.OFFER: offerSaleAcquire');
-        const config = createAuthHeader(jwt);
-        return this.post('offers/sale/place', modelOfferSaleAcquire, config);
+
+        return this.post('offers/sale/place', modelOfferSaleAcquire);
       },
-      async getListOfferPurchase(jwt) {
+      async getListOfferPurchase() {
         console.warn('MODEL.OFFER: getListOfferPurchase');
-        const config = createAuthHeader(jwt);
-        return this.get('offers/purchase/list', config);
+
+        return this.get('offers/purchase/list');
       },
-      async offerPurchasePlace(modelOfferPurchasePlace, jwt) {
+      async offerPurchasePlace(modelOfferPurchasePlace) {
         console.warn('MODEL.OFFER: offerPurchasePlace');
-        const config = createAuthHeader(jwt);
-        return this.post(
-          'offers/purchase/place',
-          modelOfferPurchasePlace,
-          config
-        );
+
+        return this.post('offers/purchase/place', modelOfferPurchasePlace);
       },
-      async offerPurchaseAcquire(modelOfferPurchaseAcquire, jwt) {
+      async offerPurchaseAcquire(modelOfferPurchaseAcquire) {
         console.warn('MODEL.OFFER: offerPurchaseAcquire');
-        const config = createAuthHeader(jwt);
-        return this.post(
-          'offers/purchase/acquir',
-          modelOfferPurchaseAcquire,
-          config
-        );
+
+        return this.post('offers/purchase/acquir', modelOfferPurchaseAcquire);
       },
     },
   };

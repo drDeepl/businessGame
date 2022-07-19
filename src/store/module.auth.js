@@ -13,8 +13,8 @@ export const auth = {
       console.warn('Module.Auth.Login');
       const resp = await AuthService.login(user);
       if (resp.status == 200) {
-        context.commit('loginSuccess', user);
         const userToken = resp.data;
+        await context.commit('loginSuccess', userToken);
         return userToken;
       } else {
         context.commit('loginFailure');
@@ -37,16 +37,19 @@ export const auth = {
       this.$store.state.auth.user.access;
       return state.initialState;
     },
+    GET_USER_NAME: (state) => {
+      return state.user.username;
+    },
   },
   mutations: {
     loginSuccess(state, user) {
-      console.log('module.auth.LoginSucces');
+      console.warn('MODULE.AUTH: loginSucces');
       console.log(user);
       state.status.loggedIn = true;
       state.user = user;
     },
     loginFailure(state) {
-      console.log('module.auth.LoginFailure');
+      console.log('MODULE.AUTH: LoginFailure');
       state.status.loggedIn = false;
       state.user = null;
     },

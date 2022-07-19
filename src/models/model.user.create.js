@@ -7,16 +7,16 @@ export default class ModelUserCreate {
       email: 'Электронная почта',
       role: 'Роль пользователя',
       password: 'Пароль',
-      team_id: 'Команда'
+      team_id: 'Команда',
     };
-    this.typesProps = {
+    this.types = {
       username: 'string',
       first_name: 'string',
       last_name: 'string',
       email: 'string',
       role: 'string',
       password: 'string',
-      team_id: 'integer'
+      team_id: 'number',
     };
     this.ruleValidate = {
       username: 'field',
@@ -25,7 +25,16 @@ export default class ModelUserCreate {
       email: 'email',
       role: 'field',
       password: 'field',
-      team_id: 'integer'
+      team_id: 'number',
+    };
+    this.data = {
+      username: '',
+      first_name: '',
+      last_name: '',
+      email: '',
+      role: '',
+      password: '',
+      team_id: 0,
     };
   }
 }

@@ -1,13 +1,14 @@
 export default class CreateProduct {
   constructor() {
     this.props = {
-      name: 'Название продукта'
+      name: 'Название продукта',
     };
     this.types = {
-      name: 'string'
+      name: 'string',
     };
     this.ruleValidate = {
-      name: 'field'
+      name: 'field',
     };
+    this.data = {name: ''};
   }
 }

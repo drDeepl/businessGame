@@ -5,12 +5,16 @@ export default class ModelProduct {
       name: 'Название продукта',
     };
     this.types = {
-      id: 'integer',
+      id: 'number',
       name: 'string',
     };
     this.ruleValidate = {
-      id: 'integer',
+      id: 'number',
       name: 'field',
+    };
+    this.data = {
+      id: 0,
+      name: '',
     };
   }
 }

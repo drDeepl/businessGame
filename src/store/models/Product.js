@@ -1,5 +1,5 @@
 import {Model} from '@vuex-orm/core';
-import {createAuthHeader} from '@/helpers/JWT.helper';
+import TokenService from '@/services/token.service';
 console.warn('MODEL.Product');
 
 export default class Product extends Model {
@@ -11,23 +11,24 @@ export default class Product extends Model {
     };
   }
   static apiConfig = {
+    headers: {
+      Authorization: TokenService.getLocalAccessToken(),
+    },
     actions: {
-      async getListProducts(jwt) {
+      async getListProducts() {
         console.warn('STORE.MODEL.PRODUCT: getListProduct');
-        const config = createAuthHeader(jwt);
-        return this.get('products', config);
+
+        return this.get('products');
       },
-      async createProduct(data, jwt) {
+      async createProduct(data) {
         console.warn('STORE.MODEL.PRODUCT: createProduct');
-        const config = createAuthHeader(jwt);
-        return this.post('products', data, config);
+
+        return this.post('products', data);
       },
-      async deleteProduct(id, jwt) {
+      async deleteProduct(id) {
         console.warn('STORE.MODEL.PRODUCT: deleteProduct');
-        const config = createAuthHeader(jwt);
-        config.delete = Number.parseInt(id);
-        console.error(config);
-        return this.delete('products/' + id, config);
+
+        return this.delete('products/' + id, {delete: Number.parseInt(id)});
       },
     },
   };

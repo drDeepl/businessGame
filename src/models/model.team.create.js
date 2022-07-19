@@ -2,15 +2,19 @@ export default class ModelCreateTeam {
   constructor() {
     this.props = {
       name: 'Название команды',
-      balance: 'Стартовый баланс команды'
+      balance: 'Стартовый баланс команды',
     };
-    this.typesProps = {
+    this.types = {
       name: 'string',
-      balance: 'integer'
+      balance: 'number',
     };
     this.ruleValidate = {
       name: 'field',
-      balance: 'integer'
+      balance: 'number',
+    };
+    this.data = {
+      name: '',
+      balance: 0,
     };
   }
 }

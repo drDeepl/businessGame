@@ -1,5 +1,5 @@
 import {Model} from '@vuex-orm/core';
-import {createAuthHeader} from '@/helpers/JWT.helper';
+import TokenService from '@/services/token.service';
 console.warn('MODEL.PRODUCT_KIT');
 
 export default class ProductKit extends Model {
@@ -13,17 +13,18 @@ export default class ProductKit extends Model {
     };
   }
   static apiConfig = {
+    headers: {
+      Authorization: TokenService.getLocalAccessToken(),
+    },
     actions: {
-      async createProductKit(productKit, jwt) {
+      async createProductKit(productKit) {
         console.warn('STORE.MODEL.PRODUCT_KIT: createProductKit');
-        const config = createAuthHeader(jwt);
-        console.warn(config);
-        return this.post('product-kits', productKit, config);
+
+        return this.post('product-kits', productKit);
       },
-      async getListProductKits(jwt) {
+      async getListProductKits() {
         console.warn('STORE.MODEL.PRODUCT_KIT: getListProductKits');
-        const config = createAuthHeader(jwt);
-        return this.get('product-kits', config);
+        return this.get('product-kits');
       },
     },
   };

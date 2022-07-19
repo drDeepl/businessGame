@@ -1,5 +1,5 @@
 import {Model} from '@vuex-orm/core';
-import {createAuthHeader} from '@/helpers/JWT.helper';
+import TokenService from '@/services/token.service';
 
 console.warn('MODEL.ACCOUNT');
 export default class Account extends Model {
@@ -12,36 +12,39 @@ export default class Account extends Model {
     };
   }
   static apiConfig = {
+    headers: {
+      Authorization: TokenService.getLocalAccessToken(),
+    },
     actions: {
-      async getListAccounts(jwt) {
+      async getListAccounts() {
         console.warn('MODEL.ACCOUNT: getListAccount');
-        const config = createAuthHeader(jwt);
-        return this.get('accounts', config);
+
+        return this.get('accounts');
       },
-      async getAccount(accountId, jwt) {
+      async getAccount(accountId) {
         console.warn('MODEL.ACCOUNT: getAccount');
-        const config = createAuthHeader(jwt);
-        return this.get('accounts/' + accountId, config);
+
+        return this.get('accounts/' + accountId);
       },
-      async getTransactions(accountId, jwt) {
+      async getTransactions(accountId) {
         console.warn('MODEL.ACCOUNT: getTransactions');
-        const config = createAuthHeader(jwt);
-        return this.get('accounts/' + accountId + '/transactions', config);
+
+        return this.get('accounts/' + accountId + '/transactions');
       },
-      async transferBetweenAccount(modelTransferAccount, jwt) {
+      async transferBetweenAccount(modelTransferAccount) {
         console.warn('MODEL.ACCOUNT: transferBetweenAccount');
-        const config = createAuthHeader(jwt);
-        return this.post('account/transfer', modelTransferAccount, config);
+
+        return this.post('account/transfer', modelTransferAccount);
       },
-      async absorbAccount(modelAbsorbAccount, jwt) {
+      async absorbAccount(modelAbsorbAccount) {
         console.warn('MODEL.ACCOUNT: absorbAccount');
-        const config = createAuthHeader(jwt);
-        return this.post('accounts/absorb', modelAbsorbAccount, config);
+
+        return this.post('accounts/absorb', modelAbsorbAccount);
       },
-      async emitAccount(modelEmitAccount, jwt) {
+      async emitAccount(modelEmitAccount) {
         console.warn('MODEL.ACCOUNT: emitAccount');
-        const config = createAuthHeader(jwt);
-        return this.put('accounts/emit', modelEmitAccount, config);
+
+        return this.put('accounts/emit', modelEmitAccount);
       },
     },
   };

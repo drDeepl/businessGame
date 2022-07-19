@@ -1,6 +1,5 @@
 import {Model} from '@vuex-orm/core';
-import {createAuthHeader} from '@/helpers/JWT.helper';
-
+import TokenService from '@/services/token.service';
 console.warn('MODEL.USER');
 
 export default class User extends Model {
@@ -21,36 +20,39 @@ export default class User extends Model {
     };
   }
   static apiConfig = {
+    headers: {
+      Authorization: TokenService.getLocalAccessToken(),
+    },
+
     actions: {
-      async getListUsers(jwt) {
+      async getListUsers() {
         console.warn('MODEL.USER: getListUsers');
-        const config = createAuthHeader(jwt);
-        return this.get('users', config);
+        return this.get('users');
       },
-      async createUser(modelCreateUser, jwt) {
-        console.warn('MODEL.USER: createsUser');
-        const config = createAuthHeader(jwt);
-        return this.post('users', modelCreateUser, config);
-      },
-      async getUser(userId, jwt) {
+      async createUser(modelCreateUser) {
         console.warn('MODEL.USER: createUser');
-        const config = createAuthHeader(jwt);
-        return this.get('users/' + userId, config);
+        return this.post('users', modelCreateUser);
       },
-      async updateUser(userId, data, jwt) {
+      async getUserByUsername(username) {
+        return this.get('users/name/' + username);
+      },
+      async getUser(userId) {
+        console.warn('MODEL.USER: createUser');
+        return this.get('users/' + userId);
+      },
+      async updateUser(userId, data) {
         console.warn('MODEL.USER: updateUser');
-        const config = createAuthHeader(jwt);
-        return this.post('users/' + userId, data, config);
+        return this.post('users/' + userId, data);
       },
-      async deleteUser(userId, jwt) {
-        const config = createAuthHeader(jwt);
-        config.delete = Number.parseInt(userId);
-        return this.delete('users/' + userId, config);
+      async deleteUser(userId) {
+        return this.delete('users/' + userId, {
+          delete: Number.parseInt(userId),
+        });
       },
-      async getRoles(jwt) {
+      async getRoles() {
         console.warn('MODEL.USER: getRules');
-        const config = createAuthHeader(jwt);
-        return this.get('roles', config);
+
+        return this.get('roles');
       },
     },
   };

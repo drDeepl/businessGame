@@ -28,7 +28,7 @@
       :activate="forms.formAddProductKit.active"
       :title="forms.titleForm"
       :model="forms.formAddProductKit.model"
-      :select="forms.formAddProductKit.select"
+      :disableFields="forms.formAddProductKit.disableFields"
       :parentFunction="onClickApplyCreateProductKit"
       :cancelForm="onClickCancelForm"
     >
@@ -84,7 +84,7 @@
             <!-- NOTE: id - мнимая часть этой карточки <span>{{ product.id }}</span> -->
           </div>
         </v-tab-item>
-        <!-- INFO: список готовых продуктовых ноборов -->
+        <!-- INFO: список готовых продуктовых наборов -->
         <v-tab-item class="mt-2">
           <div class="products-cards">
             <ProductCard
@@ -120,6 +120,7 @@
               :title="forms.titleForm"
               :model="forms.formSellProductKit.model"
               :select="forms.formSellProductKit.select"
+              :disableFields="forms.formSellProductKit.disableFields"
               :parentFunction="onClickApplySellProductKit"
               :cancelForm="onClickCancelForm"
             >
@@ -201,7 +202,7 @@ export default {
           select: {},
           values: {},
           applySucces: false,
-          disableFields: {}, // NOTE: {disable textField: value}
+          disableFields: {}, // NOTE: {disable textField: boolean}
         },
         formSellProduct: {
           active: false,
@@ -216,6 +217,7 @@ export default {
           validate: false,
           select: {},
           applySucces: false,
+          disableFields: {}, // NOTE: {disable textField: boolean}
         },
       },
     };
@@ -279,18 +281,12 @@ export default {
       console.warn('MANUFACTURER.VUE: onClickCreateProductKit');
       this.forms.activeForm = 'formAddProductKit';
       this.forms.titleForm = 'Создать продуктовый набор';
-      this.forms.formAddProductKit.select['product_id'] = [product.name];
+      this.forms.formAddProductKit.model.data['product_id'] = product.id;
+      this.forms.formAddProductKit.disableFields['product_id'] = true;
       this.forms.formAddProductKit.active = true;
     },
     async onClickApplyCreateProductKit(productKit) {
       console.warn('MANUFACTURER.vue: onClickApplyCreateProduct');
-      // NOTE: Далее должна произойти подмена названия продукта на его id
-      console.error(ProductKit);
-      console.log(productKit);
-      const productName = productKit['product_id']; // NOTE: мини-костыль для читаемости формы
-      // INFO: Имя продукта должно быть уникальным для каждого производителя
-      const productId = Product.query().where('name', productName).first().id;
-      productKit.product_id = productId;
       console.error(productKit);
       await ProductKit.api().createProductKit(productKit, this.getJWT);
       const arrayPK = ProductKit.all();
@@ -308,9 +304,10 @@ export default {
       console.warn(productKit);
       this.forms.activeForm = 'formSellProductKit';
       this.forms.titleForm = 'Продать продуктовый набор';
-      this.forms.formSellProductKit.select['product_kit_id'] = [
-        productKit.product,
-      ];
+      this.forms.formSellProductKit.disableFields['product_kit_id'] = true;
+      this.forms.formSellProductKit.model.data['product_kit_id'] =
+        productKit.id;
+
       // FIX:  Найти способ подмены данных при помощи словаря
       this.forms.formSellProductKit.active = true;
     },

@@ -1,5 +1,5 @@
 import {Model} from '@vuex-orm/core';
-import {createAuthHeader} from '@/helpers/JWT.helper';
+import TokenService from '@/services/token.service';
 
 console.warn('MODEL.TEAM');
 
@@ -13,42 +13,38 @@ export default class Team extends Model {
     };
   }
   static apiConfig = {
+    headers: {
+      Authorization: TokenService.getLocalAccessToken(),
+    },
     actions: {
-      async createTeam(modelCreateTeam, jwt) {
+      async createTeam(modelCreateTeam) {
         console.warn('MODEL.TEAM: createTeam');
-        const config = createAuthHeader(jwt);
-        return this.post('teams', modelCreateTeam, config);
+        return this.post('teams/', modelCreateTeam);
       },
-      async getListTeams(jwt) {
+      async getListTeams() {
         console.warn('MODEL.TEAM: getListTeams');
-        const config = createAuthHeader(jwt);
-        return this.get('teams', config);
+        return this.get('teams');
       },
-      async getTeam(teamId, jwt) {
+      async getTeam(teamId) {
         console.warn('MODEL.TEAM: getTeam');
-        const config = createAuthHeader(jwt);
-        return this.get('team/' + teamId, config);
+        return this.get('teams/' + teamId);
       },
     },
-    async getParticipantsTeams(teamId, jwt) {
+    async getParticipantsTeams(teamId) {
       console.warn('MODEL.TEAM: getParticipantsTeams');
-      const config = createAuthHeader(jwt);
-      return this.get('team/' + teamId + '/participants', config);
+      return this.get('team/' + teamId + '/participants');
     },
-    async movePlayer(modelMovePlayer, jwt) {
+    async movePlayer(modelMovePlayer) {
       console.warn('MODEL.TEAM: movePlayer');
-      const config = createAuthHeader(jwt);
-      return this.put('teams', modelMovePlayer, config);
+      return this.put('teams/', modelMovePlayer);
     },
-    async renameTeam(teamId, nameTeam, jwt) {
+    async renameTeam(teamId, nameTeam) {
       console.warn('MODEL.TEAM: renameTeam');
-      const config = createAuthHeader(jwt);
-      return this.put('team/' + teamId + '/' + nameTeam, config);
+      return this.put('team/' + teamId + '/' + nameTeam);
     },
-    async removeTeam(teamId, jwt) {
+    async removeTeam(teamId) {
       console.warn('MODEL.TEAM: removeTeam');
-      const config = createAuthHeader(jwt);
-      return this.delete('teams/' + teamId, config);
+      return this.delete('teams/' + teamId);
     },
   };
 }

@@ -7,12 +7,12 @@ export default class Team {
       account: 'Счёт команды'
     };
     this.types = {
-      id: 'integer',
+      id: 'number',
       name: 'string',
       account: 'string'
     };
     this.ruleValidate = {
-      id: 'integer',
+      id: 'number',
       name: 'field',
       account: 'field'
     };

@@ -1,4 +1,4 @@
-export default class User {
+export default class ModelUser {
   constructor() {
     this.props = [
       'id',
@@ -11,7 +11,7 @@ export default class User {
       'role',
       'team',
       'account',
-      'is_superuser'
+      'is_superuser',
     ];
     this.titleProps = {
       id: 'id',
@@ -24,10 +24,10 @@ export default class User {
       role: 'Роль',
       team: 'Команда',
       account: 'Счет',
-      is_superuser: 'Администратор'
+      is_superuser: 'Администратор',
     };
     this.types = {
-      id: 'integer',
+      id: 'number',
       last_login: 'string',
       username: 'string',
       first_name: 'string',
@@ -35,9 +35,9 @@ export default class User {
       email: 'string',
       date_joined: 'string',
       role: 'string',
-      team: 'integer',
-      account: 'integer',
-      is_superuser: 'boolean'
+      team: 'number',
+      account: 'number',
+      is_superuser: 'boolean',
     };
   }
 }

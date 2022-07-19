@@ -7,18 +7,19 @@
         <!-- // NOTE: То текстовое поле не отображается -->
         <div v-if="Object.keys(select).indexOf(textField) >= 0">
           <v-select
+            v-if="!disableFields.hasOwnProperty(textField)"
             color="#6c63ff"
             class="pr-2 pl-2 ma-1"
             v-model="createdModel[textField]"
             :items="select[textField]"
             :label="model.props[textField]"
             :rules="form.rules.field"
-            :input="textField"
           >
           </v-select>
         </div>
         <div v-else>
           <v-text-field
+            v-if="!disableFields.hasOwnProperty(textField)"
             color="#6c63ff"
             class="pr-2 pl-2 ma-1 admin-field"
             v-model="createdModel[textField]"
@@ -44,6 +45,7 @@
 </template>
 
 <script>
+import {prepareTypes} from '@/helpers/helper.form';
 export default {
   // NOTE: Данная форма будет принимать модель типа
   // NOTE: NameModel  { titleProps: {
@@ -74,11 +76,18 @@ export default {
     },
     parentFunction: Function,
     cancelForm: Function,
-    disableFields: {}, // NOTE: {key: boolean}
+    disableFields: {
+      // NOTE: {key: boolean}
+      type: Object,
+      default() {
+        // FIX создать прототип класса со значениями false
+        return {};
+      },
+    },
   },
   data() {
     return {
-      createdModel: new Object(),
+      createdModel: Object.create(this.$props.model.data),
       form: {
         // NOTE: Что, если правила проверки будут зависеть от типа данных в модели?
         rules: {
@@ -89,7 +98,7 @@ export default {
               /.+@.+\..+/.test(v) || 'Неправильно указана электронная почта',
           ],
           // TODO: Добавить проверку поля на число
-          integer: [
+          number: [
             (v) => !!v || 'Поле не может быть пустым',
             (v) => /^[0-9]+$/.test(v) || 'Поле может состоять только из цифр',
           ],
@@ -108,12 +117,15 @@ export default {
   },
   methods: {
     async onClickApplyForm() {
-      // [07.07.2022] TODO: Решить ошибку выполнения
       console.warn('FORM.vue: OnClickApplyForm');
       console.warn(this.createdModel);
+      const createdModel = this.createdModel;
+      const typesModel = this.$props.model.types;
+      const passed = Object.keys(this.$props.select);
       if (this.$refs.form.validate()) {
-        const createdModel = Object.assign({}, this.createdModel);
-        await this.parentFunction(createdModel);
+        const preparedData = prepareTypes(createdModel, typesModel, passed);
+        console.warn(preparedData);
+        await this.parentFunction(preparedData);
         this.$refs.form.reset();
         this.$refs.form.resetValidation();
       } else {
@@ -122,8 +134,6 @@ export default {
     },
     onClickCancelForm() {
       console.warn('FORM.vue: onClickCancelForm');
-      this.createdModel = new Object();
-      this.form.errors = [];
       this.$refs.form.reset();
       this.$refs.form.resetValidation();
       return this.cancelForm();

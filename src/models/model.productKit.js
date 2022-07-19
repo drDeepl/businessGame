@@ -7,16 +7,16 @@ export default class ModelProductKit {
       time: 'Время изготовления (сек.)',
     };
     this.types = {
-      id: 'integer',
-      product: 'intger',
-      count: 'integer',
-      time: 'integer',
+      id: 'number',
+      product: 'number',
+      count: 'number',
+      time: 'number',
     };
     this.ruleValidate = {
-      id: 'integer',
+      id: 'number',
       product: 'intger',
-      count: 'integer',
-      time: 'integer',
+      count: 'number',
+      time: 'number',
     };
   }
 }

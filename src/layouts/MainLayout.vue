@@ -83,6 +83,8 @@ import {app} from '@/_config';
 import User from '@/store/models/User';
 import Team from '@/store/models/Team';
 import Account from '@/store/models/Account';
+import Product from '@/store/models/Product';
+import ProductKit from '@/store/models/ProductKit';
 export default {
   data() {
     return {
@@ -116,13 +118,16 @@ export default {
     // NOTE: 3.Получение информации о пользователе для отображения её в сайдбаре
     // NOTE: 4.Если админ, то показать панель админа
     // NOTE: 5.Отобразить имя, команду, баланс пользователя'
-
+    console.warn(User.api());
+    
     if (this.$store.state.auth.status.loggedIn) {
       const username = this.currentUser.username;
       const jwt = this.currentUser.access;
       await User.api().getListUsers(jwt);
       await Team.api().getListTeams(jwt);
       await Account.api().getListAccounts(jwt);
+      await ProductKit.api().getListProductKits(jwt);
+      await Product.api().getListProducts(jwt);
       console.warn('MAINLAYOUT: created');
       const users = User.all();
       console.error(users);
