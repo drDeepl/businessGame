@@ -6,9 +6,11 @@
           <small class="product-card-text-label" v-if="showLabel">{{
             modelItem.props[key]
           }}</small>
-          <span v-if="key != '$id'" class="product-card-text-main">{{
-            item[key]
-          }}</span>
+          <span
+            v-if="key != '$id'"
+            :class="'product-card-text-main' + ' ' + key"
+            >{{ item[key] }}</span
+          >
         </v-card-text>
       </div>
       <slot></slot>

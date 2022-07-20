@@ -9,6 +9,7 @@ import VeeValidate from 'vee-validate';
 import Vuex from 'vuex';
 import vuetify from '@/plugins/vuetify';
 import Close from 'vue-material-design-icons/Close.vue';
+import Delete from 'vue-material-design-icons/Delete.vue';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {
@@ -48,6 +49,7 @@ Vue.use(VeeValidate);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('close-icon', Close);
+Vue.component('delete-icon', Delete);
 Vue.use(Vuex);
 
 Vue.use(MainLayout);

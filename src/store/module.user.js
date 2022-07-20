@@ -9,7 +9,7 @@ import {
 export const user = {
   namespaced: true,
   state: {
-    updateUser: {}, // NOTE: {username: status}
+    updateUser: {}, // NOTE: {userId: status}
     userInfo: {
       // INFO: 'username': userData,
     },
@@ -60,6 +60,14 @@ export const user = {
       );
       context.commit('SET_USER_INFO', dataForUpdateUser.data);
     },
+    userToUpdate(context, id) {
+      console.warn('MODULE.USER: userToUpdate');
+      context.commit('SET_STATE_USER_UPDATE', id);
+    },
+    stateUpdatedUser(context, userId) {
+      console.warn('MODULE.USER: stateUpdatedUser');
+      context.commit('SET_STATE_USER_UPDATED', userId);
+    },
   },
   getters: {
     GET_USER_INFO_BY_USERNAME: (state) => (username) => {
@@ -84,7 +92,7 @@ export const user = {
     GET_USER_ID_UPDATE: (state) => {
       console.warn('MODULE.USER: GET_USER_ID_UPDATE');
       for (let userId in state.updateUser) {
-        if (state[userId] == 'UPDATE') {
+        if (state.updateUser[userId] == 'UPDATE') {
           return userId;
         }
       }
@@ -105,6 +113,8 @@ export const user = {
       state.arrays.users = users;
     },
     SET_STATE_USER_UPDATE: function (state, userId) {
+      console.warn('MODULE.USER: SET_STATE_USER_UPDATE');
+      console.warn(userId);
       state.updateUser[userId] = 'UPDATE';
     },
     SET_STATE_USER_UPDATED: function (state, userId) {

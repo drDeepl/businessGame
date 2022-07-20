@@ -7,9 +7,9 @@ export default class Team extends Model {
   static entity = 'teams';
   static fields() {
     return {
-      id: this.attr(null),
-      name: this.attr(''),
-      account: this.attr(null),
+      id: this.number(null),
+      name: this.string(''),
+      account: this.number(null),
     };
   }
   static apiConfig = {

@@ -109,7 +109,8 @@ export default {
     };
   },
   async created() {
-    // [11.07.2022]: TODO: Сделать страницу для поставщика
+    // TODO [20.07.2022]: переделать страницу авторизации
+    // TODO [20.07.2022]: оформить покупку продуктового набора через состояния
 
     // NOTE: 'Что должно происходить здесь
     // NOTE: 0.Проверка на авторизацию
@@ -119,7 +120,7 @@ export default {
     // NOTE: 4.Если админ, то показать панель админа
     // NOTE: 5.Отобразить имя, команду, баланс пользователя'
     console.warn(User.api());
-    
+
     if (this.$store.state.auth.status.loggedIn) {
       const username = this.currentUser.username;
       const jwt = this.currentUser.access;

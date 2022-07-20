@@ -1,4 +1,4 @@
-export function prepareTypes(model, modelTypes, passed) {
+export function prepareTypes(model, modelTypes, passed = []) {
   // NOTE: Функция принимает на вход заполненую модель с данными из формы
   // NOTE: и модель с типами данных
   // NOTE: Где каждому свойству из model соответствует тип данных из modelTypes

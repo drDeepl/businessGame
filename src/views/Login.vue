@@ -44,6 +44,7 @@ import {required} from 'vuelidate/lib/validators';
 import LoginForm from '@/models/model.login.form';
 import {card} from '@/_config';
 import User from '@/store/models/User';
+import TokenService from '@/services/token.service';
 export default {
   mixins: [validationMixin],
   data() {
@@ -84,10 +85,11 @@ export default {
           const userToken = await this.$store.dispatch('auth/login', user);
           const username = userToken.username;
           console.error(username);
+          const access = TokenService.getLocalAccessToken();
+          console.warn(access);
           const response = await User.api().getUserByUsername(username);
           const userData = response.response.data;
           const role = userData.role.toLowerCase();
-          console.warn(this.$http);
           this.$router.push('/' + role);
           console.log('After Login');
           console.log(this.$store.state.auth.status);

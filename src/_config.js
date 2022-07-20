@@ -17,7 +17,7 @@ export const card = {
 };
 export const playerSidebarLinks = [
   {title: 'Склад', url: '/storage'},
-  {title: 'Предложения', url: '/shop'},
+  {title: 'Магазин', url: '/shop'},
   {title: 'Обо мне', url: '/profile'},
 ];
 

@@ -112,6 +112,15 @@
                   @click.prevent="onClickUpdateUser(user)"
                   >Редактировать</v-btn
                 >
+
+                <v-btn
+                  class="ml-1 mr-0 mt-0 mb-0 pa-0"
+                  outlined
+                  color="red"
+                  rounded
+                  @click="onClickDeleteUser(user)"
+                  ><delete-icon
+                /></v-btn>
               </v-card>
 
               <Form
@@ -238,7 +247,13 @@ export default {
       },
       // INFO: listUsersHeader отображает данные,
       // INFO: которые покажутся на внешней стороне карточки
-      listUsersHeaders: {id: true, username: true, role: true, team: true},
+      listUsersHeaders: {
+        id: true,
+        username: true,
+        role: true,
+        team: true,
+        account: true,
+      },
     };
   },
 
@@ -298,7 +313,7 @@ export default {
       console.warn('Admin.vue: onClickUpdateUser');
       console.error('USER FROM ROW:\n', user);
       // FIX: Неизвестный тип мутации
-      this.$store.commit('STATE_UPDATE_USER');
+      this.$store.dispatch('user/userToUpdate', user.id);
       this.forms.formUpdateUser.selectedUser = user;
       this.titleCurrentForm = 'Редактирование пользователя';
       this.forms.formActive = 'formUpdateUser';
@@ -317,25 +332,24 @@ export default {
       const teamId = team.id;
       modelUpdateUser.team_id = teamId;
       const userUpdateId = this.$store.getters['user/GET_USER_ID_UPDATE'];
-      console.error(userUpdateId);
-
-      //   const userId = this.forms.formUpdateUser.selectedUser.id;
-      //   const team_id = this.$store.getters['team/GET_DATA_TEAM_BY_TeamName'](
-      //     modelUpdateUser.team_id
-      //   ).id;
-      //   modelUpdateUser.team_id = team_id;
-      //   let dataForUpdateUser = {
-      //     userId: userId,
-      //     data: modelUpdateUser,
-      //   };
-      //   await this.$store.dispatch('user/updateUser', dataForUpdateUser);
-      //   this.arrays.users = await this.$store.dispatch('user/getUsers');
-      //   this.arrays.users.reverse();
+      this.$store.dispatch('user/stateUpdatedUser', userUpdateId);
+      console.error(userUpdateId, modelUpdateUser);
+      await User.api().updateUser(userUpdateId, modelUpdateUser);
+      const listUsers = this.$store.$db().model('users').query().all();
+      this.arrays.users = listUsers;
+      this.arrays.users.reverse();
       // }
     },
     // onCancelEditUser() {
     //   this.forms.formUpdateUser.active = false;
     // },
+    async onClickDeleteUser(user) {
+      console.warn('ADMIN: onClickDeleteUser');
+      console.error(user);
+      await User.api().deleteUser(user.id);
+      const users = this.$store.$db().model('users').query().all();
+      this.arrays.users = users;
+    },
     onClickAutoCreateUser() {
       const newModel = createRandomUser(this.models.modelCreateUser);
       this.models.modelCreateUser = newModel;

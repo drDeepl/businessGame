@@ -9,6 +9,7 @@ import Account from './models/Account';
 import Product from './models/Product';
 import ProductKit from './models/ProductKit';
 import Offer from './models/Offer';
+import Transaction from './models/Transaction';
 import {auth} from './module.auth';
 import {user} from './module.user';
 import {account} from './module.account';
@@ -32,6 +33,7 @@ database.register(Account);
 database.register(Product);
 database.register(ProductKit);
 database.register(Offer);
+database.register(Transaction);
 
 export default new Vuex.Store({
   modules: {

@@ -40,7 +40,7 @@
 
 .admin-row-user-card {
   display: grid !important;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 9em 9em 9em 9em 9em 9em 3em;
   border: 1px solid rgba(108, 99, 255, 0.55) !important;
   border-radius: 17px !important;
   box-shadow: none !important;
@@ -91,3 +91,6 @@
 //   color: black !important;
 //   z-index: 0 !important;
 // }
+.delete-icon {
+  color: $color-red !important;
+}

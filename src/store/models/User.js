@@ -27,6 +27,7 @@ export default class User extends Model {
     actions: {
       async getListUsers() {
         console.warn('MODEL.USER: getListUsers');
+        console.warn(this);
         return this.get('users');
       },
       async createUser(modelCreateUser) {
@@ -42,7 +43,7 @@ export default class User extends Model {
       },
       async updateUser(userId, data) {
         console.warn('MODEL.USER: updateUser');
-        return this.post('users/' + userId, data);
+        return this.put('users/' + userId, data);
       },
       async deleteUser(userId) {
         return this.delete('users/' + userId, {

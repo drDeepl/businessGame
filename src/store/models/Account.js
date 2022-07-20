@@ -31,7 +31,7 @@ export default class Account extends Model {
 
         return this.get('accounts/' + accountId + '/transactions');
       },
-      async transferBetweenAccount(modelTransferAccount) {
+      async accountTransfer(modelTransferAccount) {
         console.warn('MODEL.ACCOUNT: transferBetweenAccount');
 
         return this.post('account/transfer', modelTransferAccount);
