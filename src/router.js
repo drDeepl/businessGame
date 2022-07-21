@@ -49,8 +49,13 @@ export const router = new Router({
         },
         {
           path: '/shop',
-          name: 'store',
+          name: 'shop',
           component: () => import('@/views/Shop.vue'),
+        },
+        {
+          path: '/storage',
+          name: 'storage',
+          component: () => import('@/views/Storage.vue'),
         },
         {
           path: '/:pathMathc(.*)*',

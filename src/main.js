@@ -53,7 +53,6 @@ Vue.component('delete-icon', Delete);
 Vue.use(Vuex);
 
 Vue.use(MainLayout);
-
 setupInterceptors(store);
 
 new Vue({

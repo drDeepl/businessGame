@@ -1,6 +1,6 @@
 import {Model} from '@vuex-orm/core';
-import TokenService from '@/services/token.service';
 
+import instance from '@/api/main';
 console.warn('MODEL.ACCOUNT');
 export default class Account extends Model {
   static entity = 'accounts';
@@ -11,10 +11,9 @@ export default class Account extends Model {
       balance: this.attr(null),
     };
   }
+  static axios = instance;
   static apiConfig = {
-    headers: {
-      Authorization: TokenService.getLocalAccessToken(),
-    },
+    headers: {},
     actions: {
       async getListAccounts() {
         console.warn('MODEL.ACCOUNT: getListAccount');

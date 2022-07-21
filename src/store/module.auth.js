@@ -33,9 +33,8 @@ export const auth = {
     initState: (state) => {
       return state;
     },
-    getRequestConfig: (state) => {
-      this.$store.state.auth.user.access;
-      return state.initialState;
+    getToken: (state) => {
+      return 'Bearer ' + state.user.acces;
     },
     GET_USER_NAME: (state) => {
       return state.user.username;

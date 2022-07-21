@@ -83,8 +83,8 @@ import {app} from '@/_config';
 import User from '@/store/models/User';
 import Team from '@/store/models/Team';
 import Account from '@/store/models/Account';
-import Product from '@/store/models/Product';
-import ProductKit from '@/store/models/ProductKit';
+// import Product from '@/store/models/Product';
+// import ProductKit from '@/store/models/ProductKit';
 export default {
   data() {
     return {
@@ -101,67 +101,14 @@ export default {
         isActive: false,
         className: 'sidebar-container',
         template: 'Деловая игра',
-        links: [{title: 'Магазин', url: 'shop'}],
+        links: [],
       },
       tab: {
         activeTab: '',
       },
     };
   },
-  async created() {
-    // TODO [20.07.2022]: переделать страницу авторизации
-    // TODO [20.07.2022]: оформить покупку продуктового набора через состояния
 
-    // NOTE: 'Что должно происходить здесь
-    // NOTE: 0.Проверка на авторизацию
-    // NOTE: 1.Получение access токена
-    // NOTE: 2.Извлечение из него id пользователя
-    // NOTE: 3.Получение информации о пользователе для отображения её в сайдбаре
-    // NOTE: 4.Если админ, то показать панель админа
-    // NOTE: 5.Отобразить имя, команду, баланс пользователя'
-    console.warn(User.api());
-
-    if (this.$store.state.auth.status.loggedIn) {
-      const username = this.currentUser.username;
-      const jwt = this.currentUser.access;
-      await User.api().getListUsers(jwt);
-      await Team.api().getListTeams(jwt);
-      await Account.api().getListAccounts(jwt);
-      await ProductKit.api().getListProductKits(jwt);
-      await Product.api().getListProducts(jwt);
-      console.warn('MAINLAYOUT: created');
-      const users = User.all();
-      console.error(users);
-      const userData = User.query().where('username', username).first();
-      let roleUser = userData.role;
-      const links =
-        this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
-      this.sidebar.links = links;
-      if (userData.role.toLowerCase() == 'player') {
-        const teamId = userData.team;
-        const teamName = this.$store
-          .$db()
-          .model('teams')
-          .query()
-          .where('id', teamId)
-          .first().name;
-        console.error(teamName);
-        const teamBalance = this.$store
-          .$db()
-          .model('accounts')
-          .query()
-          .where('id', userData.account)
-          .first().balance;
-
-        this.sidebarUserInfo.username.value = username;
-        this.sidebarUserInfo.role.value = roleUser;
-        this.sidebarUserInfo.team.value = teamName;
-        this.sidebarUserInfo.balance.value = teamBalance;
-      }
-    } else {
-      this.$router.push('/');
-    }
-  },
   computed: {
     currentUser() {
       return this.$store.state.auth.user;
@@ -204,6 +151,77 @@ export default {
     onMyProfile() {
       this.$router.push('/profile');
     },
+  },
+  async created() {
+    // TODO [20.07.2022]: переделать страницу авторизации
+    // TODO [20.07.2022]: оформить покупку продуктового набора через состояния
+
+    // NOTE: 'Что должно происходить здесь
+    // NOTE: 0.Проверка на авторизацию
+    // NOTE: 1.Получение access токена
+    // NOTE: 2.Извлечение из него id пользователя
+    // NOTE: 3.Получение информации о пользователе для отображения её в сайдбаре
+    // NOTE: 4.Если админ, то показать панель админа
+    // NOTE: 5.Отобразить имя, команду, баланс пользователя'
+    console.warn(User.api());
+
+    if (this.$store.state.auth.status.loggedIn) {
+      const username = this.currentUser.username;
+      const responseUser = await User.api().getUserByUsername(username);
+      const dataUser = responseUser.response.data;
+      const roleUser = dataUser.role.toLowerCase();
+      if (roleUser == 'player') {
+        this.sidebar.links =
+          this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
+        const teamId = dataUser.team;
+        const resTeam = await Team.api().getTeam(teamId);
+        const dataTeam = resTeam.response.data;
+        const resAccount = await Account.api().getAccount(dataTeam.account);
+        const dataAccount = resAccount.response.data;
+        this.sidebarUserInfo.username.value = username;
+        this.sidebarUserInfo.role.value = roleUser;
+        this.sidebarUserInfo.team.value = dataTeam.name;
+        this.sidebarUserInfo.balance.value = dataAccount.balance;
+      }
+
+      // console.warn('USER_DATA\n', data);
+      // await User.api().getListUsers();
+      // await Team.api().getListTeams();
+      // await Account.api().getListAccounts();
+      // await ProductKit.api().getListProductKits();
+      // await Product.api().getListProducts();
+      // console.warn('MAINLAYOUT: created');
+      // const users = User.all();
+      // console.error(users);
+      // const userData = User.query().where('username', username).first();
+      // let roleUser = userData.role;
+      // const links =
+      //   this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
+      // this.sidebar.links = links;
+      // if (userData.role.toLowerCase() == 'player') {
+      //   const teamId = userData.team;
+      //   const teamName = this.$store
+      //     .$db()
+      //     .model('teams')
+      //     .query()
+      //     .where('id', teamId)
+      //     .first().name;
+      //   console.error(teamName);
+      //   const teamBalance = this.$store
+      //     .$db()
+      //     .model('accounts')
+      //     .query()
+      //     .where('id', userData.account)
+      //     .first().balance;
+
+      //   this.sidebarUserInfo.username.value = username;
+      //   this.sidebarUserInfo.role.value = roleUser;
+      //   this.sidebarUserInfo.team.value = teamName;
+      //   this.sidebarUserInfo.balance.value = teamBalance;
+      // }
+    } else {
+      this.$router.push('/');
+    }
   },
 };
 </script>

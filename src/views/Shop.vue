@@ -79,22 +79,13 @@ import Offer from '@/store/models/Offer';
 import SaleOffer from '@/models/model.offer.sale';
 import AccountTransfer from '@/models/model.account.transfer';
 import ModelTransaction from '@/models/model.transaction';
-import Account from '@/store/models/Account';
+// import Account from '@/store/models/Account';
 import Transaction from '@/store/models/Transaction';
-import User from '@/store/models/User';
+// import User from '@/store/models/User';
 import Team from '@/store/models/Team';
 
 import {prepareTypes} from '@/helpers/helper.form';
 export default {
-  async created() {
-    await Offer.api().getListSaleOffers();
-    const user = this.$store.state.auth.user;
-    console.error(user);
-    console.warn('USERNAME');
-    const users = await User.api().getListUsers();
-    this.arrays.users = users.response.data;
-    await Team.api().getListTeams();
-  },
   data() {
     return {
       title: '',
@@ -227,23 +218,29 @@ export default {
       const offers = this.$store.$db().model('offers').query().all();
       console.error(offers);
       const accountTransfer = new AccountTransfer();
-      const trader = this.$store
-        .$db()
-        .model('users')
-        .query()
-        .where('username', offer.trader)
-        .first();
-      const account_id_from = trader.account;
-      const account_id_to = this.currentUserData.account;
-      accountTransfer.data.account_id_from = account_id_from;
-      accountTransfer.data.account_id_to = account_id_to;
-      accountTransfer.data.amount = offer.price;
-      const createdOffer = prepareTypes(
-        accountTransfer.data,
-        accountTransfer.types
-      );
-      await Account.api().accountTransfer(createdOffer);
+      console.error(prepareTypes, accountTransfer);
+
+      // console.warn('ACCOUNT TRANSFER\n', accountTransfer);
+      // console.warn('TRADER', trader);
+      // const account_id_from = trader.account;
+      // const account_id_to = this.currentUserData.account;
+      // accountTransfer.data.account_id_from = account_id_from;
+      // accountTransfer.data.account_id_to = account_id_to;
+      // accountTransfer.data.amount = offer.price;
+      // const createdOffer = prepareTypes(
+      //   accountTransfer.data,
+      //   accountTransfer.types
+      // );
+      // console.warn('CREATED OFFER', createdOffer);
+      // await Account.api().accountTransfer(createdOffer);
     },
+  },
+  async created() {
+    await Offer.api().getListSaleOffers();
+    const user = this.$store.state.auth.user;
+    console.error(user);
+    console.warn('USERNAME');
+    await Team.api().getListTeams();
   },
   components: {ProductCard},
 };

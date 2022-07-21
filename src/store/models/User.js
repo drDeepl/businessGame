@@ -1,5 +1,6 @@
 import {Model} from '@vuex-orm/core';
 import TokenService from '@/services/token.service';
+import instance from '@/api/main';
 console.warn('MODEL.USER');
 
 export default class User extends Model {
@@ -19,15 +20,12 @@ export default class User extends Model {
       is_superuser: this.attr(false),
     };
   }
+  static axios = instance;
   static apiConfig = {
-    headers: {
-      Authorization: TokenService.getLocalAccessToken(),
-    },
-
+    headers: {'Content-Type': 'application/json'},
     actions: {
       async getListUsers() {
         console.warn('MODEL.USER: getListUsers');
-        console.warn(this);
         return this.get('users');
       },
       async createUser(modelCreateUser) {
@@ -35,7 +33,9 @@ export default class User extends Model {
         return this.post('users', modelCreateUser);
       },
       async getUserByUsername(username) {
-        return this.get('users/name/' + username);
+        return this.get('users/name/' + username, {
+          headers: TokenService.getLocalAccessToken(),
+        });
       },
       async getUser(userId) {
         console.warn('MODEL.USER: createUser');
@@ -43,12 +43,11 @@ export default class User extends Model {
       },
       async updateUser(userId, data) {
         console.warn('MODEL.USER: updateUser');
+
         return this.put('users/' + userId, data);
       },
       async deleteUser(userId) {
-        return this.delete('users/' + userId, {
-          delete: Number.parseInt(userId),
-        });
+        return this.delete('users/' + userId, {delete: userId});
       },
       async getRoles() {
         console.warn('MODEL.USER: getRules');

@@ -15,24 +15,21 @@ export const user = {
     },
     linksSidebarByRole: {
       // INFO: role: [{title: String, url: String,}]
-      PLAYER: playerSidebarLinks,
-      MANUFACTURER: manufacturerSidebarLinks,
-      CUSTOMER: [],
+      player: playerSidebarLinks,
+      manufacturer: manufacturerSidebarLinks,
+      customer: [],
       SUPERUSER: adminSidebarLinks,
     },
     arrays: {
       // INFO: [JSON User]
-      users: null,
       usersById: {}, // INFO: idUsers: dataUsers
     },
   },
   actions: {
-    async getUserDataByUsName(context, username) {
-      console.warn('MODULE.USER: getUserData');
-      console.log(context, username + '\n______________');
-      const userData = await UserService.getUserDataByUsername(username);
-      context.commit('SET_USER_INFO', userData);
-    },
+    // async getUserDataByUsName(context, username) {
+    //   console.warn('MODULE.USER: getUserData');
+    // await User.api()
+    // },
     async getRolesUser(context) {
       const roles = await UserService.getRoles();
       console.log(context);

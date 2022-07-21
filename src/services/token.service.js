@@ -7,7 +7,7 @@ class TokenService {
   getLocalAccessToken() {
     console.warn('TOKEN.SERVICE: getLocalAccessToken');
     const user = JSON.parse(localStorage.getItem('user'));
-    return user ? 'Bearer ' + user.access : null;
+    return user ? user.access : null;
   }
 
   updateLocalAccessToken(token) {
