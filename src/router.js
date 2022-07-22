@@ -58,6 +58,11 @@ export const router = new Router({
           component: () => import('@/views/Storage.vue'),
         },
         {
+          path: '/error',
+          name: 'error',
+          component: () => import('@/views/Error.vue'),
+        },
+        {
           path: '/:pathMathc(.*)*',
           name: 'NotFound',
           component: () => import('@/views/NotFound.vue'),

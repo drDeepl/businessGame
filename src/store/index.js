@@ -18,6 +18,8 @@ import {team} from './module.team';
 import {products} from './module.products';
 import {productKit} from './module.productKit';
 import instance from '@/api/main';
+import ProductKitStorage from '@/store/models/ProductKitStorage';
+import ProductStorage from '@/store/models/ProductStorage';
 
 const userInfo = localStorage.getItem('user');
 if (userInfo) {
@@ -32,6 +34,8 @@ VuexORM.use(VuexORMAxios, {axios: instance});
 const database = new VuexORM.Database();
 
 // INFO: Register model to Doatabase
+database.register(ProductKitStorage);
+database.register(ProductStorage);
 database.register(Token);
 database.register(User);
 database.register(Team);

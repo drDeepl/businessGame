@@ -91,7 +91,12 @@ export default {
           const response = await User.api().getUserByUsername(username);
           const userData = response.response.data;
           const role = userData.role.toLowerCase();
-          this.$router.push('/' + role);
+          if (userData.is_superuser) {
+            this.$router.push('/admin');
+          } else {
+            this.$router.push('/' + role);
+          }
+
           console.log('After Login');
           console.log(this.$store.state.auth.status);
         } catch (e) {

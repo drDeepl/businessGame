@@ -79,8 +79,9 @@ import Offer from '@/store/models/Offer';
 import SaleOffer from '@/models/model.offer.sale';
 import AccountTransfer from '@/models/model.account.transfer';
 import ModelTransaction from '@/models/model.transaction';
-// import Account from '@/store/models/Account';
+import Account from '@/store/models/Account';
 import Transaction from '@/store/models/Transaction';
+import User from '@/store/models/User';
 // import User from '@/store/models/User';
 import Team from '@/store/models/Team';
 
@@ -212,35 +213,47 @@ export default {
       this.arrays.transactions = transactionList;
     },
     async onClickBuyProductKit(offer) {
+      // NOTE: функция находит account_from по trader
+      // NOTE: account_id_to находится по текующему пользователю
       console.warn('SHOP.VUE: onClickBuyProductKit');
       console.error('offer\n', offer);
-      console.warn('currentUser', this.currentUser);
-      const offers = this.$store.$db().model('offers').query().all();
-      console.error(offers);
+      const currentUserData = (
+        await User.api().getUserByUsername(this.currentUser)
+      ).response.data;
+
+      // FIX Чтобы получить баланс необходимо иметь номер счёта
+      // FIX пользователь создаётся без номера счёта
+      const balance = (await Account.api().getAccount(currentUserData.account))
+        .response.data;
+      // FIX =======================================
+
+      const offerPrice = Number.parseInt(offer.price);
+      console.error(balance, '\noffer price ' + offerPrice);
+      console.warn('CURRENT_USER_DATA\n', currentUserData);
+      const account_to = this.currentUserData.account;
+      const account_from = offer.trader;
+      const amount = offerPrice;
       const accountTransfer = new AccountTransfer();
       console.error(prepareTypes, accountTransfer);
-
-      // console.warn('ACCOUNT TRANSFER\n', accountTransfer);
-      // console.warn('TRADER', trader);
-      // const account_id_from = trader.account;
-      // const account_id_to = this.currentUserData.account;
-      // accountTransfer.data.account_id_from = account_id_from;
-      // accountTransfer.data.account_id_to = account_id_to;
-      // accountTransfer.data.amount = offer.price;
-      // const createdOffer = prepareTypes(
-      //   accountTransfer.data,
-      //   accountTransfer.types
-      // );
-      // console.warn('CREATED OFFER', createdOffer);
-      // await Account.api().accountTransfer(createdOffer);
+      accountTransfer.data['account_id_from'] = account_from;
+      accountTransfer.data['account_id_to'] = account_to;
+      accountTransfer.data.amount = amount;
+      const createdOffer = prepareTypes(
+        accountTransfer.data,
+        accountTransfer.types
+      );
+      console.log(Account);
+      console.warn('CREATED OFFER', createdOffer);
+      // const transfer = await Account.api().accountTransfer(createdOffer);
+      // console.warn(transfer);
     },
   },
   async created() {
     await Offer.api().getListSaleOffers();
+    await Team.api().getListTeams();
     const user = this.$store.state.auth.user;
     console.error(user);
     console.warn('USERNAME');
-    await Team.api().getListTeams();
   },
   components: {ProductCard},
 };

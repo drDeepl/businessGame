@@ -7,7 +7,7 @@ export default class User extends Model {
   static entity = 'users';
   static fields() {
     return {
-      id: this.attr(null),
+      id: this.number(null),
       last_login: this.attr(''),
       username: this.attr(''),
       first_name: this.attr(''),
@@ -15,8 +15,8 @@ export default class User extends Model {
       email: this.attr(''),
       data_joined: this.attr(''),
       role: this.attr(''),
-      team: this.attr(null),
-      account: this.attr(null),
+      team: this.number(null),
+      account: this.number(null),
       is_superuser: this.attr(false),
     };
   }
