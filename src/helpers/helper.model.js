@@ -1,4 +1,4 @@
-import ValidateError from '@/errors/error.validate';
+import {ValidateError} from '@/errors/error.validate';
 
 export function createModelFromResponseData(Class, data) {
   const lengthDataProps = Object.keys(data).length;

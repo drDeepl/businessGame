@@ -1,5 +1,4 @@
 import {Model} from '@vuex-orm/core';
-import TokenService from '@/services/token.service';
 import instance from '@/api/main';
 console.warn('MODEL.USER');
 
@@ -29,13 +28,12 @@ export default class User extends Model {
         return this.get('users');
       },
       async createUser(modelCreateUser) {
+        // FIX возврат функции
         console.warn('MODEL.USER: createUser');
-        return this.post('users', modelCreateUser);
+        return await this.post('users', modelCreateUser);
       },
       async getUserByUsername(username) {
-        return this.get('users/name/' + username, {
-          headers: TokenService.getLocalAccessToken(),
-        });
+        return this.get('users/name/' + username);
       },
       async getUser(userId) {
         console.warn('MODEL.USER: createUser');

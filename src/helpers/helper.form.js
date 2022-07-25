@@ -23,6 +23,6 @@ export function prepareTypes(model, modelTypes, passed = []) {
       result[key] = model[key];
     }
   }
-  console.warn('PREAPRED COMPLETE', model);
+  console.warn('PREPARED COMPLETE', model);
   return result;
 }

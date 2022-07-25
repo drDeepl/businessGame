@@ -89,6 +89,7 @@ import {prepareTypes} from '@/helpers/helper.form';
 export default {
   data() {
     return {
+      loading: false,
       title: '',
       cards: {
         cardOffer: {
@@ -249,6 +250,7 @@ export default {
     },
   },
   async created() {
+    this.loading = true;
     await Offer.api().getListSaleOffers();
     await Team.api().getListTeams();
     const user = this.$store.state.auth.user;

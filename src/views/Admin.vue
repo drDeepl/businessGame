@@ -31,7 +31,7 @@
                 elevation="2"
                 v-if="forms.formCreateUser.errors.length > 0"
                 class="form-error-container"
-                >Ошибки в следующий полях:
+                >Упс...
                 <small
                   class="form-error-text"
                   v-for="message in forms.formCreateUser.errors"
@@ -161,6 +161,7 @@ import Form from '@/UI/Form.vue';
 
 // import {validationMixin} from 'vuelidate';
 // import {required, email, numeric} from 'vuelidate/lib/validators';
+import {codeErrorResponse} from '@/helpers/helper.error';
 import ModelUserCreate from '@/models/model.user.create';
 import ModelUpdateUser from '@/models/model.user.update';
 import ModelCreateTeam from '@/models/model.team.create';
@@ -282,6 +283,7 @@ export default {
     onClickCancelForm() {
       const activeForm = this.forms.formActive;
       this.forms[activeForm].active = false;
+      this.forms[activeForm].errors = [];
     },
     async onClickCreateUser(modelCreateUser) {
       console.warn('ADMIN.VUE: onClickCreateUser');
@@ -299,9 +301,18 @@ export default {
       const team_id = team.id;
       modelCreateUser['team_id'] = team_id;
       console.error('NEW USER\n', modelCreateUser);
-      await User.api().createUser(modelCreateUser);
-      const listUsers = this.$store.$db().model('users').query().all();
-      this.arrays.users = listUsers;
+      try {
+        await User.api().createUser(modelCreateUser);
+        const listUsers = this.$store.$db().model('users').query().all();
+        this.arrays.users = listUsers;
+      } catch (e) {
+        const errorCode = codeErrorResponse(e);
+        if (errorCode == 422) {
+          this.forms.formCreateUser.errors = [
+            'Такое имя пользователя уже существует',
+          ];
+        }
+      }
     },
     async onClickCreateTeam(modelCreateTeam) {
       console.warn('ADMIN.VUE: onClickCreateTeam');
@@ -320,6 +331,7 @@ export default {
       this.forms.formUpdateUser.active = true;
     },
     async onClickApplyUpdateUser(modelUpdateUser) {
+      this.forms.formCreateUser.erros = [];
       // [07.07.2022] TODO: Сделать функцию обновления даных пользователя
       console.warn('ADMIN.vue: onClickUpdateUser');
       console.error(modelUpdateUser);
@@ -335,14 +347,17 @@ export default {
       this.$store.dispatch('user/stateUpdatedUser', userUpdateId);
       console.error(userUpdateId, modelUpdateUser);
       await User.api().updateUser(userUpdateId, modelUpdateUser);
-      const listUsers = this.$store.$db().model('users').query().all();
-      this.arrays.users = listUsers;
-      this.arrays.users.reverse();
+
+      // if (responseOrError.error) {
+      //   console.warn('ERROR USER 422');
+      //   this.forms.formCreateUser.errors.push(responseOrError.error);
+      // } else {
+      //   const listUsers = this.$store.$db().model('users').query().all();
+      //   this.arrays.users = listUsers;
+      //   this.arrays.users.reverse();
       // }
     },
-    // onCancelEditUser() {
-    //   this.forms.formUpdateUser.active = false;
-    // },
+
     async onClickDeleteUser(user) {
       console.warn('ADMIN: onClickDeleteUser');
       console.error(user);

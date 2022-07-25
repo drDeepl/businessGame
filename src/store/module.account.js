@@ -8,11 +8,11 @@ export const account = {
   },
   actions: {
     async getAccountById(context, model) {
-      // getAccountById получает на  вход объект model
-      // model = {idAccount: Integer, idTeam: Integer}\
-      // По idAccount получает данные о счете\
-      // Создает модель для хранения данных dataAccountByIdTeam
-      // После сохраняет данные в state в виде {idTeam:dataAccount}\
+      // NOTE: getAccountById получает на  вход объект model
+      // NOTE: model = {idAccount: Integer, idTeam: Integer}\
+      // NOTE: По idAccount получает данные о счете\
+      // NOTE: Создает модель для хранения данных dataAccountByIdTeam
+      // NOTE: После сохраняет данные в state в виде {idTeam:dataAccount}\
       console.warn('MODULE.ACCOUNT: getAccountById');
       console.log(model);
       console.log('Context\n', context);
