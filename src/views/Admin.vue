@@ -20,10 +20,31 @@
               :activate="forms.formCreateUser.active"
               :title="titleCurrentForm"
               :model="forms.formCreateUser.model"
-              :select="{role: arrays.role, team_id: teamNames}"
+              :select="{role: arrays.role}"
+              :disableFields="{team_id: true}"
               :cancelForm="onClickCancelForm"
               :parentFunction="onClickCreateUser"
             >
+              <div v-if="forms.formCreateUser.model.data.role">
+                <v-select
+                  v-if="
+                    forms.formCreateUser.model.data.role.toLowerCase() ==
+                    'player'
+                  "
+                  color="#6c63ff"
+                  class="pr-2 pl-2 ma-1"
+                  v-model="forms.formCreateUser.model.data.team_id"
+                  :items="teamNames"
+                  :label="forms.formCreateUser.model.props.team_id"
+                  :rules="[(v) => !!v || 'Поле не может быть пустым']"
+                >
+                </v-select>
+              </div>
+
+              <v-btn class="ma-2" outlined color="orange" @click="fakeUser"
+                >Фейк пользователь</v-btn
+              >
+              <div>{{ forms.formCreateUser.model.data }}</div>
               <v-alert
                 border="right"
                 colored-border
@@ -82,7 +103,13 @@
           </v-tab-item>
           <!-- // INFO: Список пользователей -->
           <v-tab-item>
-            <div class="admin-list-users-wrapper">
+            <v-progress-circular
+              class="manufacturer-layout"
+              indeterminate
+              size="64"
+              v-if="arrays.users == null || arrays.users == undefined"
+            ></v-progress-circular>
+            <div v-else class="admin-list-users-wrapper">
               <v-card class="ma-1 pa-1 admin-row-user-card list-users-header">
                 <span
                   class="admin-users-text"
@@ -158,49 +185,25 @@
 
 <script>
 import Form from '@/UI/Form.vue';
-
-// import {validationMixin} from 'vuelidate';
-// import {required, email, numeric} from 'vuelidate/lib/validators';
 import {codeErrorResponse} from '@/helpers/helper.error';
+import {createRandomUser} from '@/helpers/helper.fake';
 import ModelUserCreate from '@/models/model.user.create';
 import ModelUpdateUser from '@/models/model.user.update';
 import ModelCreateTeam from '@/models/model.team.create';
 import ModelUser from '@/models/model.user';
 import UserService from '@/services/user.service';
-import {createRandomUser} from '@/helpers/helper.fake';
+
 import User from '@/store/models/User';
 import Team from '@/store/models/Team';
 
 export default {
-  async created() {
-    console.warn('ADMIN.VUE: created');
-    const currentUser = this.$store.state.auth.user;
-    const username = currentUser.username;
-    console.error(username);
-    const userData = await User.api().getUserByUsername(username);
-    // await this.$store.dispatch('user/getUserDataByUsName', username);
-    // const userData =
-    //   this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](username);
-    // FIX: удалить после исправления ошибок
-    userData.is_superuser = true;
-    // FIX: ================================
-    if (!userData.is_superuser) {
-      this.$router.push('/');
-    } else {
-      this.arrays.role = await UserService.getRoles();
-
-      const listTeams = await Team.api().getListTeams();
-
-      let listUsers = await User.api().getListUsers();
-      console.warn(listTeams.response.data);
-      this.arrays.users = listUsers.response.data;
-      this.arrays.team = listTeams.response.data;
-    }
-  },
   data() {
     return {
       titleCurrentForm: '',
       currentForm: '',
+      loading: {
+        users: true,
+      },
       titles:
         this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE']('SUPERUSER')[0],
       models: {
@@ -210,7 +213,7 @@ export default {
       },
       arrays: {
         role: null,
-        team: null, // INFO: {nameTeam: data team}
+        teams: null, // INFO: {nameTeam: data team}
         users: null,
       },
 
@@ -257,7 +260,31 @@ export default {
       },
     };
   },
+  async created() {
+    console.warn('ADMIN.VUE: created');
+    const currentUser = this.$store.state.auth.user;
+    const username = currentUser.username;
+    console.error(username);
+    const userData = await User.api().getUserByUsername(username);
+    // await this.$store.dispatch('user/getUserDataByUsName', username);
+    // const userData =
+    //   this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](username);
+    // FIX: удалить после исправления ошибок
+    userData.is_superuser = true;
+    // FIX: ================================
+    if (!userData.is_superuser) {
+      this.$router.push('/');
+    } else {
+      this.arrays.role = await UserService.getRoles();
 
+      const listTeams = await Team.api().getListTeams();
+
+      let listUsers = await User.api().getListUsers();
+      console.warn(listTeams.response.data);
+      this.arrays.users = listUsers.response.data;
+      this.arrays.teams = listTeams.response.data;
+    }
+  },
   computed: {
     teamNames() {
       let listTeams = this.$store.$db().model('teams').query().all();
@@ -287,29 +314,36 @@ export default {
     },
     async onClickCreateUser(modelCreateUser) {
       console.warn('ADMIN.VUE: onClickCreateUser');
+      console.warn(modelCreateUser);
       this.forms.formCreateUser.errors = [];
       // INFO: modelCreateUser содержит данные из формы
       // INFO: Функция выполняет валидацию данных, полученных из формы
       // INFO: А после показывает ошибки либо отправляет данные на сервер
       console.warn(modelCreateUser);
-      const team = this.$store
-        .$db()
-        .model('teams')
-        .query()
-        .where('name', modelCreateUser['team_id'])
-        .first();
-      const team_id = team.id;
-      modelCreateUser['team_id'] = team_id;
+      if (modelCreateUser.role.toLowerCase() == 'player') {
+        const team = this.$store
+          .$db()
+          .model('teams')
+          .query()
+          .where('name', modelCreateUser['team_id'])
+          .first();
+        console.warn('TEAM\n', team);
+        const team_id = team.id;
+        modelCreateUser['team_id'] = team_id;
+      }
+
       console.error('NEW USER\n', modelCreateUser);
+      // FIX: Обработка ошибки при создании пользователя с существующим username
       try {
-        await User.api().createUser(modelCreateUser);
+        const user = await User.api().createUser(modelCreateUser);
+        console.error(user.response.data);
         const listUsers = this.$store.$db().model('users').query().all();
         this.arrays.users = listUsers;
       } catch (e) {
         const errorCode = codeErrorResponse(e);
         if (errorCode == 422) {
           this.forms.formCreateUser.errors = [
-            'Такое имя пользователя уже существует',
+            'Имя пользователя уже существует',
           ];
         }
       }
@@ -317,13 +351,14 @@ export default {
     async onClickCreateTeam(modelCreateTeam) {
       console.warn('ADMIN.VUE: onClickCreateTeam');
       console.error(modelCreateTeam);
-      await Team.api().createTeam(modelCreateTeam);
+      const createdTeam = await Team.api().createTeam(modelCreateTeam);
+      console.error(createdTeam);
       await User.api().getListUsers();
     },
     onClickUpdateUser(user) {
       console.warn('Admin.vue: onClickUpdateUser');
       console.error('USER FROM ROW:\n', user);
-      // FIX: Неизвестный тип мутации
+
       this.$store.dispatch('user/userToUpdate', user.id);
       this.forms.formUpdateUser.selectedUser = user;
       this.titleCurrentForm = 'Редактирование пользователя';
@@ -369,7 +404,14 @@ export default {
       const newModel = createRandomUser(this.models.modelCreateUser);
       this.models.modelCreateUser = newModel;
     },
+    fakeUser() {
+      console.warn('ADMIN.VUE: fakeUser');
+      let model = this.forms.formCreateUser.model.data;
+      const new_model = createRandomUser(model);
+      this.forms.formCreateUser.model.data = new_model;
+    },
   },
+
   components: {
     Form,
   },

@@ -136,6 +136,7 @@
 // TODO: [13.07.22]: продажу продуктовых наборов
 // TODO: [15.07.2022] Упростить подмену product_id на product_name
 // TODO: [18.07.2022] научиться в общем виде делать подмену данных формы через watch
+// TODO: [26.07.2022] Синхронизировать данные между компонентами
 import ModelProduct from '@/models/model.product';
 import ModelProductKit from '@/models/model.productKit';
 import CreateProduct from '@/models/model.create.product';
@@ -277,7 +278,7 @@ export default {
       const resp = await Product.api().createProduct(createdProduct, jwt);
       console.error(resp);
     },
-    async onClickCreateProductKit(product) {
+    onClickCreateProductKit(product) {
       console.warn('MANUFACTURER.VUE: onClickCreateProductKit');
       this.forms.activeForm = 'formAddProductKit';
       this.forms.titleForm = 'Создать продуктовый набор';
@@ -288,10 +289,11 @@ export default {
     async onClickApplyCreateProductKit(productKit) {
       console.warn('MANUFACTURER.vue: onClickApplyCreateProduct');
       console.error(productKit);
-      await ProductKit.api().createProductKit(productKit, this.getJWT);
-      const arrayPK = ProductKit.all();
-      console.log(arrayPK);
-      console.log(this.arrays.productKits);
+      // await ProductKit.api().createProductKit(productKit);
+      // const arrayPK = ProductKit.all();
+      // console.log(arrayPK);
+      // console.log(this.arrays.productKits);
+      this.$store.commit('productKit/SET_PRODUCT_KIT_LIST_UPDATED');
       this.arrays.productKits = ProductKit.all();
     },
     async onClickDeleteProduct(product) {

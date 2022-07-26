@@ -5,7 +5,12 @@
         <p id="sidebar-tittle" class="user-info">{{ title }}</p>
         <ul class="user-info" v-if="sidebarUserInfo.role.value == 'player'">
           <!-- TODO: Оформить красивый вывод информации -->
+          <v-skeleton-loader
+            v-if="loading.sidebarUserInfo"
+            type="text@4"
+          ></v-skeleton-loader>
           <li
+            v-else
             :id="row"
             class="user-info-row"
             v-for="row in Object.keys(sidebarUserInfo)"
@@ -91,6 +96,9 @@ export default {
       test: '',
       title: app.title,
       userId: 0,
+      loading: {
+        sidebarUserInfo: true,
+      },
       sidebarUserInfo: {
         username: {title: 'Имя пользователя', value: ''},
         role: {title: 'Роль', value: ''},
@@ -170,10 +178,11 @@ export default {
       const responseUser = await User.api().getUserByUsername(username);
       const dataUser = responseUser.response.data;
       const roleUser = dataUser.role.toLowerCase();
+      this.sidebar.links =
+        this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
       if (roleUser == 'player') {
-        this.sidebar.links =
-          this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
         const teamId = dataUser.team;
+        console.error('DATA USER\n', dataUser);
         const resTeam = await Team.api().getTeam(teamId);
         const dataTeam = resTeam.response.data;
         const resAccount = await Account.api().getAccount(dataTeam.account);
@@ -182,6 +191,7 @@ export default {
         this.sidebarUserInfo.role.value = roleUser;
         this.sidebarUserInfo.team.value = dataTeam.name;
         this.sidebarUserInfo.balance.value = dataAccount.balance;
+        this.loading.sidebarUserInfo = false;
       }
 
       // console.warn('USER_DATA\n', data);

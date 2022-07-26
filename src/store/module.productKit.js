@@ -1,40 +1,29 @@
-import ProductKitService from '@/services/productKit.service';
-
+import ProductKit from './models/ProductKit';
 export const productKit = {
   namespaced: true,
   state: {
-    productKits: {}, // INFO: { id_productKit: data_productKit}
-    productKits_By_Product: {} // INFO: {productId: data_productKit}
+    productKitList: {
+      // NOTE: ['ACTIVE', 'UPDATED']
+      status: null,
+    },
   },
   actions: {
-    async createProductKit(context, productKit) {
-      console.warn('MODULE.PRODUCT_KIT', productKit);
-      const createdProductKit = await ProductKitService.createProdKit(
-        productKit
-      );
-      context.commit('SET_PRODUCT_KIT', createdProductKit);
-      console.error(createdProductKit);
-      return createdProductKit;
+    async getListProdKit(context) {
+      console.warn('STORE.MODULE.PRODUCT_KIT: getListProdKit');
+      await ProductKit.api().getListProductKits();
+      context.commit('SET_PRODUCT_KIT_LIST_UPDATED');
     },
-    async getProductsKit(context) {
-      console.warn('MODULE.PRODUCT_KIT');
-      console.log(context);
-    }
   },
   getters: {
-    GET_LIST_PRODUCT_KITS: state => {
-      return state.productKits;
-    }
+    GET_STATUS_LIST_PRODUCT_KIT: (state) => {
+      return state.productKitList.status;
+    },
   },
   mutations: {
-    SET_PRODUCT_KIT: function(state, createdProductKit) {
-      console.warn('MODULE.PRODUCT_KIT', 'SET_PRODUCT_KIT');
-      // NOTE: функия сохранает готовый набор продуктов
-      // NOTE: в state по id productKit и id product(product)
-      state.productKits[createdProductKit.id] = createdProductKit;
-      state.productKits_By_Product[
-        createdProductKit.product
-      ] = createdProductKit;
-    }
-  }
+    SET_PRODUCT_KIT_LIST_UPDATED: function (state) {
+      console.warn('MODULE.PRODUCT_KIT: SET_PRODUCT_KIT_LIST_UPDATED');
+      state.productKitList.status = 'UPDATED';
+      console.warn(state.productKitList.status);
+    },
+  },
 };

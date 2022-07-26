@@ -3,9 +3,19 @@
     <!-- <Form> </Form> -->
     <v-tabs>
       <v-tab>Предложения</v-tab>
+
       <v-tab @click="onClickTabTransaction">Все транзакции</v-tab>
+      <!-- INFO: Вкладка с предложениями о покупке продуктового набора -->
       <v-tab-item>
-        <div v-if="offers.length > 0" class="cards-container">
+        {{ getStatusListProdKit }}
+        <v-progress-circular
+          v-if="offers.length <= 0"
+          color="#ee5544"
+          class="manufacturer-layout"
+          indeterminate
+          size="64"
+        ></v-progress-circular>
+        <div v-else class="cards-container">
           <ProductCard
             v-for="offer in offers"
             :key="offer.id"
@@ -28,10 +38,34 @@
               >
             </div>
           </ProductCard>
+          <v-bottom-sheet v-model="lowBalance">
+            <v-sheet class="text-center" height="15em">
+              <v-btn class="mt-6" text color="red" @click="onClickOkLowBalance">
+                закрыть
+              </v-btn>
+              <div class="py-3">
+                <v-card-text
+                  >Упс.. не хватает денег на балансе для покупки
+                  товара</v-card-text
+                >
+                <v-card-text v-for="offer in offers" :key="offer['$id']">
+                  {{ offer }}
+                </v-card-text>
+              </div>
+            </v-sheet>
+          </v-bottom-sheet>
         </div>
       </v-tab-item>
+      <!-- INFO: Вкладка с транзакциями -->
       <v-tab-item>
-        <div class="transaction-container" v-if="transactions.length > 0">
+        <v-progress-circular
+          v-if="offers.length <= 0"
+          color="#ee5544"
+          class="manufacturer-layout"
+          indeterminate
+          size="64"
+        ></v-progress-circular>
+        <div v-else class="transaction-container">
           <v-simple-table>
             <template v-slot:default>
               <thead>
@@ -86,10 +120,12 @@ import User from '@/store/models/User';
 import Team from '@/store/models/Team';
 
 import {prepareTypes} from '@/helpers/helper.form';
+// TODO: [26.07.2022] Синхронизировать данные между компонентами
 export default {
   data() {
     return {
       loading: false,
+      lowBalance: false,
       title: '',
       cards: {
         cardOffer: {
@@ -112,6 +148,10 @@ export default {
     };
   },
   computed: {
+    getStatusListProdKit() {
+      // FIX: в компоненте manufacturer данные изменяются, а здесь нет
+      return this.$store.state.productKit.productKitList.status;
+    },
     offers() {
       return this.$store.$db().model('offers').all();
     },
@@ -222,31 +262,40 @@ export default {
         await User.api().getUserByUsername(this.currentUser)
       ).response.data;
 
-      // FIX Чтобы получить баланс необходимо иметь номер счёта
-      // FIX пользователь создаётся без номера счёта
-      const balance = (await Account.api().getAccount(currentUserData.account))
-        .response.data;
-      // FIX =======================================
+      const accountData = (
+        await Account.api().getAccount(currentUserData.account)
+      ).response.data;
+      const balance = Number.parseInt(accountData.balance);
 
+      console.error('BALANCE\n', balance);
       const offerPrice = Number.parseInt(offer.price);
-      console.error(balance, '\noffer price ' + offerPrice);
-      console.warn('CURRENT_USER_DATA\n', currentUserData);
-      const account_to = this.currentUserData.account;
-      const account_from = offer.trader;
-      const amount = offerPrice;
-      const accountTransfer = new AccountTransfer();
-      console.error(prepareTypes, accountTransfer);
-      accountTransfer.data['account_id_from'] = account_from;
-      accountTransfer.data['account_id_to'] = account_to;
-      accountTransfer.data.amount = amount;
-      const createdOffer = prepareTypes(
-        accountTransfer.data,
-        accountTransfer.types
-      );
-      console.log(Account);
-      console.warn('CREATED OFFER', createdOffer);
-      // const transfer = await Account.api().accountTransfer(createdOffer);
-      // console.warn(transfer);
+      if (balance < offerPrice) {
+        console.error('BALANCE LOW PRICE OFFER');
+        this.lowBalance = true;
+      } else {
+        console.warn('CURRENT_USER_DATA\n', currentUserData);
+        const account_to = this.currentUserData.account;
+        const account_from = offer.trader;
+        const amount = offerPrice;
+        const accountTransfer = new AccountTransfer();
+        console.error(prepareTypes, accountTransfer);
+        accountTransfer.data['account_id_from'] = account_from;
+        accountTransfer.data['account_id_to'] = account_to;
+        accountTransfer.data.amount = amount;
+        const createdOffer = prepareTypes(
+          accountTransfer.data,
+          accountTransfer.types
+        );
+        console.log(Account);
+        console.warn('CREATED OFFER', createdOffer);
+        // const transfer = await Account.api().accountTransfer(createdOffer);
+        // console.warn(transfer);
+      }
+    },
+    onClickOkLowBalance() {
+      console.warn('SHOP.VUE: onClickOkLowBalances');
+      // NOTE: Данная функция закрывает всплывающее сообщение
+      this.lowBalance = false;
     },
   },
   async created() {
