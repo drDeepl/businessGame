@@ -5,7 +5,7 @@ export default class ProductKitStorage extends Model {
   static entity = 'productKits_storage';
   static fields() {
     return {
-      product_kit: this.attr({}),
+      product_kit: this.attr(''),
       count: this.attr(null),
     };
   }
@@ -15,7 +15,7 @@ export default class ProductKitStorage extends Model {
     actions: {
       async getListProductKits(team_id) {
         console.warn('MODEL.PRODUCT.STORAGE');
-        this.get('store/' + team_id + '/product-kits/list');
+        return this.get('store/' + team_id + '/product-kits/list');
       },
     },
   };

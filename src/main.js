@@ -10,44 +10,16 @@ import Vuex from 'vuex';
 import vuetify from '@/plugins/vuetify';
 import Close from 'vue-material-design-icons/Close.vue';
 import Delete from 'vue-material-design-icons/Delete.vue';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {
-  faHome,
-  faUser,
-  faUserPlus,
-  faSignInAlt,
-  faSignOutAlt,
-  faWarehouse,
-  faShoppingCart,
-  faTag,
-  faAddressCard,
-  faUsers,
-  faChartLine,
-  faTimesCircle,
-} from '@fortawesome/free-solid-svg-icons';
+import ChevronDown from 'vue-material-design-icons/ChevronDown';
 import MainLayout from './layouts/MainLayout.vue';
 import setupInterceptors from './services/setupInterceptors';
-library.add(
-  faHome,
-  faUser,
-  faUserPlus,
-  faSignInAlt,
-  faSignOutAlt,
-  faWarehouse,
-  faShoppingCart,
-  faTag,
-  faAddressCard,
-  faUsers,
-  faChartLine,
-  faTimesCircle
-);
 
 Vue.config.productionTip = false;
 
 Vue.use(VeeValidate);
 
-Vue.component('font-awesome-icon', FontAwesomeIcon);
+// Vue.component('font-awesome-icon', FontAwesomeIcon);
+Vue.component('arrow-icon', ChevronDown);
 Vue.component('close-icon', Close);
 Vue.component('delete-icon', Delete);
 Vue.use(Vuex);

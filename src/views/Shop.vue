@@ -1,60 +1,87 @@
 <template>
   <div class="shop-container">
     <!-- <Form> </Form> -->
+
     <v-tabs>
       <v-tab>Предложения</v-tab>
 
       <v-tab @click="onClickTabTransaction">Все транзакции</v-tab>
       <!-- INFO: Вкладка с предложениями о покупке продуктового набора -->
       <v-tab-item>
-        {{ getStatusListProdKit }}
-        <v-progress-circular
-          v-if="offers.length <= 0"
-          color="#ee5544"
-          class="manufacturer-layout"
-          indeterminate
-          size="64"
-        ></v-progress-circular>
-        <div v-else class="cards-container">
-          <ProductCard
-            v-for="offer in offers"
-            :key="offer.id"
-            :item="changeTrader(offer)"
-            :modelItem="cards.cardOffer.model"
-            :showLabel="true"
-          >
-            <div
-              class="product-card-text"
-              v-if="currentUserData.role.toLowerCase() == 'player'"
-            >
+        <v-expansion-panels>
+          <v-expansion-panel>
+            <v-expansion-panel-header>
+              <div class="shop-offer-header">
+                <arrow-icon class="offer-header-arrow" />
+                <span class="offer-header-item">Предложения</span>
+              </div>
+            </v-expansion-panel-header>
+
+            <v-expansion-panel-content>
               <v-btn
-                class="ma-1"
+                class="pa-2 btn-offer"
                 outlined
                 rounded
+                color="red"
+                @click="onClickUpdateOffers"
+                >проверить предложения</v-btn
+              >
+              <v-progress-circular
+                v-if="offers.length <= 0"
                 color="#ee5544"
-                @click="onClickBuyProductKit(offer)"
-              >
-                купить</v-btn
-              >
-            </div>
-          </ProductCard>
-          <v-bottom-sheet v-model="lowBalance">
-            <v-sheet class="text-center" height="15em">
-              <v-btn class="mt-6" text color="red" @click="onClickOkLowBalance">
-                закрыть
-              </v-btn>
-              <div class="py-3">
-                <v-card-text
-                  >Упс.. не хватает денег на балансе для покупки
-                  товара</v-card-text
+                class="manufacturer-layout"
+                indeterminate
+                size="64"
+              ></v-progress-circular>
+
+              <div v-else class="cards-container">
+                <ProductCard
+                  v-for="offer in offers"
+                  :key="offer.id"
+                  :item="changeTrader(offer)"
+                  :modelItem="cards.cardOffer.model"
+                  :showLabel="true"
                 >
-                <v-card-text v-for="offer in offers" :key="offer['$id']">
-                  {{ offer }}
-                </v-card-text>
+                  <div
+                    class="product-card-text"
+                    v-if="currentUserData.role.toLowerCase() == 'player'"
+                  >
+                    <v-btn
+                      class="ma-1"
+                      outlined
+                      rounded
+                      color="#ee5544"
+                      @click="onClickBuyProductKit(offer)"
+                    >
+                      купить</v-btn
+                    >
+                  </div>
+                </ProductCard>
+                <v-bottom-sheet v-model="lowBalance">
+                  <v-sheet class="text-center" height="15em">
+                    <v-btn
+                      class="mt-6"
+                      text
+                      color="red"
+                      @click="onClickOkLowBalance"
+                    >
+                      закрыть
+                    </v-btn>
+                    <div class="py-3">
+                      <v-card-text
+                        >Упс.. не хватает денег на балансе для покупки
+                        товара</v-card-text
+                      >
+                      <v-card-text v-for="offer in offers" :key="offer['$id']">
+                        {{ offer }}
+                      </v-card-text>
+                    </div>
+                  </v-sheet>
+                </v-bottom-sheet>
               </div>
-            </v-sheet>
-          </v-bottom-sheet>
-        </div>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </v-tab-item>
       <!-- INFO: Вкладка с транзакциями -->
       <v-tab-item>
@@ -126,6 +153,7 @@ export default {
     return {
       loading: false,
       lowBalance: false,
+
       title: '',
       cards: {
         cardOffer: {
@@ -147,6 +175,7 @@ export default {
       },
     };
   },
+
   computed: {
     getStatusListProdKit() {
       // FIX: в компоненте manufacturer данные изменяются, а здесь нет
@@ -274,8 +303,8 @@ export default {
         this.lowBalance = true;
       } else {
         console.warn('CURRENT_USER_DATA\n', currentUserData);
-        const account_to = this.currentUserData.account;
-        const account_from = offer.trader;
+        const account_from = this.currentUserData.account;
+        const account_to = offer.trader;
         const amount = offerPrice;
         const accountTransfer = new AccountTransfer();
         console.error(prepareTypes, accountTransfer);
@@ -288,9 +317,13 @@ export default {
         );
         console.log(Account);
         console.warn('CREATED OFFER', createdOffer);
-        // const transfer = await Account.api().accountTransfer(createdOffer);
-        // console.warn(transfer);
+        const transfer = await Account.api().accountTransfer(createdOffer);
+        console.warn(transfer);
       }
+    },
+    async onClickUpdateOffers() {
+      console.warn('SHOP: onClickUpdateOffers');
+      await Offer.api().getListSaleOffers();
     },
     onClickOkLowBalance() {
       console.warn('SHOP.VUE: onClickOkLowBalances');

@@ -8,10 +8,10 @@ export const productKit = {
     },
   },
   actions: {
-    async getListProdKit(context) {
+    async socket_getListProdKit(context) {
       console.warn('STORE.MODULE.PRODUCT_KIT: getListProdKit');
       await ProductKit.api().getListProductKits();
-      context.commit('SET_PRODUCT_KIT_LIST_UPDATED');
+      context.commit('SOCKET_PRODUCT_KIT_LIST_UPDATED');
     },
   },
   getters: {
@@ -20,7 +20,7 @@ export const productKit = {
     },
   },
   mutations: {
-    SET_PRODUCT_KIT_LIST_UPDATED: function (state) {
+    SOCKET_PRODUCT_KIT_LIST_UPDATED: function (state) {
       console.warn('MODULE.PRODUCT_KIT: SET_PRODUCT_KIT_LIST_UPDATED');
       state.productKitList.status = 'UPDATED';
       console.warn(state.productKitList.status);

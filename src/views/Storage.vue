@@ -12,6 +12,7 @@
 </template>
 
 <script>
+// FIX [27.07.2022]: Поля заголовка слишком большие
 import ProductKitStorage from '@/store/models/ProductKitStorage';
 import User from '@/store/models/User';
 export default {
@@ -40,9 +41,10 @@ export default {
       .data;
     console.error(userData);
     const team_id = userData.team;
-
+    console.error(team_id);
     const response = await ProductKitStorage.api().getListProductKits(team_id);
-    console.warn(response);
+    const listProductKitTeam = response.response.data;
+    console.warn(listProductKitTeam);
     // this.arrays.productKits = productKits;
   },
 };

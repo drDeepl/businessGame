@@ -9,6 +9,7 @@ const setup = (store) => {
         let headers = authHeader();
         headers['Authorization'] = 'Bearer ' + token; // for Spring Boot back-end
         // config.headers["x-access-token"] = token; // for Node.js Express back-end
+        console.warn(config);
         config.headers = headers;
       }
       return config;
