@@ -13,9 +13,13 @@ import Delete from 'vue-material-design-icons/Delete.vue';
 import ChevronDown from 'vue-material-design-icons/ChevronDown';
 import MainLayout from './layouts/MainLayout.vue';
 import setupInterceptors from './services/setupInterceptors';
+import VueSSE from 'vue-sse';
 
 Vue.config.productionTip = false;
 
+
+
+Vue.use(VueSSE);
 Vue.use(VeeValidate);
 
 // Vue.component('font-awesome-icon', FontAwesomeIcon);

@@ -9,7 +9,7 @@ const setup = (store) => {
         let headers = authHeader();
         headers['Authorization'] = 'Bearer ' + token; // for Spring Boot back-end
         // config.headers["x-access-token"] = token; // for Node.js Express back-end
-        console.warn(config);
+
         config.headers = headers;
       }
       return config;
@@ -40,7 +40,6 @@ const setup = (store) => {
 
             store.dispatch('auth/refresh', access);
             TokenService.updateLocalAccessToken(access);
-            console.warn(originalConfig);
             return instance(originalConfig);
           } catch (_error) {
             return Promise.reject(_error);

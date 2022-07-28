@@ -10,7 +10,7 @@
       <v-tab-item>
         <v-expansion-panels>
           <v-expansion-panel>
-            <v-expansion-panel-header>
+            <v-expansion-panel-header @click="onClickOffers">
               <div class="shop-offer-header">
                 <arrow-icon class="offer-header-arrow" />
                 <span class="offer-header-item">Предложения</span>
@@ -18,14 +18,6 @@
             </v-expansion-panel-header>
 
             <v-expansion-panel-content>
-              <v-btn
-                class="pa-2 btn-offer"
-                outlined
-                rounded
-                color="red"
-                @click="onClickUpdateOffers"
-                >проверить предложения</v-btn
-              >
               <v-progress-circular
                 v-if="offers.length <= 0"
                 color="#ee5544"
@@ -140,21 +132,26 @@ import Offer from '@/store/models/Offer';
 import SaleOffer from '@/models/model.offer.sale';
 import AccountTransfer from '@/models/model.account.transfer';
 import ModelTransaction from '@/models/model.transaction';
+import AccountAcquire from '@/models/model.account.acquire';
 import Account from '@/store/models/Account';
 import Transaction from '@/store/models/Transaction';
 import User from '@/store/models/User';
 // import User from '@/store/models/User';
 import Team from '@/store/models/Team';
-
 import {prepareTypes} from '@/helpers/helper.form';
+
 // TODO: [26.07.2022] Синхронизировать данные между компонентами
+
 export default {
   data() {
     return {
-      loading: false,
       lowBalance: false,
 
       title: '',
+      offersTab: {
+        subscribe: false,
+        loading: false,
+      },
       cards: {
         cardOffer: {
           model: new SaleOffer(),
@@ -175,14 +172,20 @@ export default {
       },
     };
   },
+  async created() {
+    this.loading = true;
+    await Offer.api().getListSaleOffers();
+
+    await Team.api().getListTeams();
+    const user = this.$store.state.auth.user;
+    console.error(user);
+    console.warn('USERNAME');
+  },
 
   computed: {
-    getStatusListProdKit() {
-      // FIX: в компоненте manufacturer данные изменяются, а здесь нет
-      return this.$store.state.productKit.productKitList.status;
-    },
     offers() {
-      return this.$store.$db().model('offers').all();
+      const offers = Offer.query().orderBy('id', 'desc').get();
+      return offers;
     },
     changeTrader() {
       console.warn('SHOP: changeTrader');
@@ -263,6 +266,10 @@ export default {
       return this.$store.$db().model('transactions').query().all();
     },
   },
+  watch: {
+    // TODO: навесить наблюдателя, который
+    // TODO: будет изменять состояние вкладки "Предложения"
+  },
   methods: {
     getAccount(accountId) {
       console.warn('SHOP: getAccount');
@@ -283,8 +290,8 @@ export default {
       this.arrays.transactions = transactionList;
     },
     async onClickBuyProductKit(offer) {
-      // NOTE: функция находит account_from по trader
-      // NOTE: account_id_to находится по текующему пользователю
+      // NOTE: функция находит account_id_to по trader
+      // NOTE: account_id_from находится по текующему пользователю
       console.warn('SHOP.VUE: onClickBuyProductKit');
       console.error('offer\n', offer);
       const currentUserData = (
@@ -295,49 +302,64 @@ export default {
         await Account.api().getAccount(currentUserData.account)
       ).response.data;
       const balance = Number.parseInt(accountData.balance);
-
-      console.error('BALANCE\n', balance);
       const offerPrice = Number.parseInt(offer.price);
       if (balance < offerPrice) {
         console.error('BALANCE LOW PRICE OFFER');
         this.lowBalance = true;
       } else {
-        console.warn('CURRENT_USER_DATA\n', currentUserData);
-        const account_from = this.currentUserData.account;
-        const account_to = offer.trader;
-        const amount = offerPrice;
-        const accountTransfer = new AccountTransfer();
-        console.error(prepareTypes, accountTransfer);
-        accountTransfer.data['account_id_from'] = account_from;
-        accountTransfer.data['account_id_to'] = account_to;
-        accountTransfer.data.amount = amount;
-        const createdOffer = prepareTypes(
-          accountTransfer.data,
-          accountTransfer.types
+        // const teamDataUser = await Team.api().getTeam(currUserData.team);
+        // const teamDataTrader = await Team.api().getTeam(
+        //   traderUserData.response.data.team
+        // );
+        // console.error('TRADER DATA\n', traderUserData);
+        // console.error('CURRENT USER DATA\n', currUserData);
+        // console.error('TEAM DATA USER\n', teamDataUser);
+        // console.error('TEAM DATA TRADER\n', teamDataTrader);
+        // const account_from = this.currentUserData.account;
+        // const account_to = offer.trader;
+        // const amount = offerPrice;
+        // const accountTransfer = new AccountTransfer();
+
+        // accountTransfer.data['account_id_from'] = account_from;
+        // accountTransfer.data['account_id_to'] = account_to;
+        // accountTransfer.data.amount = amount;
+        // const createdOffer = prepareTypes(
+        //   accountTransfer.data,
+        //   accountTransfer.types
+        // );
+
+        console.warn('CREATED OFFER', AccountTransfer, prepareTypes);
+        // const responseTransfer = await Account.api().accountTransfer(
+        //   createdOffer
+        // );
+        // console.warn(responseTransfer.response.data);
+        const accountAcquire = new AccountAcquire().data;
+        accountAcquire.offer_id = Number.parseInt(offer.id);
+        console.warn(accountAcquire);
+        const responseAccountAcquire = await Offer.api().offerSaleAcquire(
+          Number.parseInt(offer.id)
         );
-        console.log(Account);
-        console.warn('CREATED OFFER', createdOffer);
-        const transfer = await Account.api().accountTransfer(createdOffer);
-        console.warn(transfer);
+        console.error(responseAccountAcquire.response.data);
       }
     },
-    async onClickUpdateOffers() {
-      console.warn('SHOP: onClickUpdateOffers');
-      await Offer.api().getListSaleOffers();
+    onClickOffers() {
+      // FIX: костыль подобия long polling для
+      // FIX: динамического обновления предложений
+      console.warn('SHOP: onClickOffers');
+      // let offers = setInterval(
+      //   () =>
+      //     Offer.api()
+      //       .getListSaleOffers()
+      //       .then((result) => console.log(result.response.data)),
+      //   100000
+      // );
+      // console.error(offers);
     },
     onClickOkLowBalance() {
       console.warn('SHOP.VUE: onClickOkLowBalances');
       // NOTE: Данная функция закрывает всплывающее сообщение
       this.lowBalance = false;
     },
-  },
-  async created() {
-    this.loading = true;
-    await Offer.api().getListSaleOffers();
-    await Team.api().getListTeams();
-    const user = this.$store.state.auth.user;
-    console.error(user);
-    console.warn('USERNAME');
   },
   components: {ProductCard},
 };

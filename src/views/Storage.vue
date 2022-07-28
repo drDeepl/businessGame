@@ -3,18 +3,21 @@
     <v-tabs>
       <v-tab>продуктовые наборы</v-tab>
       <v-tab-item>
-        <div v-for="productKit in arrays.productKits" :key="productKit.id">
+        <!-- <div v-for="productKit in productKits" :key="productKit.id">
           {{ productKit }}
-        </div>
+        </div> -->
+        <!-- TODO: -->
       </v-tab-item>
     </v-tabs>
   </div>
 </template>
 
 <script>
-// FIX [27.07.2022]: Поля заголовка слишком большие
 import ProductKitStorage from '@/store/models/ProductKitStorage';
 import User from '@/store/models/User';
+import ProductKitStore from '@/UI/ProductKitStore.vue';
+
+// TODO: [28.07.2022] отображение продуктового набора в виде карточки + заголовки
 export default {
   data() {
     return {
@@ -33,6 +36,9 @@ export default {
         .where('username', username)
         .first();
     },
+    productKits() {
+      return this.$store.$db().model('productKits_storage').query().all();
+    },
   },
   methods: {},
   async created() {
@@ -46,6 +52,9 @@ export default {
     const listProductKitTeam = response.response.data;
     console.warn(listProductKitTeam);
     // this.arrays.productKits = productKits;
+  },
+  components: {
+    ProductKitStore,
   },
 };
 </script>
