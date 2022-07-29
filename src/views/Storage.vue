@@ -1,28 +1,62 @@
 <template>
-  <div>
-    <v-tabs>
+  <div class="productKit-store-page">
+    <v-tabs class="productKit-store-page">
       <v-tab>продуктовые наборы</v-tab>
-      <v-tab-item>
+      <v-tab-item class="tab-productKit-store">
         <!-- <div v-for="productKit in productKits" :key="productKit.id">
           {{ productKit }}
         </div> -->
-        <!-- TODO: -->
+
+        <Load v-if="loading.productKits" />
+        <div v-else class="productKit-store-cards">
+          <!-- <div>{{ productKits }}</div> -->
+          <!-- <div>{{ changeProductIdOnName(productKit) }}</div> -->
+
+          <div v-for="productKit in productKits" :key="productKit['$id']">
+            <ProductKitStoreCard
+              :item="productKit"
+              :modelItem="cards.productKit.model"
+              :childItemModel="{product_kit: cards.productKit.childModel}"
+              :getProductName="getProductName"
+            >
+              <v-btn class="productKit-store-card-btn" outlined rounded
+                ><span class="productKit-store-card-btn text"
+                  >создать продукт</span
+                ></v-btn
+              >
+            </ProductKitStoreCard>
+          </div>
+        </div>
       </v-tab-item>
     </v-tabs>
   </div>
 </template>
 
 <script>
+// TODO: улучшить дизайн карточки
+// TODO: создание продукта из продуктового набора
+// TODO: продажу продуктового набора клиенту
 import ProductKitStorage from '@/store/models/ProductKitStorage';
 import User from '@/store/models/User';
-import ProductKitStore from '@/UI/ProductKitStore.vue';
+import ProductKitStore from '@/models/model.productKitStore';
+import ProductKit from '@/models/model.productKit';
+import ProductKitStoreCard from '@/UI/ProductKitStoreCard.vue';
+import Load from '@/UI/Load.vue';
 
 // TODO: [28.07.2022] отображение продуктового набора в виде карточки + заголовки
 export default {
   data() {
     return {
-      loading: false,
+      loading: {
+        productKits: false,
+      },
       arrays: {productKits: []},
+      cards: {
+        productKit: {
+          model: new ProductKitStore(),
+          childModel: new ProductKit(),
+        },
+      },
     };
   },
   computed: {
@@ -39,6 +73,16 @@ export default {
     productKits() {
       return this.$store.$db().model('productKits_storage').query().all();
     },
+    getProductName() {
+      return (id) => {
+        return this.$store
+          .$db()
+          .model('products')
+          .query()
+          .where('id', id)
+          .first().name;
+      };
+    },
   },
   methods: {},
   async created() {
@@ -48,13 +92,18 @@ export default {
     console.error(userData);
     const team_id = userData.team;
     console.error(team_id);
+
+    this.loading.productKits = true;
     const response = await ProductKitStorage.api().getListProductKits(team_id);
+
+    this.loading.productKits = false;
     const listProductKitTeam = response.response.data;
     console.warn(listProductKitTeam);
     // this.arrays.productKits = productKits;
   },
   components: {
-    ProductKitStore,
+    ProductKitStoreCard,
+    Load,
   },
 };
 </script>

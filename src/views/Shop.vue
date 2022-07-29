@@ -77,13 +77,7 @@
       </v-tab-item>
       <!-- INFO: Вкладка с транзакциями -->
       <v-tab-item>
-        <v-progress-circular
-          v-if="offers.length <= 0"
-          color="#ee5544"
-          class="manufacturer-layout"
-          indeterminate
-          size="64"
-        ></v-progress-circular>
+        <Load v-if="offers.length <= 0" />
         <div v-else class="transaction-container">
           <v-simple-table>
             <template v-slot:default>
@@ -128,6 +122,7 @@
 <script>
 // import Form from '@/UI/Form.vue';
 import ProductCard from '@/UI/ProductCard.vue';
+import Load from '@/UI/Load.vue';
 import Offer from '@/store/models/Offer';
 import SaleOffer from '@/models/model.offer.sale';
 import AccountTransfer from '@/models/model.account.transfer';
@@ -361,6 +356,6 @@ export default {
       this.lowBalance = false;
     },
   },
-  components: {ProductCard},
+  components: {ProductCard, Load},
 };
 </script>

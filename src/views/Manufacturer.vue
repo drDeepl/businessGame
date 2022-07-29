@@ -290,10 +290,7 @@ export default {
     async onClickApplyCreateProductKit(productKit) {
       console.warn('MANUFACTURER.vue: onClickApplyCreateProduct');
       console.error(productKit);
-      await ProductKit.api().createProductKit(productKit);
-      const arrayPK = ProductKit.all();
-      console.log(arrayPK);
-      console.log(this.arrays.productKits);
+
       await this.$store.dispatch('productKit/socket_getListProdKit');
       this.arrays.productKits = ProductKit.all();
     },

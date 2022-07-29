@@ -1,5 +1,5 @@
 <template>
-  <div :class="sidebar.className" id="wrapper">
+  <div :class="sidebar.className + ' mainLayout'" id="wrapper">
     <aside id="sidebar-wrapper" class="aside-sidebar">
       <div class="sidebar-container">
         <p id="sidebar-tittle" class="user-info">{{ title }}</p>
@@ -88,6 +88,7 @@ import {app} from '@/_config';
 import User from '@/store/models/User';
 import Team from '@/store/models/Team';
 import Account from '@/store/models/Account';
+import Product from '@/store/models/Product';
 // import Product from '@/store/models/Product';
 // import ProductKit from '@/store/models/ProductKit';
 export default {
@@ -116,50 +117,6 @@ export default {
       },
     };
   },
-
-  computed: {
-    currentUser() {
-      return this.$store.state.auth.user;
-    },
-    currentTab() {
-      return this.$route.params;
-    },
-
-    users() {
-      return this.$store.$db().model('users').all();
-    },
-    sidebarLinks() {
-      return this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](
-        this.sidebarUserInfo.role
-      );
-    },
-  },
-  methods: {
-    async onClickMenu() {
-      this.sidebar.isActive = !this.sidebar.isActive;
-      if (this.sidebar.isActive) {
-        console.warn('MAINLAYOUT: onClickMenu');
-        this.sidebar.className = 'menuDisplayed';
-      } else {
-        this.sidebar.className = '';
-      }
-    },
-
-    onClickTab() {
-      this.sidebar.className = 'sidebar-container';
-      this.sidebar.isActive = !this.sidebar.isActive;
-    },
-    setActiveTab(title) {
-      return (this.tab.activeTab = title);
-    },
-    OnLogOut() {
-      this.$store.dispatch('auth/logout');
-      this.$router.push('/');
-    },
-    onMyProfile() {
-      this.$router.push('/profile');
-    },
-  },
   async created() {
     // TODO [20.07.2022]: переделать страницу авторизации
     // TODO [20.07.2022]: оформить покупку продуктового набора через состояния
@@ -178,6 +135,7 @@ export default {
       const responseUser = await User.api().getUserByUsername(username);
       const dataUser = responseUser.response.data;
       const roleUser = dataUser.role.toLowerCase();
+      await Product.api().getListProducts();
       this.sidebar.links =
         this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
       if (roleUser == 'player') {
@@ -232,6 +190,49 @@ export default {
     } else {
       this.$router.push('/');
     }
+  },
+  computed: {
+    currentUser() {
+      return this.$store.state.auth.user;
+    },
+    currentTab() {
+      return this.$route.params;
+    },
+
+    users() {
+      return this.$store.$db().model('users').all();
+    },
+    sidebarLinks() {
+      return this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](
+        this.sidebarUserInfo.role
+      );
+    },
+  },
+  methods: {
+    async onClickMenu() {
+      this.sidebar.isActive = !this.sidebar.isActive;
+      if (this.sidebar.isActive) {
+        console.warn('MAINLAYOUT: onClickMenu');
+        this.sidebar.className = 'menuDisplayed';
+      } else {
+        this.sidebar.className = '';
+      }
+    },
+
+    onClickTab() {
+      this.sidebar.className = 'sidebar-container';
+      this.sidebar.isActive = !this.sidebar.isActive;
+    },
+    setActiveTab(title) {
+      return (this.tab.activeTab = title);
+    },
+    OnLogOut() {
+      this.$store.dispatch('auth/logout');
+      this.$router.push('/');
+    },
+    onMyProfile() {
+      this.$router.push('/profile');
+    },
   },
 };
 </script>

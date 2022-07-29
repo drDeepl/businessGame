@@ -1,0 +1,47 @@
+.productKit-store-page {
+  max-height: 100% !important;
+}
+
+.productKit-store-cards {
+  display: grid !important;
+  justify-content: center !important;
+  grid-template-rows: 10em 10em;
+}
+
+.productKit-store-card-container {
+  display: flex !important;
+  flex-direction: column !important;
+  border: 1px solid $color-purple !important;
+  border-radius: 17px !important;
+  box-shadow: 0.4em -0.2em 1.2em rgba(108, 99, 255, 0.6) !important;
+  width: 18em;
+  margin-top: 1em;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  align-items: center !important;
+}
+
+.productKit-store-card-row-container {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.05em;
+}
+
+.productKit-store-card-row-container > span {
+  color: $color-orange;
+  font-weight: 700;
+}
+
+.productKit-store-card-btn {
+  display: flex !important;
+  justify-content: center !important;
+  color: $color-orange !important;
+  width: 10em !important;
+}
+
+.productKit-store-card-btn.text {
+  font-size: 0.75em;
+}
