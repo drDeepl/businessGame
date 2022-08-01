@@ -1,5 +1,6 @@
 <template>
-  <div :class="sidebar.className + ' mainLayout'" id="wrapper">
+  <Load v-if="$store.getters['user/GET_STATE_getUser']" />
+  <div v-else :class="sidebar.className + ' mainLayout'" id="wrapper">
     <aside id="sidebar-wrapper" class="aside-sidebar">
       <div class="sidebar-container">
         <p id="sidebar-tittle" class="user-info">{{ title }}</p>
@@ -89,6 +90,7 @@ import User from '@/store/models/User';
 import Team from '@/store/models/Team';
 import Account from '@/store/models/Account';
 import Product from '@/store/models/Product';
+import Load from '@/UI/Load.vue';
 // import Product from '@/store/models/Product';
 // import ProductKit from '@/store/models/ProductKit';
 export default {
@@ -98,6 +100,7 @@ export default {
       title: app.title,
       userId: 0,
       loading: {
+        main: this.$store.getters['mainLayout/LOADING'],
         sidebarUserInfo: true,
       },
       sidebarUserInfo: {
@@ -133,9 +136,11 @@ export default {
     if (this.$store.state.auth.status.loggedIn) {
       const username = this.currentUser.username;
       const responseUser = await User.api().getUserByUsername(username);
+
       const dataUser = responseUser.response.data;
       const roleUser = dataUser.role.toLowerCase();
       await Product.api().getListProducts();
+
       this.sidebar.links =
         this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
       if (roleUser == 'player') {
@@ -234,5 +239,6 @@ export default {
       this.$router.push('/profile');
     },
   },
+  components: {Load},
 };
 </script>

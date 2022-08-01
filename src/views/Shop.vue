@@ -302,32 +302,7 @@ export default {
         console.error('BALANCE LOW PRICE OFFER');
         this.lowBalance = true;
       } else {
-        // const teamDataUser = await Team.api().getTeam(currUserData.team);
-        // const teamDataTrader = await Team.api().getTeam(
-        //   traderUserData.response.data.team
-        // );
-        // console.error('TRADER DATA\n', traderUserData);
-        // console.error('CURRENT USER DATA\n', currUserData);
-        // console.error('TEAM DATA USER\n', teamDataUser);
-        // console.error('TEAM DATA TRADER\n', teamDataTrader);
-        // const account_from = this.currentUserData.account;
-        // const account_to = offer.trader;
-        // const amount = offerPrice;
-        // const accountTransfer = new AccountTransfer();
-
-        // accountTransfer.data['account_id_from'] = account_from;
-        // accountTransfer.data['account_id_to'] = account_to;
-        // accountTransfer.data.amount = amount;
-        // const createdOffer = prepareTypes(
-        //   accountTransfer.data,
-        //   accountTransfer.types
-        // );
-
         console.warn('CREATED OFFER', AccountTransfer, prepareTypes);
-        // const responseTransfer = await Account.api().accountTransfer(
-        //   createdOffer
-        // );
-        // console.warn(responseTransfer.response.data);
         const accountAcquire = new AccountAcquire().data;
         accountAcquire.offer_id = Number.parseInt(offer.id);
         console.warn(accountAcquire);

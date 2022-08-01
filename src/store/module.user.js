@@ -1,23 +1,22 @@
 import UserService from '@/services/user.service';
-import {isExist} from '@/services/utils.service';
+
 import {
   adminSidebarLinks,
   playerSidebarLinks,
   manufacturerSidebarLinks,
+  customerSidebarLinks,
 } from '@/_config';
 
+import User from './models/User';
 export const user = {
   namespaced: true,
   state: {
-    updateUser: {}, // NOTE: {userId: status}
-    userInfo: {
-      // INFO: 'username': userData,
-    },
+    getUser: false,
     linksSidebarByRole: {
       // INFO: role: [{title: String, url: String,}]
       player: playerSidebarLinks,
       manufacturer: manufacturerSidebarLinks,
-      customer: [],
+      customer: customerSidebarLinks,
       SUPERUSER: adminSidebarLinks,
     },
     arrays: {
@@ -26,10 +25,14 @@ export const user = {
     },
   },
   actions: {
-    // async getUserDataByUsName(context, username) {
-    //   console.warn('MODULE.USER: getUserData');
-    // await User.api()
-    // },
+    async getUserByUsername(context, username) {
+      console.warn('MODULE.USER: getUserByUsername');
+      context.commit('SET_GET_USER');
+      const response = await User.api().getUserByUsername(username);
+      const user = response.response.data;
+      context.commit('SET_GET_USER_COMPLETE');
+      return user;
+    },
     async getRolesUser(context) {
       const roles = await UserService.getRoles();
       console.log(context);
@@ -67,36 +70,22 @@ export const user = {
     },
   },
   getters: {
-    GET_USER_INFO_BY_USERNAME: (state) => (username) => {
-      console.warn('MODULE.USER: GET_USER_INFO_BY_USERNAME');
-      const userData = state.userInfo[username];
-      if (isExist(userData)) {
-        return userData;
-      } else {
-        return false;
-      }
+    GET_STATE_getUser: (state) => {
+      return state.getUser;
     },
-
     GET_SIDEBAR_LINKS_BY_ROLE: (state) => (role) => {
       console.warn('MODULE.USER: GET_SIDEBAR_LINKS_BY_ROLE');
       const sidebarLinks = state.linksSidebarByRole[role];
       return sidebarLinks;
     },
-    GET_LIST_USERS: (state) => {
-      console.warn('MODULE.USERS: GET_LIST_USERS');
-      return state.arrays.users;
-    },
-    GET_USER_ID_UPDATE: (state) => {
-      console.warn('MODULE.USER: GET_USER_ID_UPDATE');
-      for (let userId in state.updateUser) {
-        if (state.updateUser[userId] == 'UPDATE') {
-          return userId;
-        }
-      }
-    },
   },
   mutations: {
-    // FIX: Неизвестный тип мутации
+    SET_GET_USER: function (state) {
+      state.getUser = true;
+    },
+    SET_GET_USER_COMPLETE: function (state) {
+      state.getUser = false;
+    },
     STATE_UPDATE_USER: function (state, userId) {
       console.warn('MODULE.USER: stateUpdateUser');
       state.updateUser[userId] = 'UPDATE';

@@ -5,7 +5,7 @@ export default class ProductStorage extends Model {
   static entity = 'products_storage';
   static fields() {
     return {
-      product: this.attr({}),
+      product: this.attr(null),
       count: this.attr(null),
     };
   }
@@ -15,7 +15,7 @@ export default class ProductStorage extends Model {
     actions: {
       async getListProducts(team_id) {
         console.warn('MODEL.PRODUCT.STORAGE');
-        this.get('store/' + team_id + '/products/list');
+        return this.get('store/' + team_id + '/products/list');
       },
     },
   };

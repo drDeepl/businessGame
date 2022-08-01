@@ -31,7 +31,7 @@ export default class Offer extends Model {
       async offerSaleAcquire(modelOfferSaleAcquire) {
         console.warn('MODEL.OFFER: offerSaleAcquire');
 
-        return this.get('offers/sale/acquire/' + modelOfferSaleAcquire);
+        return this.post('offers/sale/acquire/' + modelOfferSaleAcquire);
       },
       async getListOfferPurchase() {
         console.warn('MODEL.OFFER: getListOfferPurchase');

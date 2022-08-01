@@ -2,7 +2,7 @@
   <div>
     <v-card class="productKit-store-card-container pr-3 pl-3">
       <v-card-title class="productKit-store-card-title pa-0">
-        Продуктовый набор для продукта
+        {{ title }}:
         {{ getProductName(item.product_kit.product) }}</v-card-title
       >
       <div
@@ -47,12 +47,12 @@
 export default {
   props: {
     // INFO: в модели объекта находиться свойства с заголовками для отображения
+    title: String,
     modelItem: Object,
     item: Object,
     // NOTE: childItemModel = { model}
     childItemModel: Object,
     getProductName: Function,
-    title: Object,
   },
 };
 </script>

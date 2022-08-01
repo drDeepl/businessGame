@@ -1,8 +1,11 @@
 import ProductService from '@/services/product.service';
+import ProductStorage from '@/store/models/ProductStorage';
+
 import Product from './models/Product';
 export const products = {
   namespaced: true,
   state: {
+    getProductsStore: true,
     products: {}, // NOTE: {productId: data}
     productsByName: {}, // NOTE: {product_name: data}
     productKits: {}, // NOTE: {productKit_id: data}
@@ -18,12 +21,14 @@ export const products = {
     },
   },
   actions: {
-    async createProduct(context, name) {
-      if (typeof name == 'string') {
-        const createdProduct = await ProductService.createProduct(name);
-        context.commit('SET_PRODUCT', createdProduct);
-        return createdProduct;
-      }
+    async getListProductInStore(context, team_id) {
+      console.warn('MODULE.PRODUCTS: getListProductInStore');
+      context.commit('SET_STATE_GET_PRODUCTS_STORE');
+      const response = await ProductStorage.api().getListProducts(team_id);
+
+      const listProductsStore = response.response.data;
+      context.commit('SET_STATE_GET_PRODUCTS_STORE_COMPLETE');
+      return listProductsStore;
     },
     async getListProducts() {
       console.warn('MODULE.PRODUCTS: getListProduct');
@@ -45,6 +50,10 @@ export const products = {
     },
   },
   getters: {
+    GET_STATE_getProductsStore: (state) => {
+      console.warn('MODULE.PRODUCTS: GET_STATE_getProductsStore');
+      return state.getProductsStore;
+    },
     GET_LIST_TABS_ACTION: (state) => {
       console.warn('MODULE.PRODUCTS: GET_LIST_TABS');
       return state.arrays.tabsAction;
@@ -72,18 +81,13 @@ export const products = {
     },
   },
   mutations: {
-    SET_PRODUCT_ARRAY: function (state, createdProduct) {
-      console.warn('MODULE.PRODUCTS: SET_PRODUCT_ARRAY');
-      console.error(createdProduct);
-      state.products[createdProduct.id] = createdProduct;
+    SET_STATE_GET_PRODUCTS_STORE: function (state) {
+      console.warn('MODULE.PRODUCTS: SET_STATE_GET_PRODUCTS_STORE');
+      state.getProductsStore = true;
     },
-    SET_LIST_PRODUCTS: function (state, listProducts) {
-      console.warn('MODULE.PRODUCTS.VUE: SET_LIST_PRODUCTS');
-      for (let key in listProducts) {
-        const product = listProducts[key];
-        state.products[product.id] = product;
-        state.productsByName[product.name] = product;
-      }
+    SET_STATE_GET_PRODUCTS_STORE_COMPLETE: function (state) {
+      console.warn('MODULE.PRODUCTS: SET_STATE_GET_PRODUCTS_STORE');
+      state.getProductsStore = false;
     },
   },
 };

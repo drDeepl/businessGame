@@ -17,6 +17,7 @@ import {account} from './module.account';
 import {team} from './module.team';
 import {products} from './module.products';
 import {productKit} from './module.productKit';
+import {mainLayout} from './module.main.layout';
 import instance from '@/api/main';
 import ProductKitStorage from '@/store/models/ProductKitStorage';
 import ProductStorage from '@/store/models/ProductStorage';
@@ -62,6 +63,7 @@ export default new Vuex.Store({
     team,
     products,
     productKit,
+    mainLayout,
   },
   plugins: [VuexORM.install(database)],
 });

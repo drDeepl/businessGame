@@ -30,7 +30,8 @@ export const manufacturerSidebarLinks = [
 ];
 
 export const customerSidebarLinks = [
-  {title: 'Купить продуктовый набор', url: '/storage'},
+  // {title: 'Магазин', url: '/shop'},
+  // {title: 'Склад', url: '/storage'},
 ];
 
 export const rowUpdateUser = {

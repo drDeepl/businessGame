@@ -14,6 +14,7 @@
 
           <div v-for="productKit in productKits" :key="productKit['$id']">
             <ProductKitStoreCard
+              :title="'Продуктовый набор для продукта'"
               :item="productKit"
               :modelItem="cards.productKit.model"
               :childItemModel="{product_kit: cards.productKit.childModel}"
@@ -59,32 +60,6 @@ export default {
       },
     };
   },
-  computed: {
-    currentUserData() {
-      let username = this.$store.state.auth.user.username;
-      console.warn('Storage.vue\nusername ' + username);
-      return this.$store
-        .$db()
-        .model('users')
-        .query()
-        .where('username', username)
-        .first();
-    },
-    productKits() {
-      return this.$store.$db().model('productKits_storage').query().all();
-    },
-    getProductName() {
-      return (id) => {
-        return this.$store
-          .$db()
-          .model('products')
-          .query()
-          .where('id', id)
-          .first().name;
-      };
-    },
-  },
-  methods: {},
   async created() {
     const username = this.$store.state.auth.user.username;
     const userData = (await User.api().getUserByUsername(username)).response
@@ -98,9 +73,36 @@ export default {
 
     this.loading.productKits = false;
     const listProductKitTeam = response.response.data;
-    console.warn(listProductKitTeam);
+    this.arrays.productKits = listProductKitTeam;
     // this.arrays.productKits = productKits;
   },
+  computed: {
+    currentUserData() {
+      let username = this.$store.state.auth.user.username;
+      console.warn('Storage.vue\nusername ' + username);
+      return this.$store
+        .$db()
+        .model('users')
+        .query()
+        .where('username', username)
+        .first();
+    },
+    productKits() {
+      return this.arrays.productKits;
+    },
+    getProductName() {
+      return (id) => {
+        return this.$store
+          .$db()
+          .model('products')
+          .query()
+          .where('id', id)
+          .first().name;
+      };
+    },
+  },
+  methods: {},
+
   components: {
     ProductKitStoreCard,
     Load,
