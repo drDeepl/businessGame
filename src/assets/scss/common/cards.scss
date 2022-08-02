@@ -1,21 +1,55 @@
+.cards-container {
+  display: grid !important;
+  grid-template-columns: 16em 16em;
+  justify-content: center !important;
+}
 .products-cards {
   display: grid;
-  grid-template-columns: 18rem 18rem;
+  grid-template-columns: 15rem 15rem;
   padding: 0;
-  margin: 0;
 }
 
 .product-card {
-  //   width: 30em;
-  min-width: 12em;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  justify-self: center !important;
-  align-items: center;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  // min-height: 10em;
+  // min-width: 13em;
   border: 1px solid $color-purple !important;
   border-radius: 17px !important;
-  box-shadow: 0.4em -0.2em 1.2em rgba(108, 99, 255, 0.6) !important;
+  box-shadow: 0.4em -0.2em 0.9em rgba(108, 99, 255, 0.6) !important;
+}
+// .card-wrapper {
+//   border: 1px solid red !important;
+// }
+
+.product-card-title {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.product-card-content {
+  display: grid !important;
+  margin-top: 0 !important;
+  grid-template-areas:
+    'head head'
+    'aside aside'
+    'price status';
+}
+
+.product:nth-child(1) {
+  grid-area: head !important;
+}
+
+.product:nth-child(3) {
+  grid-area: aside !important;
+}
+
+.product:nth-child(-2) {
+  grid-area: status !important;
+}
+
+.product:nth-child(-1) {
+  grid-area: price !important;
 }
 
 .product-card-text {
@@ -26,12 +60,16 @@
 }
 .product-card-text-main {
   font-size: 1.16em;
+  border: 1px solid $color-green;
+  border-radius: 15px;
+  padding: 0.2em 1em;
+  color: $color-green;
 }
 
 .product-card-text-main.state {
-  margin-top: 0.5em;
-  margin-bottom: 0.3em;
-  padding: 0.1em 0.7em 0.2em 0.7em; // NOTE: top right bottom left
+  // margin-top: 0.5em;
+  // margin-bottom: 0.3em;
+
   color: $color-purple;
   border: 1px solid $color-purple;
   border-radius: 15px;
@@ -39,10 +77,14 @@
 }
 
 .product-card-text-main.price {
-  padding: 0.1em 0.7em 0.2em 0.7em; // NOTE: top right bottom left
   color: $color-orange;
   border: 1px solid $color-orange;
   border-radius: 15px;
+}
+
+.product-card-text-main.price,
+.product-card-text-main.state {
+  padding: 0.1em 0.7em 0.2em 0.7em; // NOTE: top right bottom left
 }
 
 .card-action {
@@ -54,6 +96,8 @@
 
 .card-action-btn {
   display: flex !important;
-  flex-direction: column !important;
+  margin-top: 0.6em !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
   align-items: center;
 }

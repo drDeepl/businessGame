@@ -18,5 +18,6 @@ export default class ModelProductKit {
       count: 'number',
       time: 'number',
     };
+    this.hideOn = {id: true};
   }
 }

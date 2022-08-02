@@ -1,6 +1,8 @@
 <template>
   <Load v-if="$store.getters['user/GET_STATE_getUser']" />
   <div v-else :class="sidebar.className + ' mainLayout'" id="wrapper">
+    <!-- <a href="#" id="menu-toggle"> -->
+
     <aside id="sidebar-wrapper" class="aside-sidebar">
       <div class="sidebar-container">
         <p id="sidebar-tittle" class="user-info">{{ title }}</p>
@@ -29,43 +31,33 @@
       </div>
       <ul class="sidebar-nav">
         <li
+          class="mainLayout-sidebar-row"
           v-for="key in sidebar.links"
           :key="key.url"
           @click.prevent="onClickTab"
         >
           <span @click.prevent="setActiveTab(key.title)">
             <router-link :to="key.url">
-              {{ key.title }}
+              <span class="mainLayout-sidebar-row-text">{{ key.title }}</span>
             </router-link>
           </span>
         </li>
-        <li class="sidebar-logout">
-          <a class="sidebar-link" href @click.prevent="OnLogOut">
-            <font-awesome-icon icon="sign-out-alt" />Выйти
-          </a>
+        <li class="sidebar-logout mainLayout-sidebar-row">
+          <a class="sidebar-link" href @click.prevent="OnLogOut">Выйти </a>
         </li>
       </ul>
     </aside>
 
     <!-- INFO: Page Content -->
     <div id="page-content-wrapper">
-      <nav class="nav-bar">
-        <a href="#" id="menu-toggle" @click.prevent="onClickMenu">
-          <svg
-            class="button-toggle"
-            width="35"
-            height="35"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke-linecap="butt"
-            stroke-linejoin="arcs"
-          >
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </a>
-      </nav>
+      <button class="toggle-button" @click.prevent="onClickMenu">
+        <svg class="toggle-icon">
+          <line class="toggle-line" x1="9" x2="27" y1="11" y2="11" />
+          <line class="toggle-line" x1="11" x2="25" y1="18" y2="18" />
+          <line class="toggle-line" x1="13" x2="23" y1="25" y2="25" />
+        </svg>
+      </button>
+      <nav class="nav-bar"></nav>
       <div class="tb-container">
         <span class="tb">{{ tab.activeTab }}</span>
       </div>
@@ -216,6 +208,7 @@ export default {
   methods: {
     async onClickMenu() {
       this.sidebar.isActive = !this.sidebar.isActive;
+
       if (this.sidebar.isActive) {
         console.warn('MAINLAYOUT: onClickMenu');
         this.sidebar.className = 'menuDisplayed';

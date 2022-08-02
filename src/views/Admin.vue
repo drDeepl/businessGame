@@ -20,7 +20,7 @@
               :activate="forms.formCreateUser.active"
               :title="titleCurrentForm"
               :model="forms.formCreateUser.model"
-              :select="{role: arrays.role}"
+              :select="{role: arrays.role, team_id: teamNames}"
               :disableFields="{team_id: true}"
               :cancelForm="onClickCancelForm"
               :parentFunction="onClickCreateUser"
@@ -328,8 +328,12 @@ export default {
           .where('name', modelCreateUser['team_id'])
           .first();
         console.warn('TEAM\n', team);
-        const team_id = team.id;
-        modelCreateUser['team_id'] = team_id;
+        if (team) {
+          const team_id = team.id;
+          modelCreateUser['team_id'] = team_id;
+        } else {
+          console.error('TEAM IS NULL');
+        }
       }
 
       console.error('NEW USER\n', modelCreateUser);

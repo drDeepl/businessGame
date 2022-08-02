@@ -1,6 +1,7 @@
 <template>
   <v-dialog v-model="activate" persistent>
-    <v-form ref="form" class="admin-form pt-2 pb-2" @>
+    <v-form ref="form" class="admin-form pt-2 pb-2">
+      {{ select }}
       <div class="form-title">{{ title }}</div>
       <div v-for="textField in Object.keys(model.props)" :key="textField">
         <!-- // NOTE: Если свойство модели совпадает со свойством select -->
@@ -122,6 +123,7 @@ export default {
       const createdModel = this.createdModel;
       const typesModel = this.$props.model.types;
       const passed = Object.keys(this.$props.select);
+      console.warn('PASSED\n', passed);
       if (this.$refs.form.validate()) {
         const preparedData = prepareTypes(createdModel, typesModel, passed);
         console.warn(preparedData);

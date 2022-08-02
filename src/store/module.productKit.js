@@ -2,28 +2,28 @@ import ProductKit from './models/ProductKit';
 export const productKit = {
   namespaced: true,
   state: {
-    productKitList: {
-      // NOTE: ['ACTIVE', 'UPDATED']
-      status: null,
-    },
+    getProductKits: false,
   },
   actions: {
-    async socket_getListProdKit(context) {
+    async getProductKits(context) {
       console.warn('STORE.MODULE.PRODUCT_KIT: getListProdKit');
+      context.commit('SET_STATE_getProductKits');
       await ProductKit.api().getListProductKits();
-      context.commit('SOCKET_PRODUCT_KIT_LIST_UPDATED');
+      context.commit('SET_getProductKits_COMPLETE');
     },
   },
   getters: {
-    GET_STATUS_LIST_PRODUCT_KIT: (state) => {
-      return state.productKitList.status;
+    STATUS_getProductKits: (state) => {
+      return state.getProductKits;
     },
   },
   mutations: {
-    SOCKET_PRODUCT_KIT_LIST_UPDATED: function (state) {
-      console.warn('MODULE.PRODUCT_KIT: SET_PRODUCT_KIT_LIST_UPDATED');
-      state.productKitList.status = 'UPDATED';
-      console.warn(state.productKitList.status);
+    SET_STATE_getProductKits: function (state) {
+      console.warn('MODULE.PRODUCT_KIT: SET_STATE_getProductKits');
+      state.getProductKits = true;
+    },
+    SET_getProductKits_COMPLETE: function (state) {
+      state.getProductKits = false;
     },
   },
 };

@@ -30,10 +30,21 @@
                 <ProductCard
                   v-for="offer in offers"
                   :key="offer.id"
-                  :item="changeTrader(offer)"
+                  :title="{for_product: true}"
+                  :item="changeProductKit(changeTrader(offers[0]))"
                   :modelItem="cards.cardOffer.model"
                   :showLabel="true"
                 >
+                  <div>
+                    {{
+                      $store
+                        .$db()
+                        .model('productKits')
+                        .query()
+                        .where('id', offer.product_kit)
+                        .get()
+                    }}
+                  </div>
                   <div
                     class="product-card-text"
                     v-if="currentUserData.role.toLowerCase() == 'player'"
@@ -123,11 +134,13 @@
 // import Form from '@/UI/Form.vue';
 import ProductCard from '@/UI/ProductCard.vue';
 import Load from '@/UI/Load.vue';
-import Offer from '@/store/models/Offer';
+
 import SaleOffer from '@/models/model.offer.sale';
 import AccountTransfer from '@/models/model.account.transfer';
 import ModelTransaction from '@/models/model.transaction';
 import AccountAcquire from '@/models/model.account.acquire';
+
+import Offer from '@/store/models/Offer';
 import Account from '@/store/models/Account';
 import Transaction from '@/store/models/Transaction';
 import User from '@/store/models/User';
@@ -135,7 +148,8 @@ import User from '@/store/models/User';
 import Team from '@/store/models/Team';
 import {prepareTypes} from '@/helpers/helper.form';
 
-// TODO: [26.07.2022] Синхронизировать данные между компонентами
+// TODO: [26.07.2022] Синхронизировать данные между компонентами через web socket или SSE
+// TODO: [02.08.2022] проверку на уникальность продукта
 
 export default {
   data() {
@@ -144,7 +158,6 @@ export default {
 
       title: '',
       offersTab: {
-        subscribe: false,
         loading: false,
       },
       cards: {
@@ -168,9 +181,8 @@ export default {
     };
   },
   async created() {
-    this.loading = true;
     await Offer.api().getListSaleOffers();
-
+    this.$store.dispatch('productKit/getProductKits');
     await Team.api().getListTeams();
     const user = this.$store.state.auth.user;
     console.error(user);
@@ -218,21 +230,22 @@ export default {
     },
     changeProductKit() {
       return (offer) => {
-        console.warn('SHOP: WATCH: changeProductKit');
-        console.warn(offer.product_kit);
-        const productKit = this.$store
+        console.warn('SHOP: COMPUTED: changeProductKit');
+        console.warn(offer);
+
+        const product_id = this.$store
           .$db()
           .model('productKits')
           .query()
           .where('id', offer.product_kit)
-          .first();
-        const productName = this.$store
+          .first().product;
+        const product = this.$store
           .$db()
           .model('products')
           .query()
-          .where('id', productKit.product)
+          .where('id', product_id)
           .first();
-        offer.product_kit = productName;
+        offer.for_product = product.name;
         return offer;
       };
     },
@@ -306,6 +319,7 @@ export default {
         const accountAcquire = new AccountAcquire().data;
         accountAcquire.offer_id = Number.parseInt(offer.id);
         console.warn(accountAcquire);
+        console.error('offer\n', offer);
         const responseAccountAcquire = await Offer.api().offerSaleAcquire(
           Number.parseInt(offer.id)
         );

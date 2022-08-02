@@ -2,7 +2,7 @@ export default class ModelProduct {
   constructor() {
     this.props = {
       id: 'id',
-      name: 'Название продукта',
+      name: 'продукт',
     };
     this.types = {
       id: 'number',
@@ -16,5 +16,6 @@ export default class ModelProduct {
       id: 0,
       name: '',
     };
+    this.hideOn = {id: true};
   }
 }

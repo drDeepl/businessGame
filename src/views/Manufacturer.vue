@@ -48,8 +48,8 @@
               v-for="product in products"
               :key="product.id"
               :item="product"
+              :title="{name: true}"
               :modelItem="modelsCard.product"
-              :showLabel="true"
             >
               <v-menu bottom>
                 <template v-slot:activator="{on, attrs}">
@@ -90,6 +90,7 @@
             <ProductCard
               v-for="productKit in productKits"
               :key="productKit.id"
+              :title="{product: true}"
               :item="productKit"
               :modelItem="modelsCard.productKit"
               :showLabel="true"
@@ -100,18 +101,18 @@
                   rounded
                   color="#ee5544"
                   class="product-group-button mb-2 mr-2 ml-2"
-                  @click.prevent="onClickDeleteProductKit"
+                  @click.prevent="onClickSellProductKit(productKit)"
                 >
-                  <span>удалить</span>
+                  <span>продать</span>
                 </v-btn>
                 <v-btn
                   outlined
                   rounded
                   color="#ee5544"
                   class="product-group-button mb-2 mr-2 ml-2"
-                  @click.prevent="onClickSellProductKit(productKit)"
+                  @click.prevent="onClickDeleteProductKit"
                 >
-                  <span>продать</span>
+                  <span>удалить</span>
                 </v-btn>
               </div>
             </ProductCard>
