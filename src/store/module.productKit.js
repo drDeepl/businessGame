@@ -3,6 +3,7 @@ export const productKit = {
   namespaced: true,
   state: {
     getProductKits: false,
+    getProductKit: null,
   },
   actions: {
     async getProductKits(context) {
@@ -15,6 +16,13 @@ export const productKit = {
   getters: {
     STATUS_getProductKits: (state) => {
       return state.getProductKits;
+    },
+    GET_PRODUCT_KIT: () => {
+      console.warn('MODULE.productKit: GET_PRODUCT_KIT_FOR_SHOW');
+      return (productKitId) => {
+        const productKit = ProductKit.query().where('id', productKitId).first();
+        return productKit;
+      };
     },
   },
   mutations: {
