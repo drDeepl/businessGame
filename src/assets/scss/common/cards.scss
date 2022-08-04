@@ -6,10 +6,12 @@
 .products-cards {
   display: grid;
   grid-template-columns: 15rem 15rem;
+  justify-content: center !important;
+  column-gap: 2%;
   padding: 0;
 }
 
-.product-card {
+.offer-card {
   padding-top: 1em;
   padding-bottom: 1em;
   // min-height: 10em;
@@ -23,12 +25,12 @@
 //   border: 1px solid red !important;
 // }
 
-.product-card-title {
+.offer-card-title {
   display: flex !important;
   flex-direction: column;
 }
 
-.product-card-content {
+.offer-card-content {
   display: grid !important;
   margin-top: 0 !important;
   grid-template-areas:
@@ -53,13 +55,13 @@
   grid-area: price !important;
 }
 
-.product-card-text {
+.offer-card-text {
   display: flex !important;
   flex-direction: column !important;
   align-items: center;
   font-size: 0.8em;
 }
-.product-card-text-main {
+.offer-card-text-main {
   font-size: 1.16em;
   border: 1px solid $color-green;
   border-radius: 15px;
@@ -67,7 +69,7 @@
   color: $color-green;
 }
 
-.product-card-text-main.state {
+.offer-card-text-main.state {
   // margin-top: 0.5em;
   // margin-bottom: 0.3em;
 
@@ -77,14 +79,14 @@
   text-transform: lowercase;
 }
 
-.product-card-text-main.price {
+.offer-card-text-main.price {
   color: $color-orange;
   border: 1px solid $color-orange;
   border-radius: 15px;
 }
 
-.product-card-text-main.price,
-.product-card-text-main.state {
+.offer-card-text-main.price,
+.offer-card-text-main.state {
   padding: 0.1em 0.7em 0.2em 0.7em; // NOTE: top right bottom left
 }
 
@@ -101,4 +103,45 @@
   flex-direction: row !important;
   flex-wrap: wrap !important;
   align-items: center;
+}
+
+.product-card {
+  border: 1px solid $color-purple !important;
+  border-radius: 12px !important;
+  width: 100%;
+
+  display: grid !important;
+  grid-template-areas:
+    'head head'
+    'aside aside'
+    'price status';
+}
+
+.product-card-title {
+  grid-area: head !important;
+  justify-content: center;
+}
+
+.product-card-title {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.product-card-text {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.product-card-text-value {
+  text-align: center;
+  color: $color-green;
+  font-size: 1.2em;
+  // border-radius: 3px;
+  // border: 1px solid $color-green;
+  // background-color: rgba(49, 196, 141, 0.15);
+}
+
+.manufacturer-card-action {
+  flex-direction: column;
+  justify-content: center;
 }

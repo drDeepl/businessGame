@@ -1,7 +1,6 @@
 <template>
   <v-dialog v-model="activate" persistent>
     <v-form ref="form" class="admin-form pt-2 pb-2">
-      {{ select }}
       <div class="form-title">{{ title }}</div>
       <div v-for="textField in Object.keys(model.props)" :key="textField">
         <!-- // NOTE: Если свойство модели совпадает со свойством select -->
@@ -33,7 +32,13 @@
 
       <slot></slot>
       <div class="admin-btn-form">
-        <v-btn outlined color="#31c48d" rounded @click="onClickApplyForm()">
+        <v-btn
+          outlined
+          color="#31c48d"
+          rounded
+          :loading="load"
+          @click="onClickApplyForm()"
+        >
           Подтвердить
         </v-btn>
         <v-spacer></v-spacer>
@@ -85,6 +90,12 @@ export default {
         return {};
       },
     },
+    load: {
+      type: Boolean,
+      default() {
+        return false;
+      },
+    },
   },
   data() {
     return {
@@ -118,20 +129,22 @@ export default {
   },
   methods: {
     async onClickApplyForm() {
-      console.warn('FORM.vue: OnClickApplyForm');
-      console.warn(this.createdModel);
-      const createdModel = this.createdModel;
-      const typesModel = this.$props.model.types;
-      const passed = Object.keys(this.$props.select);
-      console.warn('PASSED\n', passed);
-      if (this.$refs.form.validate()) {
-        const preparedData = prepareTypes(createdModel, typesModel, passed);
-        console.warn(preparedData);
-        await this.parentFunction(preparedData);
-        this.$refs.form.reset();
-        this.$refs.form.resetValidation();
-      } else {
-        console.error('FORM INVALID');
+      if (!this.load) {
+        console.warn('FORM.vue: OnClickApplyForm');
+        console.warn(this.createdModel);
+        const createdModel = this.createdModel;
+        const typesModel = this.$props.model.types;
+        const passed = Object.keys(this.$props.select);
+        console.warn('PASSED\n', passed);
+        if (this.$refs.form.validate()) {
+          const preparedData = prepareTypes(createdModel, typesModel, passed);
+          console.warn(preparedData);
+          await this.parentFunction(preparedData);
+          this.$refs.form.reset();
+          this.$refs.form.resetValidation();
+        } else {
+          console.error('FORM INVALID');
+        }
       }
     },
     onClickCancelForm() {

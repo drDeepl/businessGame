@@ -1,5 +1,6 @@
 import {Model} from '@vuex-orm/core';
 import TokenService from '@/services/token.service';
+import ProductKit from './ProductKit';
 
 export default class Offer extends Model {
   static entity = 'offers';
@@ -7,6 +8,7 @@ export default class Offer extends Model {
     return {
       id: this.attr(null),
       product_kit: this.attr(null),
+      productKit_data: this.belongsTo(ProductKit, 'product_kit'),
       price: this.attr(null),
       trader: this.attr(null),
       timestamp: this.attr(''),

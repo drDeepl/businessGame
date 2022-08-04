@@ -12,8 +12,8 @@
   // 10em 15em
 }
 
-.manufacturer-tabs {
-  overflow-y: scroll !important;
+.manufacturer-tabs-wrapper {
+  width: 100% !important;
 }
 
 .manufacturer-action-text {
@@ -37,4 +37,7 @@
 div[class*='disabled'] label[class*='disabled'],
 input[disabled] {
   color: $color-green !important;
+}
+.v-window {
+  width: 100vw !important;
 }

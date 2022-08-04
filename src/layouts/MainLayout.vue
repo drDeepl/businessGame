@@ -128,10 +128,10 @@ export default {
     if (this.$store.state.auth.status.loggedIn) {
       const username = this.currentUser.username;
       const responseUser = await User.api().getUserByUsername(username);
-
       const dataUser = responseUser.response.data;
       const roleUser = dataUser.role.toLowerCase();
       await Product.api().getListProducts();
+      await this.$store.dispatch('productKit/getProductKits');
 
       this.sidebar.links =
         this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);

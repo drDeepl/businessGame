@@ -4,7 +4,7 @@ export default class ModelProductKit {
       id: 'id',
       product: 'Продукт',
       count: 'Количество',
-      time: 'Время изготовления (сек.)',
+      time: 'Время изготовления / сек.',
     };
     this.types = {
       id: 'number',
@@ -18,6 +18,6 @@ export default class ModelProductKit {
       count: 'number',
       time: 'number',
     };
-    this.hideOn = {id: true};
+    this.hideShow = {id: true};
   }
 }

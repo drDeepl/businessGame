@@ -33,6 +33,13 @@ export const user = {
       context.commit('SET_GET_USER_COMPLETE');
       return user;
     },
+    async getUser(context, userId) {
+      console.warn('MODULE.user: getUser');
+      const response = await User.api().getUser(userId);
+      const user = response.response.data;
+      console.warn(context);
+      return user;
+    },
     async getRolesUser(context) {
       const roles = await UserService.getRoles();
       console.log(context);

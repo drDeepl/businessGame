@@ -7,6 +7,7 @@
 
       <v-tab @click="onClickTabTransaction">Все транзакции</v-tab>
       <!-- INFO: Вкладка с предложениями о покупке продуктового набора -->
+
       <v-tab-item>
         <v-expansion-panels>
           <v-expansion-panel>
@@ -24,7 +25,8 @@
                 class="manufacturer-layout"
                 indeterminate
                 size="64"
-              ></v-progress-circular>
+              >
+              </v-progress-circular>
 
               <div v-else class="cards-container">
                 <!-- INFO revealId есть ключ во vuex state для отображения -->
@@ -33,9 +35,11 @@
                 <OfferCard
                   v-for="offer in offers"
                   :key="offer.id"
-                  :title="{for_product: true}"
+                  :title="{
+                    product: offer.productKit_data.product_data.name,
+                  }"
                   :item="offer"
-                  :itemReveal="getProductKit(offer.product_kit)"
+                  :itemReveal="offer.productKit_data"
                   :modelItem="cards.cardOffer.model"
                   :modelReveal="cards.cardOffer.reveal.model"
                   :showLabel="true"
@@ -66,9 +70,6 @@
                         >Упс.. не хватает денег на балансе для покупки
                         товара</v-card-text
                       >
-                      <v-card-text v-for="offer in offers" :key="offer['$id']">
-                        {{ offer }}
-                      </v-card-text>
                     </div>
                   </v-sheet>
                 </v-bottom-sheet>
@@ -180,7 +181,6 @@ export default {
   async created() {
     this.$store.commit('shopState/SET_STATE_LOAD_mainLayout');
     await Offer.api().getListSaleOffers();
-    this.$store.dispatch('productKit/getProductKits');
     await Team.api().getListTeams();
     const user = this.$store.state.auth.user;
     console.error(user);
@@ -190,64 +190,20 @@ export default {
 
   computed: {
     offers: function () {
-      const offers = Offer.query().orderBy('id', 'desc').get();
-      return offers;
+      const offers = Offer.query()
+        .with('productKit_data.product_data')
+        .orderBy('id', 'desc')
+        .get();
+      return offers[0]['productKit_data'] ? offers : [];
     },
-    // changeTrader: function () {
-    //   console.warn('SHOP: changeTrader');
-    //   return (offer) => {
-    //     console.warn(offer);
-    //     const trader = this.$store
-    //       .$db()
-    //       .model('users')
-    //       .query()
-    //       .where('id', offer.trader)
-    //       .first();
-
-    //     if (trader == undefined || trader == null) {
-    //       return offer;
-    //     } else {
-    //       offer.trader = trader.username;
-    //       return offer;
-    //     }
-    //   };
-    // },
-    getUsernameByAccountId: function () {
-      console.warn('SHOP: getUsernameByAccountId');
-      return (id) => {
-        const user = this.$store
-          .$db()
-          .model('users')
-          .query()
-          .where('account', id)
-          .first();
-        console.warn('user\n', user);
-        return user
-          ? user.username
-          : 'пользователя с id ' + id + 'не существует';
-      };
+    transactions() {
+      console.warn('SHOP: transactions');
+      return this.$store.$db().model('transactions').query().all();
     },
-    // changeProductKit: function () {
-    //   return (offer) => {
-    //     console.warn('SHOP: COMPUTED: changeProductKit');
-    //     console.warn(offer);
+    productKits() {
+      return this.$store.$db().model('productKits').query().all();
+    },
 
-    //     const product_id = this.$store
-    //       .$db()
-    //       .model('productKits')
-    //       .query()
-    //       .where('id', offer.product_kit)
-    //       .first().product;
-    //     const product = this.$store
-    //       .$db()
-    //       .model('products')
-    //       .query()
-    //       .where('id', product_id)
-    //       .first();
-    //     offer.for_product = product.name;
-    //     return offer;
-    //   };
-    // },
     getProductKit: function () {
       return (productKitId) => {
         const productKit =
@@ -269,22 +225,24 @@ export default {
         .where('username', username)
         .first();
     },
-
-    transactions() {
-      console.warn('SHOP: transactions');
-      return this.$store.$db().model('transactions').query().all();
-    },
-    learnMoreActive: function () {
-      // return Object.prototype.hasOwnProperty.call(activeCards);
-      return this.revealCards;
-      // return this.cards.cardOffer.active.hasOwnProperty(offer_id);
-    },
   },
   watch: {
     // TODO: навесить наблюдателя, который
     // TODO: будет изменять состояние вкладки "Предложения"
   },
   methods: {
+    async prepareOffer(offer) {
+      console.warn('SHOP.VUE: prepareOffer');
+      console.warn(offer);
+
+      const pk = this.$store
+        .$db()
+        .model('productKits')
+        .query()
+        .with('product_data')
+        .get();
+      console.warn(pk);
+    },
     getAccount(accountId) {
       console.warn('SHOP: getAccount');
       const team = this.$store
@@ -332,34 +290,26 @@ export default {
         console.error(responseAccountAcquire.response.data);
       }
     },
-    onClickOpenLearnMore(offer_id) {
-      console.warn('SHOP.VUE: onClickLearnMore');
-      console.error('productKitId\n', offer_id);
 
-      this.$store.commit('offer/SET_OPEN_learnMore', offer_id);
-
-      // const pk =
-      // this.$store.getters['productKit/GET_PRODUCT_KIT'](productKitId);
-      // console.error(pk);
-    },
-
-    onClickCloseLearnMore(offer_id) {
-      console.warn('SHOP.VUE: onCLickCloseLearnMore');
-      console.warn(offer_id);
-      this.revealCards[offer_id] = false;
-    },
     onClickOffers() {
       // FIX: костыль подобия long polling для
       // FIX: динамического обновления предложений
       console.warn('SHOP: onClickOffers');
-      // let offers = setInterval(
-      //   () =>
-      //     Offer.api()
-      //       .getListSaleOffers()
-      //       .then((result) => console.log(result.response.data)),
-      //   100000
-      // );
-      // console.error(offers);
+      const longPoll = this.$store.getters['shopState/GET_STATE_LONG_POLL'];
+      console.warn(longPoll);
+      if (longPoll) {
+        console.error('LONG POLL WORK');
+      } else {
+        this.$store.commit('shopState/SET_LONG_POLL');
+        console.error('LONG POLL RUNNING');
+        setInterval(
+          () =>
+            Offer.api()
+              .getListSaleOffers()
+              .then((result) => console.log(result.response.data)),
+          100000
+        );
+      }
     },
     onClickOkLowBalance() {
       console.warn('SHOP.VUE: onClickOkLowBalances');

@@ -1,7 +1,7 @@
 <template>
   <div class="manufacturer-layout">
     <div>Страница поставщика</div>
-
+    {{ productKits[0] }}
     <div class="manufacturer-actions">
       <v-btn
         class="manufacturer-btn-action ma-1"
@@ -14,16 +14,31 @@
         ><span class="manufacturer-action-text">{{ tab.label }}</span>
       </v-btn>
     </div>
-    <!-- NOTE: Форма создания продукта  -->
+    <!-- INFO: Форма создания продукта  -->
     <Form
       :activate="forms.formAddProduct.active"
       :title="forms.titleForm"
       :model="forms.formAddProduct.model"
       :parentFunction="onClickCreateProduct"
       :cancelForm="onClickCancelForm"
+      :load="createProduct"
     >
+      <v-alert v-if="forms.formAddProduct.errors.length > 0">
+        <v-card-text class="ma-0 pa-0">Возникли следующие ошибки:</v-card-text>
+        <ul class="form-errors-container">
+          <li
+            class="form-error-message"
+            v-for="error in forms.formAddProduct.errors"
+            :key="error"
+          >
+            <v-card-text class="mt-1 pa-0 form-error-text">
+              {{ error }}
+            </v-card-text>
+          </li>
+        </ul>
+      </v-alert>
     </Form>
-    <!-- NOTE: Форма создания продуктового набора-->
+    <!-- INFO: Форма создания продуктового набора-->
     <Form
       :activate="forms.formAddProductKit.active"
       :title="forms.titleForm"
@@ -34,10 +49,7 @@
     >
     </Form>
     <div>
-      <v-tabs
-        color="#6c63ff"
-        class="manufacturer-layout manufacturer-tabs mt-2"
-      >
+      <v-tabs color="#6c63ff" class="manufacturer-layout mt-2">
         <v-tab color="#6c63ff" v-for="tab in tabs.tabsView" :key="tab.view">
           {{ tab.label }}
         </v-tab>
@@ -48,38 +60,29 @@
               v-for="product in products"
               :key="product.id"
               :item="product"
-              :title="{name: true}"
+              :title="{name: product.name}"
               :modelItem="modelsCard.product"
             >
-              <v-menu bottom>
-                <template v-slot:activator="{on, attrs}">
-                  <v-btn
-                    outlined
-                    rounded
-                    color="#ee5544"
-                    class="product-group-button mb-2 mr-2 ml-2"
-                    v-bind="attrs"
-                    v-on="on"
-                    @click.prevent="onClickCardActions(product)"
-                  >
-                    <span>действия</span>
-                  </v-btn>
-                </template>
-                <v-list flat class="container-card-actions">
-                  <v-list-item
-                    class="card-action"
-                    @click.prevent="onClickCreateProductKit(product)"
-                  >
-                    <span>Создать продуктовый набор</span>
-                  </v-list-item>
-                  <v-list-item
-                    class="card-action"
-                    @click.prevent="onClickDeleteProduct(product)"
-                  >
-                    <span>Удалить</span>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
+              <v-card-actions class="manufacturer-card-action">
+                <v-btn
+                  class="mt-1 manufacturer-action-btn"
+                  outlined
+                  rounded
+                  color="#ee5544"
+                  @click.prevent="onClickDeleteProduct(product)"
+                >
+                  <span class="product-btn-action-text">удалить</span>
+                </v-btn>
+                <v-btn
+                  class="mt-1 manufacturer-action-btn"
+                  outlined
+                  rounded
+                  color="#ee5544"
+                  @click.prevent="onClickCreateProductKit(product)"
+                >
+                  <span class="product-btn-action-text">cоздать комплект</span>
+                </v-btn>
+              </v-card-actions>
             </ProductCard>
             <!-- NOTE: id - мнимая часть этой карточки <span>{{ product.id }}</span> -->
           </div>
@@ -90,31 +93,31 @@
             <ProductCard
               v-for="productKit in productKits"
               :key="productKit.id"
-              :title="{product: true}"
               :item="productKit"
+              :title="{product: productKit.product_data.name}"
               :modelItem="modelsCard.productKit"
               :showLabel="true"
             >
-              <div class="card-action-btn">
+              <v-card-actions class="manufacturer-card-action ma-2 pa-2">
                 <v-btn
+                  class="mb-1"
                   outlined
                   rounded
                   color="#ee5544"
-                  class="product-group-button mb-2 mr-2 ml-2"
                   @click.prevent="onClickSellProductKit(productKit)"
                 >
                   <span>продать</span>
                 </v-btn>
                 <v-btn
+                  class="mb-1"
                   outlined
                   rounded
                   color="#ee5544"
-                  class="product-group-button mb-2 mr-2 ml-2"
-                  @click.prevent="onClickDeleteProductKit"
+                  @click.prevent="onClickDeleteProductKit(productKit)"
                 >
                   <span>удалить</span>
                 </v-btn>
-              </div>
+              </v-card-actions>
             </ProductCard>
             <Form
               :activate="forms.formSellProductKit.active"
@@ -151,11 +154,11 @@ import Offer from '@/store/models/Offer';
 export default {
   async created() {
     console.warn('MANUFACTURER.VUE: CREATED');
-    const jwt = this.$store.state.auth.user.access;
-    await Product.api().getListProducts(jwt);
-    await ProductKit.api().getListProductKits(jwt);
-    this.arrays.products = this.$store.$db().model('products').all();
-    this.arrays.productKits = this.$store.$db().model('productKits').all();
+    // const jwt = this.$store.state.auth.user.access;
+    // await Product.api().getListProducts(jwt);
+    // await ProductKit.api().getListProductKits(jwt);
+    // this.arrays.products = this.$store.$db().model('products').all();
+    // this.arrays.productKits = this.$store.$db().model('productKits').all();
     // console.error(listProducts.response.data);
     // console.error('listProductKits:\n', listProductKits.response.data);
     // NOTE: Что, если добавить хэлпер, которые заменит в наборе
@@ -180,10 +183,10 @@ export default {
         tabsAction: this.$store.getters['products/GET_LIST_TABS_ACTION'],
         tabsView: this.$store.getters['products/GET_LIST_TABS_VIEW'],
       },
-      arrays: {
-        products: null,
-        productKits: null,
-      },
+      // arrays: {
+      //   products: null,
+      //   productKits: null,
+      // },
       modelsCard: {
         product: new ModelProduct(),
         productKit: new ModelProductKit(),
@@ -197,6 +200,7 @@ export default {
           model: new CreateProduct(),
           validate: false,
           applySucces: false,
+          errors: [],
         },
         formAddProductKit: {
           active: false,
@@ -224,8 +228,14 @@ export default {
       },
     };
   },
-  mounted() {},
   computed: {
+    stateProduct() {
+      return this.$store.getters['stateShop/GET_STATE_PRODUCT'];
+    },
+    createProduct() {
+      return this.$store.getters['products/GET_STATE_createProduct'];
+      // return this.$store.state.products.createProduct;
+    },
     getJWT() {
       return this.$store.state.auth.user.access;
     },
@@ -238,19 +248,13 @@ export default {
     },
     productKits() {
       console.warn('MANUFACTURER.VUE: productKits');
-      let pk = this.$store.$db().model('productKits').all();
-      for (let key in pk) {
-        const product = pk[key].product;
-        const productName = this.$store
-          .$db()
-          .model('products')
-          .query()
-          .where('id', product)
-          .get()[0].name;
-        pk[key].product = productName;
-      }
-
-      return pk;
+      const productKits = this.$store
+        .$db()
+        .model('productKits')
+        .query()
+        .with('product_data')
+        .get();
+      return productKits;
     },
     getProductNameById() {
       return (id) =>
@@ -275,10 +279,26 @@ export default {
     },
     async onClickCreateProduct(createdProduct) {
       console.warn('MANUFACTURER.VUE: onClickCreateProduct');
+      this.$store.commit('products/SET_PRODUCT_CREATE');
+      this.forms.formAddProduct.errors = [];
+      createdProduct.name = createdProduct.name.toLowerCase();
+
       console.log(createdProduct);
-      const jwt = this.getJWT;
-      const resp = await Product.api().createProduct(createdProduct, jwt);
-      console.error(resp);
+      const productsWithCurrentName = this.$store
+        .$db()
+        .model('products')
+        .query()
+        .where('name', createdProduct.name)
+        .get();
+      if (productsWithCurrentName.length == 0) {
+        await this.$store.dispatch('products/createProduct', createdProduct);
+      } else {
+        // FIX:перенести в словарь с сообщениями
+        const message =
+          'Продукт с названием "' + createdProduct.name + '" уже существует';
+        this.forms.formAddProduct.errors.push(message);
+      }
+      this.$store.commit('products/SET_PRODUCT_CREATED');
     },
     onClickCreateProductKit(product) {
       console.warn('MANUFACTURER.VUE: onClickCreateProductKit');
@@ -300,6 +320,9 @@ export default {
       console.warn('MANUFACTURER.VUE: onClickDeleteProduct', product);
       await Product.api().deleteProduct(product.id, this.getJWT);
     },
+    onClickDeleteProductKit(productKit) {
+      console.warn(productKit);
+    },
     onClickSellProductKit(productKit) {
       console.warn('MANUFACTURER.VUE: onClickSellProductKit');
       console.warn(productKit);
@@ -309,7 +332,6 @@ export default {
       this.forms.formSellProductKit.model.data['product_kit_id'] =
         productKit.id;
 
-      // FIX:  Найти способ подмены данных при помощи словаря
       this.forms.formSellProductKit.active = true;
     },
     async onClickApplySellProductKit(saleOfferProductKit) {

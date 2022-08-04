@@ -11,6 +11,7 @@ import ProductKit from './models/ProductKit';
 import Offer from './models/Offer';
 import Transaction from './models/Transaction';
 import Token from './models/Token';
+
 import {auth} from './module.auth';
 import {user} from './module.user';
 import {account} from './module.account';
@@ -20,6 +21,7 @@ import {productKit} from './module.productKit';
 import {mainLayout} from './module.main.layout';
 import {offer} from './module.offer';
 import {shopState} from './module.shop.state';
+
 import instance from '@/api/main';
 import ProductKitStorage from '@/store/models/ProductKitStorage';
 import ProductStorage from '@/store/models/ProductStorage';
