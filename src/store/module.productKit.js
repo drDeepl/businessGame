@@ -4,6 +4,7 @@ export const productKit = {
   state: {
     getProductKits: false,
     getProductKit: null,
+    createProductKit: false,
   },
   actions: {
     async getProductKits(context) {
@@ -11,6 +12,10 @@ export const productKit = {
       context.commit('SET_STATE_getProductKits');
       await ProductKit.api().getListProductKits();
       context.commit('SET_getProductKits_COMPLETE');
+    },
+    async createProductKit(context, productKit) {
+      context.commit('SET_CREATE_PRODUCT_KIT');
+      await ProductKit.api().createProductKit(productKit);
     },
   },
   getters: {
@@ -24,6 +29,9 @@ export const productKit = {
         return productKit;
       };
     },
+    GET_PRODUCT_KIT_CREATE: (state) => {
+      return state.createProductKit;
+    },
   },
   mutations: {
     SET_STATE_getProductKits: function (state) {
@@ -32,6 +40,12 @@ export const productKit = {
     },
     SET_getProductKits_COMPLETE: function (state) {
       state.getProductKits = false;
+    },
+    SET_CREATE_PRODUCT_KIT: function (state) {
+      state.createProductKit = true;
+    },
+    SET_CREATE_PRODUCT_KIT_COMPLETE: function (state) {
+      state.createProductKit = false;
     },
   },
 };

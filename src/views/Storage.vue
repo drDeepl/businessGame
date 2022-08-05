@@ -9,24 +9,41 @@
 
         <Load v-if="loading.productKits" />
         <div v-else class="productKit-store-cards">
-          <!-- <div>{{ productKits }}</div> -->
-          <!-- <div>{{ changeProductIdOnName(productKit) }}</div> -->
-
-          <div v-for="productKit in productKits" :key="productKit['$id']">
-            <ProductKitStoreCard
-              :title="'Продуктовый набор для продукта'"
-              :item="productKit"
-              :modelItem="cards.productKit.model"
-              :childItemModel="{product_kit: cards.productKit.childModel}"
-              :getProductName="getProductName"
+          <OfferCard
+            v-for="productKit in productKits"
+            :key="productKit['$id']"
+            :title="{product_kit: productKit.product_kit.product}"
+            :item="productKit"
+            :modelItem="cards.productKit.model"
+            :itemReveal="productKit.product_kit"
+            :modelReveal="cards.productKit.product.model"
+            :showLabel="true"
+          >
+            <v-overlay
+              :absolute="true"
+              color="white"
+              :opacity="0.85"
+              :value="$store.getters['storageTeam/GET_STATE_CREATE_PRODUCT']"
+              class="load-layout"
             >
-              <v-btn class="productKit-store-card-btn" outlined rounded
-                ><span class="productKit-store-card-btn text"
-                  >создать продукт</span
-                ></v-btn
+              <v-progress-circular
+                :rotate="360"
+                :size="100"
+                :width="15"
+                :value="progress"
+                color="orange"
               >
-            </ProductKitStoreCard>
-          </div>
+                {{ progress }}
+              </v-progress-circular>
+            </v-overlay>
+            <v-btn
+              outlined
+              rounded
+              color="orange"
+              @click="onClickCreateProduct(productKit)"
+              ><span>создать продукт</span></v-btn
+            >
+          </OfferCard>
         </div>
       </v-tab-item>
     </v-tabs>
@@ -41,13 +58,15 @@ import ProductKitStorage from '@/store/models/ProductKitStorage';
 import User from '@/store/models/User';
 import ProductKitStore from '@/models/model.productKitStore';
 import ProductKit from '@/models/model.productKit';
-import ProductKitStoreCard from '@/UI/ProductKitStoreCard.vue';
+import OfferCard from '@/UI/OfferCard.vue';
 import Load from '@/UI/Load.vue';
 
 // TODO: [28.07.2022] отображение продуктового набора в виде карточки + заголовки
 export default {
   data() {
     return {
+      timer: 0,
+      progress: 0,
       loading: {
         productKits: false,
       },
@@ -55,7 +74,9 @@ export default {
       cards: {
         productKit: {
           model: new ProductKitStore(),
-          childModel: new ProductKit(),
+          product: {
+            model: new ProductKit(),
+          },
         },
       },
     };
@@ -101,10 +122,29 @@ export default {
       };
     },
   },
-  methods: {},
+  methods: {
+    onClickCreateProduct(productKit) {
+      this.$store.commit('storageTeam/SET_CREATE_PRODUCT');
+      console.warn('STORAGE: onClickCreateProduct');
+      console.warn(productKit);
+      const timeOfCreate = 15 * 1000; // sec => millisec
+      // FIX: запуск таймера приготовления продукта
+      let startTimer = Date.now();
+      const endTimer = startTimer + timeOfCreate;
+      console.warn(endTimer - startTimer);
+      console.warn(endTimer);
+      console.warn('TIME OF CREATE: ', timeOfCreate);
+      setTimeout(
+        this.$store.commit('storageTeam/SET_CREATE_PRODUCT_COMPLETE'),
+        timeOfCreate
+      );
+      setInterval(console.warn(100 / (endTimer / Date.now())), 1000);
+      // this.$store.commit('storageTeam/SET_CREATE_PRODUCT_COMPLETE');
+    },
+  },
 
   components: {
-    ProductKitStoreCard,
+    OfferCard,
     Load,
   },
 };

@@ -18,7 +18,10 @@
   // min-width: 13em;
   border: 1px solid $color-purple !important;
   border-radius: 17px !important;
-  box-shadow: 0.4em -0.2em 0.9em rgba(108, 99, 255, 0.6) !important;
+
+  .elevation-24 {
+    box-shadow: 0.4em -0.2em 0.9em rgba(108, 99, 255, 0.6) !important;
+  }
 }
 
 // .card-wrapper {
@@ -33,6 +36,7 @@
 .offer-card-content {
   display: grid !important;
   margin-top: 0 !important;
+
   grid-template-areas:
     'head head'
     'aside aside'

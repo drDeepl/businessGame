@@ -3,6 +3,9 @@ export const offer = {
   state: {
     // INFO: leanrMore = {offer_id: true/false}
     learnMore: {},
+    load: {
+      offerPrepare: false,
+    },
   },
   actions: {},
   getters: {
@@ -14,6 +17,9 @@ export const offer = {
     GET_STATES: (state) => {
       return state.learnMore;
     },
+    GET_STATE_OFFER_PREPARE: (state) => {
+      return state.load.offerPrepare;
+    },
   },
   mutations: {
     SET_OPEN_learnMore: function (state, offer_id) {
@@ -23,6 +29,14 @@ export const offer = {
     SET_CLOSE_learnMore: function (state, offer_id) {
       console.warn('MODULE.offer: SET_CLOSE_learnMore');
       state.learnMore[offer_id] = false;
+    },
+    SET_OFFER_PREPARE: function (state) {
+      console.warn('MODULE.OFFER: SET_OFFER_PREPARE');
+      state.load.offerPrepare = true;
+    },
+    SET_OFFER_PREPARE_COMPLETE: function (state) {
+      console.warn('MODULE.OFFER: SET_OFFER_PREPARE_COMPLETE');
+      state.load.offerPrepare = false;
     },
   },
 };

@@ -29,7 +29,20 @@
           ></v-text-field>
         </div>
       </div>
-
+      <v-alert v-if="errorsMessage.length > 0">
+        <v-card-text class="ma-0 pa-0">Возникли следующие ошибки:</v-card-text>
+        <ul class="form-errors-container">
+          <li
+            class="form-error-message"
+            v-for="error in errorsMessage"
+            :key="error"
+          >
+            <v-card-text class="mt-1 pa-0 form-error-text">
+              {{ error }}
+            </v-card-text>
+          </li>
+        </ul>
+      </v-alert>
       <slot></slot>
       <div class="admin-btn-form">
         <v-btn
@@ -96,6 +109,12 @@ export default {
         return false;
       },
     },
+    errorsMessage: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
   },
   data() {
     return {
@@ -127,6 +146,7 @@ export default {
       }
     },
   },
+
   methods: {
     async onClickApplyForm() {
       if (!this.load) {

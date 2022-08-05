@@ -66,9 +66,6 @@ export default {
         return false;
       },
     },
-    modelReveal: {type: Object},
-    itemReveal: {type: Object},
-    active: {type: Boolean},
   },
   computed: {
     testProp() {

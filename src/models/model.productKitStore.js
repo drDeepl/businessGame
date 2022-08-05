@@ -16,5 +16,6 @@ export default class ProductKitStore {
       product_kit: null,
       count: 0,
     };
+    this.hideShow = {};
   }
 }

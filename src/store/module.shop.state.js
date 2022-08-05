@@ -6,6 +6,7 @@ export const shopState = {
       offersTab: false,
       offerCard: false,
       longPoll: false,
+      offersUpdate: false,
     },
   },
   actions: {},
@@ -22,6 +23,9 @@ export const shopState = {
     GET_STATE_LONG_POLL: (state) => {
       return state.load.longPoll;
     },
+    GET_OFFERS_UPDATE: (state) => {
+      return state.load.offersUpdate;
+    },
   },
   mutations: {
     SET_STATE_LOAD_mainLayout: function (state) {
@@ -29,6 +33,12 @@ export const shopState = {
     },
     SET_STATE_COMPLETE_mainLayout: function (state) {
       state.load.mainLayout = false;
+    },
+    SET_OFFERS_UPDATE: function (state) {
+      state.load.offersUpdate = true;
+    },
+    SET_OFFERS_UPDATED: function (state) {
+      state.load.offersUpdate = false;
     },
     CHANGE_STATE_offersTab: function (state) {
       console.warn('MODULE.shop.state: CHANGE_STATE_offersTab');

@@ -1,12 +1,12 @@
 <template>
-  <div class="offer-card ma-2">
-    <v-card elevation="0">
+  <div class="ma-2 pa-0">
+    <v-card elevation="12" class="offer-card pa-2">
       <!-- NOTE: запись ниже говорит: выбери из массива только те элементы, которых нет в modelItem.hideShow-->
       <!-- NOTE: Object.keys(modelItem.props).filter((key) => !modelItem.hideShow[key])" -->
 
       <div class="card-wrapper">
         <v-expand-transition :hide-on-leave="true" mode="out-in">
-          <div class="offer-card-content" v-if="!active">
+          <div class="offer-card-content pa-1" v-if="!active">
             <div
               v-for="key in Object.keys(modelItem.props).filter(
                 (key) => !modelItem.hideShow.hasOwnProperty(key)
@@ -32,7 +32,7 @@
             </div>
           </div>
 
-          <v-card v-if="active">
+          <v-card elevation="0" v-if="active">
             <v-card-text
               class="offer-card-text pa-0"
               v-for="keyModelReveal in Object.keys(modelReveal.props).filter(
@@ -74,8 +74,6 @@
 </template>
 
 <script>
-import Load from '@/UI/Load.vue';
-
 export default {
   props: {
     // NOTE: value of title is key in modelItem
@@ -121,6 +119,5 @@ export default {
   unmounted() {
     this.loading = false;
   },
-  compoennts: {Load},
 };
 </script>

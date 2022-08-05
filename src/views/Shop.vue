@@ -20,7 +20,7 @@
 
             <v-expansion-panel-content>
               <v-progress-circular
-                v-if="offers.length <= 0"
+                v-if="offers.length == 0"
                 color="#ee5544"
                 class="manufacturer-layout"
                 indeterminate
@@ -32,29 +32,30 @@
                 <!-- INFO revealId есть ключ во vuex state для отображения -->
                 <!-- INFO обратной стороны карточки -->
 
-                <OfferCard
-                  v-for="offer in offers"
-                  :key="offer.id"
-                  :title="{
-                    product: offer.productKit_data.product_data.name,
-                  }"
-                  :item="offer"
-                  :itemReveal="offer.productKit_data"
-                  :modelItem="cards.cardOffer.model"
-                  :modelReveal="cards.cardOffer.reveal.model"
-                  :showLabel="true"
-                >
-                  <v-btn
-                    v-if="currentUserData.role.toLowerCase() == 'player'"
-                    class="ma-1"
-                    outlined
-                    rounded
-                    color="#ee5544"
-                    @click="onClickBuyProductKit(offer)"
+                <div v-for="offer in offers" :key="offer.id">
+                  <OfferCard
+                    :title="{
+                      product: offer.productKit_data.product_data.name,
+                    }"
+                    :item="offer"
+                    :itemReveal="offer.productKit_data"
+                    :modelItem="cards.cardOffer.model"
+                    :modelReveal="cards.cardOffer.reveal.model"
+                    :showLabel="true"
                   >
-                    <span>купить</span>
-                  </v-btn>
-                </OfferCard>
+                    <v-btn
+                      v-if="currentUserData.role.toLowerCase() == 'player'"
+                      class="ma-1"
+                      outlined
+                      rounded
+                      color="#ee5544"
+                      @click="onClickBuyProductKit(offer)"
+                    >
+                      <span>купить</span>
+                    </v-btn>
+                  </OfferCard>
+                </div>
+
                 <v-bottom-sheet v-model="lowBalance">
                   <v-sheet class="text-center" height="15em">
                     <v-btn
@@ -175,6 +176,8 @@ export default {
         transactions: [],
         users: [],
         teams: [],
+        offers: [],
+        state: this.$store.getters['shopState/GET_OFFERS_UPDATE'],
       },
     };
   },
@@ -185,34 +188,45 @@ export default {
     const user = this.$store.state.auth.user;
     console.error(user);
     console.warn('USERNAME');
+
     this.$store.commit('shopState/SET_STATE_COMPLETE_mainLayout');
   },
 
   computed: {
-    offers: function () {
-      const offers = Offer.query()
+    offers() {
+      console.warn('SHOP:offers');
+      this.$store.commit('shopState/SET_OFFERS_UPDATE');
+      const offers = this.$store
+        .$db()
+        .model('offers')
+        .query()
         .with('productKit_data.product_data')
-        .orderBy('id', 'desc')
-        .get();
+        .all();
+      console.warn(offers);
+
+      this.$store.commit('shopState/SET_OFFERS_UPDATED');
       return offers[0]['productKit_data'] ? offers : [];
     },
+
     transactions() {
       console.warn('SHOP: transactions');
       return this.$store.$db().model('transactions').query().all();
     },
-    productKits() {
-      return this.$store.$db().model('productKits').query().all();
-    },
-
-    getProductKit: function () {
+    getProductKit() {
       return (productKitId) => {
-        const productKit =
-          this.$store.getters['productKit/GET_PRODUCT_KIT'](productKitId);
-
-        return productKit || productKitId;
+        return this.$store
+          .$db()
+          .model('productKits')
+          .query()
+          .where('id', productKitId)
+          .with('product_data')
+          .first();
       };
     },
-
+    offersUpdated() {
+      console.warn('SHOP: offersUpdated');
+      return this.offers;
+    },
     currentUser: function () {
       return this.$store.state.auth.user.username;
     },
@@ -227,8 +241,10 @@ export default {
     },
   },
   watch: {
-    // TODO: навесить наблюдателя, который
-    // TODO: будет изменять состояние вкладки "Предложения"
+    offersUpdated(newValue, oldValue) {
+      console.warn('WATCH');
+      console.warn(newValue.length, oldValue.length);
+    },
   },
   methods: {
     async prepareOffer(offer) {
@@ -306,8 +322,13 @@ export default {
           () =>
             Offer.api()
               .getListSaleOffers()
-              .then((result) => console.log(result.response.data)),
-          100000
+              .then((result) =>
+                console.log(
+                  result.response.data,
+                  this.$store.commit('shopState/SET_OFFERS_UPDATE')
+                )
+              ),
+          10000
         );
       }
     },

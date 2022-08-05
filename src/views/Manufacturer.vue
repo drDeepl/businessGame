@@ -1,7 +1,7 @@
 <template>
   <div class="manufacturer-layout">
     <div>Страница поставщика</div>
-    {{ productKits[0] }}
+
     <div class="manufacturer-actions">
       <v-btn
         class="manufacturer-btn-action ma-1"
@@ -21,7 +21,7 @@
       :model="forms.formAddProduct.model"
       :parentFunction="onClickCreateProduct"
       :cancelForm="onClickCancelForm"
-      :load="createProduct"
+      :load="STATE_createProduct"
     >
       <v-alert v-if="forms.formAddProduct.errors.length > 0">
         <v-card-text class="ma-0 pa-0">Возникли следующие ошибки:</v-card-text>
@@ -46,6 +46,8 @@
       :disableFields="forms.formAddProductKit.disableFields"
       :parentFunction="onClickApplyCreateProductKit"
       :cancelForm="onClickCancelForm"
+      :load="STATE_createProductKit"
+      :errorsMessage="forms.formAddProductKit.errors"
     >
     </Form>
     <div>
@@ -149,32 +151,11 @@ import CreateSellOffer from '@/models/model.productKit.sell';
 import Form from '@/UI/Form.vue';
 import ProductCard from '@/UI/ProductCard.vue';
 import Product from '@/store/models/Product';
-import ProductKit from '@/store/models/ProductKit';
+
 import Offer from '@/store/models/Offer';
 export default {
   async created() {
     console.warn('MANUFACTURER.VUE: CREATED');
-    // const jwt = this.$store.state.auth.user.access;
-    // await Product.api().getListProducts(jwt);
-    // await ProductKit.api().getListProductKits(jwt);
-    // this.arrays.products = this.$store.$db().model('products').all();
-    // this.arrays.productKits = this.$store.$db().model('productKits').all();
-    // console.error(listProducts.response.data);
-    // console.error('listProductKits:\n', listProductKits.response.data);
-    // NOTE: Что, если добавить хэлпер, которые заменит в наборе
-    // NOTE: product_id на product_name
-    // FIX: Ошибка при изменении колонки в ProductKit product_id
-    // FIX: на product
-    // this.arrays.products = listProducts.response.data;
-    // TODO: [15.07.2022] упростить функцию ниже
-    // const productKits = listProductKits.response.data;
-    // for (let key in productKits) {
-    //   const productKit = productKits[key];
-    //   const product = Product.query().where('id', productKit.product).get();
-    //   const productName = product[0].name;
-    //   productKit.product = productName;
-    // }
-    // this.arrays.productKits = listProductKits.response.data;
   },
   data() {
     return {
@@ -183,10 +164,7 @@ export default {
         tabsAction: this.$store.getters['products/GET_LIST_TABS_ACTION'],
         tabsView: this.$store.getters['products/GET_LIST_TABS_VIEW'],
       },
-      // arrays: {
-      //   products: null,
-      //   productKits: null,
-      // },
+
       modelsCard: {
         product: new ModelProduct(),
         productKit: new ModelProductKit(),
@@ -209,6 +187,7 @@ export default {
           values: {},
           applySucces: false,
           disableFields: {}, // NOTE: {disable textField: boolean}
+          errors: [],
         },
         formSellProduct: {
           active: false,
@@ -232,13 +211,14 @@ export default {
     stateProduct() {
       return this.$store.getters['stateShop/GET_STATE_PRODUCT'];
     },
-    createProduct() {
+    STATE_createProduct() {
       return this.$store.getters['products/GET_STATE_createProduct'];
       // return this.$store.state.products.createProduct;
     },
-    getJWT() {
-      return this.$store.state.auth.user.access;
+    STATE_createProductKit() {
+      return this.$store.getters['productKits/GET_PRODUCT_KIT_CREATE'];
     },
+
     currentUser() {
       return this.$store.state.auth.user;
     },
@@ -310,10 +290,25 @@ export default {
     },
     async onClickApplyCreateProductKit(productKit) {
       console.warn('MANUFACTURER.vue: onClickApplyCreateProduct');
+      this.forms.formAddProductKit.errors = [];
       console.error(productKit);
 
-      await this.$store.dispatch('productKit/socket_getListProdKit');
-      this.arrays.productKits = ProductKit.all();
+      const productKitIsExists = this.$store
+        .$db()
+        .model('productKits')
+        .query()
+        .where('product', productKit.product_id)
+        .where('count', productKit.count)
+        .where('time', productKit.time)
+        .exists();
+      if (productKitIsExists) {
+        this.forms.formAddProductKit.errors.push(
+          'Такой продуктовый набор уже существует'
+        );
+      } else {
+        await this.$store.dispatch('productKit/createProductKit', productKit);
+      }
+      this.$store.commit('productKit/SET_CREATE_PRODUCT_KIT_COMPLETE');
     },
     async onClickDeleteProduct(product) {
       // FIX: Ошибка 500 при удалении продукта

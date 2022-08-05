@@ -22,3 +22,7 @@ export function createModelFromResponseData(Class, data) {
   }
   return Class;
 }
+
+export function isUniqObj(newModel, oldModel) {
+  console.warn(newModel, oldModel);
+}
