@@ -1,6 +1,6 @@
 <template>
-  <div class="ma-2 pa-0">
-    <v-card elevation="12" class="offer-card pa-2">
+  <div>
+    <v-card tile flat>
       <!-- NOTE: запись ниже говорит: выбери из массива только те элементы, которых нет в modelItem.hideShow-->
       <!-- NOTE: Object.keys(modelItem.props).filter((key) => !modelItem.hideShow[key])" -->
 
@@ -68,6 +68,16 @@
       >
         <span>подробнее</span>
       </v-btn>
+      <v-btn
+        class="ma-1"
+        outlined
+        rounded
+        color="#ee5544"
+        :loading="loading"
+        @click="onClickBuyOffer(item)"
+      >
+        <span>купить</span>
+      </v-btn>
       <slot> </slot>
     </v-card>
   </div>
@@ -97,6 +107,7 @@ export default {
 
     modelReveal: {type: Object},
     itemReveal: {type: Object},
+    btnBuyOffer: {type: Function},
   },
   data() {
     return {
@@ -112,12 +123,14 @@ export default {
     onClickCloseLearnMore() {
       this.active = false;
     },
-  },
-  beforeUnmount() {
-    this.loading = true;
-  },
-  unmounted() {
-    this.loading = false;
+    async onClickBuyOffer(item) {
+      this.$store.commit('shopState/SET_buyOffer');
+      this.loading = this.$store.getters['shopState/GET_buyOffer'];
+      console.warn('OFFER_CARD: onClickBuyOffer');
+      await this.btnBuyOffer(item);
+      this.$store.commit('shopState/SET_buyOffer_COMPLETE');
+      this.loading = this.$store.getters['shopState/GET_buyOffer'];
+    },
   },
 };
 </script>

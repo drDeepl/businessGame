@@ -99,7 +99,6 @@ export default {
       // NOTE: {key: boolean}
       type: Object,
       default() {
-        // FIX создать прототип класса со значениями false
         return {};
       },
     },

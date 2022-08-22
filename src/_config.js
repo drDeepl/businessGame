@@ -9,8 +9,6 @@ export const adminSidebarLinks = [
     titleTabs: [
       {title: 'Создание пользователя', form: 'formCreateUser'},
       {title: 'создать команду', form: 'formCreateTeam'},
-      {title: 'создать счет команды', form: 'formCreateAccountTeam'},
-      {title: 'список пользователей', form: null},
     ],
   },
 ];

@@ -34,7 +34,7 @@ export default class ModelUserCreate {
       email: '',
       role: '',
       password: '',
-      team_id: 0,
+      team_id: '',
     };
   }
 }

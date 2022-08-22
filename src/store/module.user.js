@@ -1,5 +1,5 @@
 import UserService from '@/services/user.service';
-
+import User from './models/User';
 import {
   adminSidebarLinks,
   playerSidebarLinks,
@@ -7,11 +7,19 @@ import {
   customerSidebarLinks,
 } from '@/_config';
 
-import User from './models/User';
 export const user = {
   namespaced: true,
   state: {
+    createUser: false,
     getUser: false,
+    updateUser: {
+      id: null,
+      updating: false,
+    },
+    deleteUser: false,
+    userInfo: {
+      balanceTeam: null,
+    },
     linksSidebarByRole: {
       // INFO: role: [{title: String, url: String,}]
       player: playerSidebarLinks,
@@ -25,11 +33,11 @@ export const user = {
     },
   },
   actions: {
-    async getUserByUsername(context, username) {
+    async getUserDataByUsername(context, username) {
       console.warn('MODULE.USER: getUserByUsername');
       context.commit('SET_GET_USER');
-      const response = await User.api().getUserByUsername(username);
-      const user = response.response.data;
+      const responseWrap = await User.api().getUserByUsername(username);
+      const user = responseWrap.response;
       context.commit('SET_GET_USER_COMPLETE');
       return user;
     },
@@ -51,32 +59,36 @@ export const user = {
 
       return users;
     },
-    async createUser(context, newUser) {
+    async createUser(context, modelCreateUser) {
       console.warn('MODULE.USER: createUser');
-      const user = await UserService.createUser(newUser);
-      console.error(user, context);
-      context.commit('SET_USER_INFO', user);
+      const responseWrap = await User.api().createUser(modelCreateUser);
+      context.commit('SET_CREATED_USER');
+      return responseWrap;
     },
     async updateUser(context, dataForUpdateUser) {
-      // [08.07.2022] TODO: UserService.updateDataUser(user_id, updatedUser);
+      console.warn('MODULE.USER: updateUser');
       console.error(dataForUpdateUser);
-      console.log(context);
-      await UserService.updateDataUser(
-        dataForUpdateUser.userId,
-        dataForUpdateUser.data
-      );
-      context.commit('SET_USER_INFO', dataForUpdateUser.data);
+      const userId = dataForUpdateUser.userId;
+      const userData = dataForUpdateUser.userData;
+      await User.api().updateUser(userId, userData);
+      context.commit('SET_USER_UPDATED');
     },
-    userToUpdate(context, id) {
-      console.warn('MODULE.USER: userToUpdate');
-      context.commit('SET_STATE_USER_UPDATE', id);
-    },
-    stateUpdatedUser(context, userId) {
-      console.warn('MODULE.USER: stateUpdatedUser');
-      context.commit('SET_STATE_USER_UPDATED', userId);
+    async deleteUser(context, userId) {
+      console.warn('MODULE.USER: deleteUser');
+      const responseWrap = await User.api().deleteUser(userId);
+      context.commit('SET_USER_DELETED');
+      return responseWrap.response;
     },
   },
   getters: {
+    GET_USER_BALANCE: (state) => {
+      console.warn('MODULE.USER: GET_USER_BALANCE');
+      return state.userInfo.balanceTeam;
+    },
+    GET_CREATE_USER: (state) => {
+      console.warn('MODULE.USER: GET_CREATE_USER');
+      return state.createUser;
+    },
     GET_STATE_getUser: (state) => {
       return state.getUser;
     },
@@ -85,17 +97,39 @@ export const user = {
       const sidebarLinks = state.linksSidebarByRole[role];
       return sidebarLinks;
     },
+    GET_USER_UPDATING: (state) => {
+      console.warn('MODULE.USER: GET_USER_UPDATING');
+      return state.updateUser.updating;
+    },
+    GET_USER_ID_ON_UPDATE: (state) => {
+      console.warn('MODULE.USER: GET_USER_ID_ON_UPDATE');
+      return state.updateUser.id;
+    },
   },
   mutations: {
+    SET_USER_BALANCE: function (state, balance) {
+      console.warn('SET_USER_BALANCE');
+      state.userInfo.balanceTeam = balance;
+    },
+    SET_CREATING_USER: function (state) {
+      state.createUser = true;
+    },
+    SET_CREATED_USER: function (state) {
+      state.createUser = false;
+    },
     SET_GET_USER: function (state) {
       state.getUser = true;
     },
     SET_GET_USER_COMPLETE: function (state) {
       state.getUser = false;
     },
-    STATE_UPDATE_USER: function (state, userId) {
+    SET_USER_UPDATING: function (state) {
       console.warn('MODULE.USER: stateUpdateUser');
-      state.updateUser[userId] = 'UPDATE';
+      state.updateUser.updating = true;
+    },
+    SET_USER_ID_ON_UPDATING: function (state, userId) {
+      console.warn('MODULE.USER: SET_USER_ID_UPDATING', userId);
+      state.updateUser.id = userId;
     },
     SET_USER_INFO: function (state, userData) {
       console.warn('MODULE.USER: SET_USER_INFO');
@@ -105,13 +139,18 @@ export const user = {
       console.warn('MODULE.USER: SET_USERS_LIST');
       state.arrays.users = users;
     },
-    SET_STATE_USER_UPDATE: function (state, userId) {
-      console.warn('MODULE.USER: SET_STATE_USER_UPDATE');
-      console.warn(userId);
-      state.updateUser[userId] = 'UPDATE';
+
+    SET_USER_UPDATED: function (state) {
+      state.updateUser.updating = false;
+      state.updateUser.id = null;
     },
-    SET_STATE_USER_UPDATED: function (state, userId) {
-      state.updateUser[userId] = 'UPDATED';
+    SET_USER_DELETE: function (state) {
+      console.warn('MODULE.USER: SET_USER_DELETE');
+      state.deleteUser = true;
+    },
+    SET_USER_DELETED: function (state) {
+      console.warn('MODULE.USER: SET_USER_DELETED');
+      state.deleteUser = false;
     },
   },
 };

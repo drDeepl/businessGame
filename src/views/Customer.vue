@@ -15,8 +15,8 @@
 
 <script>
 // import ProductStorage from '@/store/models/ProductStorage';
-import Team from '@/store/models/Team';
-import Account from '@/store/models/Account';
+// import Team from '@/store/models/Team';
+// import Account from '@/store/models/Account';
 import ModelProduct from '@/models/model.product';
 import ModelProductStore from '@/models/model.product.store';
 import Load from '@/UI/Load';
@@ -38,34 +38,35 @@ export default {
   },
   async created() {
     // TODO: получение всех продуктов от всех команд с апи
+    // FIX: Зацикливание на получении данных пользователя
     const username = this.$store.state.auth.user.username;
-    const user = await this.$store.dispatch('user/getUserByUsername', username);
+    console.warn(username);
+    const user = await this.$store.dispatch(
+      'user/getUserDataByUsername',
+      username
+    );
     console.warn(user);
-    const usersRole = user.role.toLowerCase();
-    if (usersRole == 'customer') {
-      console.warn('STORAGE.VUE: created');
-      const listProductsStore = await this.$store.dispatch(
-        'products/getListProductInStore',
-        user.team
-      );
-      console.warn(listProductsStore);
-
-      console.warn('Team: loading\n', Team);
-      console.warn('Account: loading\n', Account);
-    } else {
-      this.$router.push('/' + usersRole);
-    }
+    // const usersRole = user.role.toLowerCase();
+    // console.warn(usersRole);
+    // if (usersRole == 'customer') {
+    //   console.warn('STORAGE.VUE: created');
+    //   // console.warn('Team: loading\n', Team);
+    //   // console.warn('Account: loading\n', Account);
+    //   this.$router.push('/' + usersRole);
+    // } else {
+    //   this.$router.push('/');
+    // }
   },
   computed: {
-    currentUserData() {
-      const username = this.$store.state.auth.user.username;
-      return this.$store
-        .$db()
-        .model('users')
-        .query()
-        .where('username', username)
-        .first();
-    },
+    // currentUserData() {
+    //   const username = this.$store.state.auth.user.username;
+    //   return this.$store
+    //     .$db()
+    //     .model('users')
+    //     .query()
+    //     .where('username', username)
+    //     .first();
+    // },
   },
   methods: {},
   // components: {ProductKitStoreCard},

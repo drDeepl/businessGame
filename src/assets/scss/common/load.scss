@@ -2,6 +2,11 @@
   width: 100%;
 }
 
+.load-wrapper {
+  display: flex !important;
+  justify-content: center !important;
+}
+
 .v-overlay__scrim {
   background-color: white !important;
 }

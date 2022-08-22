@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="load-wrapper">
     <v-progress-circular
       color="#ee5544"
       class="load-bar"

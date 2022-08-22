@@ -1,16 +1,24 @@
 export const shopState = {
   namespaced: true,
   state: {
+    created: false,
     load: {
       mainLayout: false,
       offersTab: false,
       offerCard: false,
       longPoll: false,
       offersUpdate: false,
+      buyOffer: false,
     },
   },
   actions: {},
   getters: {
+    GET_buyOffer: (state) => {
+      return state.load.buyOffer;
+    },
+    GET_STATE_CREATED: (state) => {
+      return state.created;
+    },
     GET_STATE_PRODUCT: (state) => {
       return state.load.product;
     },
@@ -28,6 +36,21 @@ export const shopState = {
     },
   },
   mutations: {
+    SET_buyOffer: function (state) {
+      console.warn('MODULE.SHOP.STATE');
+      state.load.buyOffer = true;
+    },
+    SET_buyOffer_COMPLETE: function (state) {
+      console.warn('MODULE.SHOP.STATE');
+      state.load.buyOffer = false;
+    },
+    SET_STATE_CREATED: function (state) {
+      state.created = true;
+    },
+    SET_STATE_CREATED_COMPLETE: function (state) {
+      state.created = false;
+    },
+
     SET_STATE_LOAD_mainLayout: function (state) {
       state.load.mainLayout = true;
     },

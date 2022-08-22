@@ -3,47 +3,39 @@
     <v-tabs class="productKit-store-page">
       <v-tab>продуктовые наборы</v-tab>
       <v-tab-item class="tab-productKit-store">
-        <!-- <div v-for="productKit in productKits" :key="productKit.id">
-          {{ productKit }}
-        </div> -->
-
         <Load v-if="loading.productKits" />
         <div v-else class="productKit-store-cards">
-          <OfferCard
-            v-for="productKit in productKits"
-            :key="productKit['$id']"
-            :title="{product_kit: productKit.product_kit.product}"
-            :item="productKit"
-            :modelItem="cards.productKit.model"
-            :itemReveal="productKit.product_kit"
-            :modelReveal="cards.productKit.product.model"
-            :showLabel="true"
+          <div v-for="productKit in productKits" :key="productKit.id">
+            <v-card>
+              <v-card-text>{{ productKit }}</v-card-text>
+              <v-card-text>{{ prepareProductKit(productKit) }} </v-card-text>
+            </v-card>
+          </div>
+
+          <v-overlay
+            :absolute="true"
+            color="white"
+            :opacity="0.85"
+            :value="$store.getters['storageTeam/GET_STATE_CREATE_PRODUCT']"
+            class="load-layout"
           >
-            <v-overlay
-              :absolute="true"
-              color="white"
-              :opacity="0.85"
-              :value="$store.getters['storageTeam/GET_STATE_CREATE_PRODUCT']"
-              class="load-layout"
-            >
-              <v-progress-circular
-                :rotate="360"
-                :size="100"
-                :width="15"
-                :value="progress"
-                color="orange"
-              >
-                {{ progress }}
-              </v-progress-circular>
-            </v-overlay>
-            <v-btn
-              outlined
-              rounded
+            <v-progress-circular
+              :rotate="360"
+              :size="100"
+              :width="15"
+              :value="progress"
               color="orange"
-              @click="onClickCreateProduct(productKit)"
-              ><span>создать продукт</span></v-btn
             >
-          </OfferCard>
+              {{ progress }}
+            </v-progress-circular>
+          </v-overlay>
+          <v-btn
+            outlined
+            rounded
+            color="orange"
+            @click="onClickCreateProduct(productKit)"
+            ><span>создать продукт</span></v-btn
+          >
         </div>
       </v-tab-item>
     </v-tabs>
@@ -58,7 +50,7 @@ import ProductKitStorage from '@/store/models/ProductKitStorage';
 import User from '@/store/models/User';
 import ProductKitStore from '@/models/model.productKitStore';
 import ProductKit from '@/models/model.productKit';
-import OfferCard from '@/UI/OfferCard.vue';
+
 import Load from '@/UI/Load.vue';
 
 // TODO: [28.07.2022] отображение продуктового набора в виде карточки + заголовки
@@ -141,10 +133,23 @@ export default {
       setInterval(console.warn(100 / (endTimer / Date.now())), 1000);
       // this.$store.commit('storageTeam/SET_CREATE_PRODUCT_COMPLETE');
     },
+    prepareProductKit(productKit) {
+      console.warn('MODULE.STORAGE: prepareProductKit()');
+      const productId = productKit.product_kit.product;
+      const product = this.$store
+        .$db()
+        .model('products')
+        .query()
+        .where('id', productId)
+        .first();
+      const productName = product.name;
+      console.warn('PRODUCT NAME\n', productName);
+
+      return product;
+    },
   },
 
   components: {
-    OfferCard,
     Load,
   },
 };

@@ -22,6 +22,7 @@ import {mainLayout} from './module.main.layout';
 import {offer} from './module.offer';
 import {shopState} from './module.shop.state';
 import {storageTeam} from './module.storage.team';
+import {admin} from './module.admin';
 import instance from '@/api/main';
 import ProductKitStorage from '@/store/models/ProductKitStorage';
 import ProductStorage from '@/store/models/ProductStorage';
@@ -71,6 +72,7 @@ export default new Vuex.Store({
     offer,
     shopState,
     storageTeam,
+    admin,
   },
   plugins: [VuexORM.install(database)],
 });

@@ -3,6 +3,7 @@
     <div class="tab-wrapper">
       <div class="admin-card-wrapper">
         <v-tabs
+          color="#6C63FF"
           next-icon="mdi-arrow-right-bold-box-outline"
           prev-icon="mdi-arrow-left-bold-box-outline"
           show-arrows
@@ -24,27 +25,46 @@
               :disableFields="{team_id: true}"
               :cancelForm="onClickCancelForm"
               :parentFunction="onClickCreateUser"
+              :load="$store.getters['user/GET_CREATE_USER']"
             >
               <div v-if="forms.formCreateUser.model.data.role">
-                <v-select
+                <div
                   v-if="
                     forms.formCreateUser.model.data.role.toLowerCase() ==
                     'player'
                   "
-                  color="#6c63ff"
-                  class="pr-2 pl-2 ma-1"
-                  v-model="forms.formCreateUser.model.data.team_id"
-                  :items="teamNames"
-                  :label="forms.formCreateUser.model.props.team_id"
-                  :rules="[(v) => !!v || 'Поле не может быть пустым']"
                 >
-                </v-select>
+                  <v-select
+                    attach
+                    v-if="teamNames.length > 0"
+                    color="#6c63ff"
+                    class="pr-2 pl-2 ma-1 admin-form-create-user-select-team"
+                    v-model="forms.formCreateUser.model.data.team_id"
+                    :items="teamNames"
+                    :label="forms.formCreateUser.model.props.team_id"
+                    :rules="[(v) => !!v || 'Поле не может быть пустым']"
+                  >
+                  </v-select>
+                  <v-text-field
+                    v-else
+                    class="pr-2 pl-2 ma-1"
+                    color="#6c63ff"
+                    loading="error"
+                    readonly
+                    persistent-hint
+                    v-model="forms.formCreateUser.model.data.team_id"
+                    :label="'не найден список команд'"
+                    error-messages="сперва необходо создать команду для игрока"
+                    :rules="[(v) => !!v]"
+                  >
+                  </v-text-field>
+                </div>
               </div>
 
               <v-btn class="ma-2" outlined color="orange" @click="fakeUser"
-                >Фейк пользователь</v-btn
+                >Случайные данные</v-btn
               >
-              <div>{{ forms.formCreateUser.model.data }}</div>
+
               <v-alert
                 border="right"
                 colored-border
@@ -89,7 +109,7 @@
               </v-alert>
             </Form>
           </v-tab-item>
-          <!-- // INFO: Форма создания счета команды -->
+          <!-- // INFO: Форма создания счета команды
           <v-tab-item>
             <Form
               :activate="forms.formCreateUser.active"
@@ -100,84 +120,94 @@
               :parentFunction="onClickCreateUser"
             >
             </Form>
-          </v-tab-item>
-          <!-- // INFO: Список пользователей -->
-          <v-tab-item>
-            <v-progress-circular
-              class="manufacturer-layout"
-              indeterminate
-              size="64"
-              v-if="arrays.users == null || arrays.users == undefined"
-            ></v-progress-circular>
-            <div v-else class="admin-list-users-wrapper">
-              <v-card class="ma-1 pa-1 admin-row-user-card list-users-header">
-                <span
-                  class="admin-users-text"
-                  v-for="title in Object.keys(listUsersHeaders)"
-                  :key="title"
-                >
-                  {{ models.user.titleProps[title] }}</span
-                >
-              </v-card>
-              <v-card
-                class="admin-row-user-card ma-2 pa-3 admin-users-text"
-                v-for="user in users"
-                :key="user.username"
-              >
-                <span
-                  class="admin-users-text"
-                  v-for="titleProperty in Object.keys(listUsersHeaders)"
-                  :key="titleProperty"
-                  >{{ user[titleProperty] }}
-                </span>
-
-                <v-btn
-                  class="admin-row-user-btn"
-                  outlined
-                  color="#31c48d"
-                  rounded
-                  @click.prevent="onClickUpdateUser(user)"
-                  >Редактировать</v-btn
-                >
-
-                <v-btn
-                  class="ml-1 mr-0 mt-0 mb-0 pa-0"
-                  outlined
-                  color="red"
-                  rounded
-                  @click="onClickDeleteUser(user)"
-                  ><delete-icon
-                /></v-btn>
-              </v-card>
-
-              <Form
-                :activate="forms.formUpdateUser.active"
-                :title="titleCurrentForm"
-                :model="forms.formUpdateUser.model"
-                :select="{role: arrays.role, team_id: teamNames}"
-                :parentFunction="onClickApplyUpdateUser"
-                :values="forms.formUpdateUser.values"
-                :cancelForm="onClickCancelForm"
-              >
-                <v-alert
-                  border="right"
-                  colored-border
-                  type="error"
-                  elevation="2"
-                  v-if="forms.formUpdateUser.errors.length > 0"
-                  class="form-error-container"
-                  >Ошибки в следующий полях:
-                  <small
-                    class="form-error-text"
-                    v-for="message in forms.formUpdateUser.errors"
-                    :key="message"
-                    >{{ forms.formUpdateUser.model.props[message] }}</small
-                  >
-                </v-alert>
-              </Form>
-            </div>
-          </v-tab-item>
+          </v-tab-item> -->
         </v-tabs>
+        <!-- // INFO: Список пользователей -->
+        <v-expansion-panels>
+          <v-expansion-panel>
+            <v-expansion-panel-header>
+              <span>Список пользователей</span>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-progress-circular
+                class="manufacturer-layout"
+                indeterminate
+                size="64"
+                v-if="arrays.users == null || arrays.users == undefined"
+              ></v-progress-circular>
+              <div v-else class="admin-list-users-wrapper">
+                <!-- TODO: переделать через независимый компонент -->
+                <v-card class="ma-1 pa-1 admin-row-user-card list-users-header">
+                  <span
+                    class="admin-users-text"
+                    v-for="title in Object.keys(listUsersHeaders)"
+                    :key="title"
+                  >
+                    {{ models.user.titleProps[title] }}</span
+                  >
+                </v-card>
+                <v-card
+                  class="admin-row-user-card ma-2 pa-3 admin-users-text"
+                  v-for="user in users"
+                  :key="user.username"
+                >
+                  <span
+                    class="admin-users-text"
+                    v-for="titleProperty in Object.keys(listUsersHeaders)"
+                    :key="titleProperty"
+                    >{{ user[titleProperty] }}
+                  </span>
+
+                  <v-btn
+                    class="admin-row-user-btn"
+                    outlined
+                    color="#31c48d"
+                    rounded
+                    @click="onClickUpdateUser(user)"
+                    >Редактировать</v-btn
+                  >
+
+                  <v-btn
+                    class="ml-1 mr-0 mt-0 mb-0 pa-0"
+                    outlined
+                    color="red"
+                    rounded
+                    @click="onClickDeleteUser(user)"
+                  >
+                    <delete-icon />
+                  </v-btn>
+                </v-card>
+
+                <Form
+                  :activate="forms.formUpdateUser.active"
+                  :title="titleCurrentForm"
+                  :model="forms.formUpdateUser.model"
+                  :select="{role: arrays.role, team_id: teamNames}"
+                  :parentFunction="onClickApplyUpdateUser"
+                  :values="forms.formUpdateUser.values"
+                  :cancelForm="onClickCancelForm"
+                  :load="$store.getters['user/GET_USER_UPDATING']"
+                >
+                  <v-alert
+                    border="right"
+                    colored-border
+                    type="error"
+                    elevation="2"
+                    v-if="forms.formUpdateUser.errors.length > 0"
+                    class="form-error-container"
+                    >Ошибки в следующий полях:
+                    <small
+                      class="form-error-text"
+                      v-for="message in forms.formUpdateUser.errors"
+                      :key="message"
+                      >{{ forms.formUpdateUser.model.props[message] }}</small
+                    >
+                  </v-alert>
+                </Form>
+              </div>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </div>
     </div>
   </div>
@@ -199,6 +229,7 @@ import Team from '@/store/models/Team';
 export default {
   data() {
     return {
+      dialog: false,
       titleCurrentForm: '',
       currentForm: '',
       loading: {
@@ -287,7 +318,8 @@ export default {
   },
   computed: {
     teamNames() {
-      let listTeams = this.$store.$db().model('teams').query().all();
+      console.warn('ADMIN.VUE: teamNames');
+      const listTeams = this.$store.$db().model('teams').query().all();
       let namesTeam = listTeams.map((team) => team.name);
       return namesTeam;
     },
@@ -315,6 +347,7 @@ export default {
     async onClickCreateUser(modelCreateUser) {
       console.warn('ADMIN.VUE: onClickCreateUser');
       console.warn(modelCreateUser);
+      this.$store.commit('user/SET_CREATING_USER');
       this.forms.formCreateUser.errors = [];
       // INFO: modelCreateUser содержит данные из формы
       // INFO: Функция выполняет валидацию данных, полученных из формы
@@ -332,23 +365,28 @@ export default {
           const team_id = team.id;
           modelCreateUser['team_id'] = team_id;
         } else {
-          console.error('TEAM IS NULL');
+          this.forms.formCreateUser.errors.push('Такая команда не найдена');
         }
+      } else {
+        modelCreateUser['team_id'] = 0;
       }
 
-      console.error('NEW USER\n', modelCreateUser);
-      // FIX: Обработка ошибки при создании пользователя с существующим username
+      console.log('NEW USER\n', modelCreateUser);
       try {
-        const user = await User.api().createUser(modelCreateUser);
-        console.error(user.response.data);
+        const responseWrap = await this.$store.dispatch(
+          'user/createUser',
+          modelCreateUser
+        );
+        console.error('CREATED USER\n', responseWrap.response.data);
         const listUsers = this.$store.$db().model('users').query().all();
         this.arrays.users = listUsers;
       } catch (e) {
+        console.warn(e);
         const errorCode = codeErrorResponse(e);
         if (errorCode == 422) {
-          this.forms.formCreateUser.errors = [
-            'Имя пользователя уже существует',
-          ];
+          this.forms.formCreateUser.errors.push(
+            'Имя пользователя уже существует'
+          );
         }
       }
     },
@@ -357,20 +395,21 @@ export default {
       console.error(modelCreateTeam);
       const createdTeam = await Team.api().createTeam(modelCreateTeam);
       console.error(createdTeam);
-      await User.api().getListUsers();
+      // await User.api().getListUsers();
     },
+
     onClickUpdateUser(user) {
       console.warn('Admin.vue: onClickUpdateUser');
       console.error('USER FROM ROW:\n', user);
-
-      this.$store.dispatch('user/userToUpdate', user.id);
       this.forms.formUpdateUser.selectedUser = user;
       this.titleCurrentForm = 'Редактирование пользователя';
       this.forms.formActive = 'formUpdateUser';
       this.forms.formUpdateUser.active = true;
+      this.$store.commit('user/SET_USER_ID_ON_UPDATING', user.id);
     },
     async onClickApplyUpdateUser(modelUpdateUser) {
       this.forms.formCreateUser.erros = [];
+      this.$store.commit('user/SET_USER_UPDATING');
       // [07.07.2022] TODO: Сделать функцию обновления даных пользователя
       console.warn('ADMIN.vue: onClickUpdateUser');
       console.error(modelUpdateUser);
@@ -382,10 +421,13 @@ export default {
         .first();
       const teamId = team.id;
       modelUpdateUser.team_id = teamId;
-      const userUpdateId = this.$store.getters['user/GET_USER_ID_UPDATE'];
-      this.$store.dispatch('user/stateUpdatedUser', userUpdateId);
-      console.error(userUpdateId, modelUpdateUser);
-      await User.api().updateUser(userUpdateId, modelUpdateUser);
+      const userId = this.$store.getters['user/GET_USER_ID_ON_UPDATE'];
+      const dataForUpdateUser = {
+        userId: userId,
+        userData: modelUpdateUser,
+      };
+      await this.$store.dispatch('user/updateUser', dataForUpdateUser);
+      this.$store.commit('user/SET_USER_UPDATED');
 
       // if (responseOrError.error) {
       //   console.warn('ERROR USER 422');
@@ -399,6 +441,7 @@ export default {
 
     async onClickDeleteUser(user) {
       console.warn('ADMIN: onClickDeleteUser');
+      this.$store.commit('user.SET_USER_DELETE');
       console.error(user);
       await User.api().deleteUser(user.id);
       const users = this.$store.$db().model('users').query().all();

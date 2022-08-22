@@ -1,7 +1,10 @@
-
-
 .shop-offer-header {
   justify-content: flex-start !important;
+}
+
+.shop-offers.offers-not-found {
+  display: flex !important;
+  justify-content: center;
 }
 
 .offer-header-item {

@@ -121,6 +121,7 @@
                 </v-btn>
               </v-card-actions>
             </ProductCard>
+            <!-- // INFO: Form of sell ProductKit -->
             <Form
               :activate="forms.formSellProductKit.active"
               :title="forms.titleForm"
@@ -129,6 +130,7 @@
               :disableFields="forms.formSellProductKit.disableFields"
               :parentFunction="onClickApplySellProductKit"
               :cancelForm="onClickCancelForm"
+              :load="$store.getters['offer/GET_offerSale']"
             >
             </Form>
           </div>
@@ -152,7 +154,7 @@ import Form from '@/UI/Form.vue';
 import ProductCard from '@/UI/ProductCard.vue';
 import Product from '@/store/models/Product';
 
-import Offer from '@/store/models/Offer';
+// import Offer from '@/store/models/Offer';
 export default {
   async created() {
     console.warn('MANUFACTURER.VUE: CREATED');
@@ -311,7 +313,6 @@ export default {
       this.$store.commit('productKit/SET_CREATE_PRODUCT_KIT_COMPLETE');
     },
     async onClickDeleteProduct(product) {
-      // FIX: Ошибка 500 при удалении продукта
       console.warn('MANUFACTURER.VUE: onClickDeleteProduct', product);
       await Product.api().deleteProduct(product.id, this.getJWT);
     },
@@ -332,12 +333,17 @@ export default {
     async onClickApplySellProductKit(saleOfferProductKit) {
       console.warn('MANUFACTURER: onClickApplySellProductKit');
       // TODO [18.07.2022]: осуществление продажи продуктового набора
+      this.$store.commit('offer/SET_offerSale');
       console.warn(saleOfferProductKit);
       saleOfferProductKit.price = Number.parseInt(saleOfferProductKit.price);
       console.error(saleOfferProductKit);
-      const offer = await Offer.api().offerSalePlace(
-        saleOfferProductKit,
-        this.getJWT
+      // const offer = await Offer.api().offerSalePlace(
+      //   saleOfferProductKit,
+      //   this.getJWT
+      // );
+      const offer = await this.$store.dispatch(
+        'offer/offerSalePlace',
+        saleOfferProductKit
       );
       console.error(offer);
     },

@@ -127,63 +127,35 @@ export default {
 
     if (this.$store.state.auth.status.loggedIn) {
       const username = this.currentUser.username;
-      const responseUser = await User.api().getUserByUsername(username);
-      const dataUser = responseUser.response.data;
+      const responseUser = await this.$store.dispatch(
+        'user/getUserDataByUsername',
+        username
+      );
+      const dataUser = responseUser.data;
       const roleUser = dataUser.role.toLowerCase();
       await Product.api().getListProducts();
       await this.$store.dispatch('productKit/getProductKits');
-
       this.sidebar.links =
         this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
-      if (roleUser == 'player') {
+      if (dataUser.is_superuser) {
+        console.warn('GET TEAMS');
+        const teams = await Team.api().getListTeams();
+        console.warn(teams);
+      }
+      if (roleUser == 'player' && !dataUser.is_superuser) {
         const teamId = dataUser.team;
         console.error('DATA USER\n', dataUser);
         const resTeam = await Team.api().getTeam(teamId);
         const dataTeam = resTeam.response.data;
         const resAccount = await Account.api().getAccount(dataTeam.account);
         const dataAccount = resAccount.response.data;
+        this.$store.commit('user/SET_USER_BALANCE', dataAccount.balance);
         this.sidebarUserInfo.username.value = username;
         this.sidebarUserInfo.role.value = roleUser;
         this.sidebarUserInfo.team.value = dataTeam.name;
         this.sidebarUserInfo.balance.value = dataAccount.balance;
         this.loading.sidebarUserInfo = false;
       }
-
-      // console.warn('USER_DATA\n', data);
-      // await User.api().getListUsers();
-      // await Team.api().getListTeams();
-      // await Account.api().getListAccounts();
-      // await ProductKit.api().getListProductKits();
-      // await Product.api().getListProducts();
-      // console.warn('MAINLAYOUT: created');
-      // const users = User.all();
-      // console.error(users);
-      // const userData = User.query().where('username', username).first();
-      // let roleUser = userData.role;
-      // const links =
-      //   this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
-      // this.sidebar.links = links;
-      // if (userData.role.toLowerCase() == 'player') {
-      //   const teamId = userData.team;
-      //   const teamName = this.$store
-      //     .$db()
-      //     .model('teams')
-      //     .query()
-      //     .where('id', teamId)
-      //     .first().name;
-      //   console.error(teamName);
-      //   const teamBalance = this.$store
-      //     .$db()
-      //     .model('accounts')
-      //     .query()
-      //     .where('id', userData.account)
-      //     .first().balance;
-
-      //   this.sidebarUserInfo.username.value = username;
-      //   this.sidebarUserInfo.role.value = roleUser;
-      //   this.sidebarUserInfo.team.value = teamName;
-      //   this.sidebarUserInfo.balance.value = teamBalance;
-      // }
     } else {
       this.$router.push('/');
     }
