@@ -3,8 +3,8 @@ export default class ModelProductKit {
     this.props = {
       id: 'id',
       product: 'Продукт',
-      count: 'Количество',
-      time: 'Время изготовления / сек.',
+      count: 'Количество продуктов',
+      time: 'Время приготовления / сек.',
     };
     this.types = {
       id: 'number',
@@ -14,10 +14,10 @@ export default class ModelProductKit {
     };
     this.ruleValidate = {
       id: 'number',
-      product: 'intger',
+      product: 'number',
       count: 'number',
       time: 'number',
     };
-    this.hideShow = {id: true};
+    this.hideShow = {id: true, product: true};
   }
 }

@@ -44,7 +44,7 @@
               <small>
                 {{ modelReveal.props[keyModelReveal] }}
               </small>
-              <span>
+              <span class="offer-card-text-main state">
                 {{ itemReveal[keyModelReveal] }}
               </span>
             </v-card-text>
@@ -84,6 +84,7 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex';
 export default {
   props: {
     // NOTE: value of title is key in modelItem
@@ -116,6 +117,9 @@ export default {
     };
   },
 
+  computed: {
+    ...mapGetters({offerStateRunning: 'shopState/GET_buyOffer_STATE_RUNNING'}),
+  },
   methods: {
     onClickOpenLearnMore() {
       this.active = true;
@@ -124,12 +128,10 @@ export default {
       this.active = false;
     },
     async onClickBuyOffer(item) {
-      this.$store.commit('shopState/SET_buyOffer');
-      this.loading = this.$store.getters['shopState/GET_buyOffer'];
+      this.loading = this.offerStateRunning;
       console.warn('OFFER_CARD: onClickBuyOffer');
       await this.btnBuyOffer(item);
-      this.$store.commit('shopState/SET_buyOffer_COMPLETE');
-      this.loading = this.$store.getters['shopState/GET_buyOffer'];
+      this.loading = this.offerStateRunning;
     },
   },
 };

@@ -1,41 +1,46 @@
 <template>
   <div class="productKit-store-page">
-    <v-tabs class="productKit-store-page">
+    <v-tabs color="#6C63FF">
       <v-tab>продуктовые наборы</v-tab>
-      <v-tab-item class="tab-productKit-store">
-        <Load v-if="loading.productKits" />
-        <div v-else class="productKit-store-cards">
+      <v-tab-item>
+        <Load v-if="productKits.length == 0" />
+        <div v-else>
           <div v-for="productKit in productKits" :key="productKit.id">
-            <v-card>
-              <v-card-text>{{ productKit }}</v-card-text>
-              <v-card-text>{{ prepareProductKit(productKit) }} </v-card-text>
-            </v-card>
-          </div>
-
-          <v-overlay
-            :absolute="true"
-            color="white"
-            :opacity="0.85"
-            :value="$store.getters['storageTeam/GET_STATE_CREATE_PRODUCT']"
-            class="load-layout"
-          >
-            <v-progress-circular
-              :rotate="360"
-              :size="100"
-              :width="15"
-              :value="progress"
-              color="orange"
+            <ProductKitCard
+              :nameProduct="getProductName(productKit.product_kit.product)"
+              :countProductKits="productKit.count"
+              :modelProductKit="cards.productKit.model"
+              :productKit="productKit.product_kit"
             >
-              {{ progress }}
-            </v-progress-circular>
-          </v-overlay>
-          <v-btn
-            outlined
-            rounded
-            color="orange"
-            @click="onClickCreateProduct(productKit)"
-            ><span>создать продукт</span></v-btn
-          >
+              <v-card-actions class="store-product-kit-card-actions ma-0 pa-0">
+                <v-btn
+                  class="ma-0 pa-0 store-product-card-btn"
+                  color="deep-orange"
+                  text
+                  @click="onClickPrepareProduct(productKit.product_kit)"
+                >
+                  <span>приготовить продукт</span>
+                </v-btn>
+              </v-card-actions>
+              <v-overlay
+                :absolute="true"
+                color="white"
+                :opacity="0.85"
+                :value="$store.getters['storageTeam/GET_STATE_CREATE_PRODUCT']"
+                class="load-layout"
+              >
+                <v-progress-circular
+                  :rotate="360"
+                  :size="100"
+                  :width="15"
+                  :value="prepareProductKit.progress"
+                  color="deep-purple"
+                >
+                  {{ prepareProductKit.progress }}
+                </v-progress-circular>
+              </v-overlay>
+            </ProductKitCard>
+          </div>
         </div>
       </v-tab-item>
     </v-tabs>
@@ -48,27 +53,24 @@
 // TODO: продажу продуктового набора клиенту
 import ProductKitStorage from '@/store/models/ProductKitStorage';
 import User from '@/store/models/User';
-import ProductKitStore from '@/models/model.productKitStore';
+// import ProductKitStore from '@/models/model.productKitStore';
 import ProductKit from '@/models/model.productKit';
 
 import Load from '@/UI/Load.vue';
+import ProductKitStoreCard from '@/UI/ProductKitStoreCard.vue';
 
 // TODO: [28.07.2022] отображение продуктового набора в виде карточки + заголовки
 export default {
   data() {
     return {
-      timer: 0,
-      progress: 0,
-      loading: {
-        productKits: false,
+      prepareProductKit: {
+        timer: 0,
+        progress: 0,
       },
       arrays: {productKits: []},
       cards: {
         productKit: {
-          model: new ProductKitStore(),
-          product: {
-            model: new ProductKit(),
-          },
+          model: new ProductKit(),
         },
       },
     };
@@ -80,11 +82,8 @@ export default {
     console.error(userData);
     const team_id = userData.team;
     console.error(team_id);
-
-    this.loading.productKits = true;
     const response = await ProductKitStorage.api().getListProductKits(team_id);
 
-    this.loading.productKits = false;
     const listProductKitTeam = response.response.data;
     this.arrays.productKits = listProductKitTeam;
     // this.arrays.productKits = productKits;
@@ -103,54 +102,47 @@ export default {
     productKits() {
       return this.arrays.productKits;
     },
-    getProductName() {
-      return (id) => {
-        return this.$store
-          .$db()
-          .model('products')
-          .query()
-          .where('id', id)
-          .first().name;
-      };
+    progressBar: {
+      get() {
+        return this.prepareProductKit.progress;
+      },
+      set(value) {
+        this.prepareProductKit.progress =
+          this.prepareProductKit.progress + value;
+      },
     },
   },
   methods: {
-    onClickCreateProduct(productKit) {
+    async plusProgress(count) {
+      this.prepareProductKit.progress = this.prepareProductKit.progress + count;
+      console.error(this.prepareProductKit.progress);
+    },
+    onClickPrepareProduct(productKit) {
       this.$store.commit('storageTeam/SET_CREATE_PRODUCT');
-      console.warn('STORAGE: onClickCreateProduct');
+      console.warn('STORAGE: onClickPrepareProduct');
       console.warn(productKit);
-      const timeOfCreate = 15 * 1000; // sec => millisec
-      // FIX: запуск таймера приготовления продукта
-      let startTimer = Date.now();
-      const endTimer = startTimer + timeOfCreate;
-      console.warn(endTimer - startTimer);
-      console.warn(endTimer);
-      console.warn('TIME OF CREATE: ', timeOfCreate);
-      setTimeout(
-        this.$store.commit('storageTeam/SET_CREATE_PRODUCT_COMPLETE'),
-        timeOfCreate
-      );
-      setInterval(console.warn(100 / (endTimer / Date.now())), 1000);
+      this.$store.dispatch('storageTeam/prepareProduct', 210);
+      // let prepareProduct = setInterval(() => this.plusProgress(10), 1000);
+      // setTimeout(() => {
+      //   clearInterval(prepareProduct);
+      // }, 10000);
       // this.$store.commit('storageTeam/SET_CREATE_PRODUCT_COMPLETE');
     },
-    prepareProductKit(productKit) {
+    getProductName(productId) {
       console.warn('MODULE.STORAGE: prepareProductKit()');
-      const productId = productKit.product_kit.product;
       const product = this.$store
         .$db()
         .model('products')
         .query()
         .where('id', productId)
         .first();
-      const productName = product.name;
-      console.warn('PRODUCT NAME\n', productName);
-
-      return product;
+      return product.name;
     },
   },
 
   components: {
     Load,
+    ProductKitCard: ProductKitStoreCard,
   },
 };
 </script>

@@ -1,43 +1,34 @@
 <template>
-  <div>
-    <v-card class="productKit-store-card-container pr-3 pl-3">
-      <v-card-title class="productKit-store-card-title pa-0">
-        {{ title }}:
-        {{ getProductName(item.product_kit.product) }}</v-card-title
+  <div class="card-main-layout card-container pa-1">
+    <v-card class="store-card-product-kit-wrapper" elevation="0">
+      <v-badge
+        :value="countProductKits"
+        :content="countProductKits"
+        color="red"
+        class="store-card-product-kit-subtitle mt-2"
       >
-      <div
-        class="ma-0 pa-0"
-        v-for="key in Object.keys(modelItem.props)"
-        :key="key"
+        <v-card-title class="store-card-product-kit-title row-container pa-0">
+          <small>Комплект для продукта:</small>
+          <span>{{ nameProduct }}</span>
+        </v-card-title>
+      </v-badge>
+      <!-- <v-card-subtitle class="row-container pa-0 ma-0">
+        {{ countProductKits }} шт.
+      </v-card-subtitle> -->
+
+      <v-card-text
+        :class="
+          'pa-1 row-container store-card-product-kit-content-item-' + property
+        "
+        v-for="property in Object.keys(modelProductKit.props).filter(
+          (key) => !modelProductKit.hideShow[key]
+        )"
+        :key="property"
       >
-        <v-card-text
-          class="pa-0 ma-0"
-          v-if="childItemModel.hasOwnProperty(key)"
-        >
-          <p
-            class="productKit-store-card-row-container ma-2"
-            v-for="childKey in Object.keys(childItemModel[key].props).filter(
-              (key) => !/product/.test(key)
-            )"
-            :key="childKey"
-          >
-            <small class="productKit-store-card-row-title">
-              {{ childItemModel[key].props[childKey] }}
-            </small>
-            <span>
-              {{ item[key][childKey] }}
-            </span>
-          </p>
-        </v-card-text>
-        <v-card-text class="pa-0 ma-0" v-else>
-          <p class="productKit-store-card-row-container pa-0 ma-1">
-            <small class="productKit-store-card-row-title">
-              {{ modelItem.props[key] }}
-            </small>
-            <span>{{ item[key] }}</span>
-          </p>
-        </v-card-text>
-      </div>
+        <small>{{ modelProductKit.props[property] }}</small>
+        <span>{{ productKit[property] }}</span>
+      </v-card-text>
+
       <slot></slot>
     </v-card>
   </div>
@@ -46,13 +37,10 @@
 <script>
 export default {
   props: {
-    // INFO: в модели объекта находиться свойства с заголовками для отображения
-    title: String,
-    modelItem: Object,
-    item: Object,
-    // NOTE: childItemModel = { model}
-    childItemModel: Object,
-    getProductName: Function,
+    nameProduct: {type: String, required: true},
+    countProductKits: {type: Number, required: false},
+    productKit: {type: Object, required: true},
+    modelProductKit: {type: Object, required: true},
   },
 };
 </script>

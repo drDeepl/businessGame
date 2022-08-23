@@ -38,8 +38,7 @@
           <!-- INFO обратной стороны карточки -->
 
           <v-card
-            elevation="8"
-            class="offer-card ma-2"
+            class="card-main-layout ma-2 pa-2"
             v-for="offer in offers"
             :key="offer.id"
           >
@@ -66,34 +65,38 @@
                 <span>купить</span>
               </v-btn> -->
             </OfferCard>
-
-            <v-bottom-sheet persistent v-model="lowBalance">
-              <v-sheet>
-                <v-card-text>
-                  Упс.. не хватает денег на балансе для покупки товара
-                </v-card-text>
-                <v-card-text class="offer-card-text pa-0 ma-1">
-                  <small>Баланс вашей команды:</small>
-                  <span class="offer-card-text-main price">
-                    {{ $store.getters['user/GET_USER_BALANCE'] }}
-                  </span>
-                </v-card-text>
-                <v-card-text class="offer-card-text pa-0 ma-1">
-                  <small>Стоимость комплекта: </small>
-                  <span class="offer-card-text-main price">{{
-                    offer.price
-                  }}</span>
-                </v-card-text>
-                <v-btn
-                  class="ma-2"
-                  text
-                  color="red"
-                  @click="onClickOkLowBalance"
-                >
+            <DialogError
+              :title="'не хватает денег для покупки товара'"
+              :active="lowBalance"
+            >
+              <v-card-text class="offer-card-text">
+                <small class="mb-1">Баланс вашей команды:</small>
+                <span class="offer-card-text-main price">
+                  {{ $store.getters['user/GET_USER_BALANCE'] }}
+                </span>
+              </v-card-text>
+              <v-card-text class="offer-card-text">
+                <small class="mb-1">Стоимость комплекта: </small>
+                <span class="offer-card-text-main price">{{
+                  offer.price
+                }}</span>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text color="red" @click="onClickOkLowBalance">
                   закрыть
                 </v-btn>
-              </v-sheet>
-            </v-bottom-sheet>
+              </v-card-actions>
+            </DialogError>
+            <DialogError
+              v-if="offerStateError"
+              :title="'произошла ошибка при покупке комплекта'"
+              :active="offerStateError"
+            >
+              <v-btn text color="red" @click="onClickCloseOfferError"
+                >закрыть</v-btn
+              >
+            </DialogError>
           </v-card>
         </div>
         <!-- </v-expansion-panel-content>
@@ -149,6 +152,7 @@
 
 import OfferCard from '@/UI/OfferCard.vue';
 import Load from '@/UI/Load.vue';
+import DialogError from '@/UI/DialogError.vue';
 
 import SaleOffer from '@/models/model.offer.sale';
 import AccountTransfer from '@/models/model.account.transfer';
@@ -161,9 +165,10 @@ import Account from '@/store/models/Account';
 import Transaction from '@/store/models/Transaction';
 import User from '@/store/models/User';
 import Team from '@/store/models/Team';
+import {mapGetters} from 'vuex';
 import {prepareTypes} from '@/helpers/helper.form';
 
-// TODO: Синхронизировать данные между компонентами через web socket или SSE
+// TODO: Синхронизировать данные между сервером через web socket или SSE
 // TODO: расшифровку для карточки
 // TODO: показ кнопки купить в зависимости от роли
 
@@ -215,6 +220,11 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      offerStateRunning: 'shopState/GET_buyOffer_STATE_RUNNING',
+      offerStateComplete: 'shopState/GET_buyOffer_STATE_COMPLETE',
+      offerStateError: 'shopState/GET_buyOffer_STATE_ERROR',
+    }),
     offers() {
       console.warn('SHOP:offers');
       this.$store.commit('shopState/SET_OFFERS_UPDATE');
@@ -298,7 +308,7 @@ export default {
       // // NOTE: account_id_from находится по текующему пользователю
       console.warn('SHOP.VUE: onClickBuyOffer');
       console.error('offer\n', offer);
-      this.$store.commit('shopState/SET_buyOffer');
+      this.$store.commit('shopState/SET_buyOffer_STATE', 'RUNNING');
       const currentUserData = (
         await User.api().getUserByUsername(this.currentUser)
       ).response.data;
@@ -317,17 +327,27 @@ export default {
       if (balance < offerPrice) {
         console.error('BALANCE LOW PRICE OFFER');
         this.lowBalance = true;
+        this.$store.commit('shopState/SET_buyOffer_STATE_COMPLETE', 'RUNNING');
       } else {
         console.warn('CREATED OFFER', AccountTransfer, prepareTypes);
         const accountAcquire = new AccountAcquire().data;
         accountAcquire.offer_id = Number.parseInt(offer.id);
         console.warn(accountAcquire);
         console.error('offer\n', offer);
-        const responseAccountAcquire = await Offer.api().offerSaleAcquire(
-          Number.parseInt(offer.id)
-        );
-        console.error(responseAccountAcquire.response.data);
-        this.$store.commit('shopState/SET_buyOffer_COMPLETE');
+        try {
+          const responseAccountAcquire = await Offer.api().offerSaleAcquire(
+            Number.parseInt(offer.id)
+          );
+          console.error(responseAccountAcquire.response.data);
+          this.$store.commit('shopState/SET_buyOffer_STATE', 'COMPLETE');
+        } catch (e) {
+          console.warn(e);
+          this.$store.commit(
+            'shopState/SET_buyOffer_STATE_COMPLETE',
+            'RUNNING'
+          );
+          this.$store.commit('shopState/SET_buyOffer_STATE', 'ERROR');
+        }
       }
     },
 
@@ -353,11 +373,15 @@ export default {
     },
     onClickOkLowBalance() {
       console.warn('SHOP.VUE: onClickOkLowBalances');
-      // NOTE: Данная функция закрывает всплывающее сообщение
+
       this.lowBalance = false;
-      this.$store.commit('shopState/SET_buyOffer_COMPLETE');
+      this.$store.commit('shopState/SET_buyOffer_STATE_COMPLETE', 'RUNNING');
+    },
+    onClickCloseOfferError() {
+      console.warn('SHOP.VUE" onClickCloseOfferError');
+      this.$store.commit('shopState/SET_buyOffer_STATE_COMPLETE', 'ERROR');
     },
   },
-  components: {OfferCard, Load},
+  components: {OfferCard, Load, DialogError},
 };
 </script>

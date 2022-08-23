@@ -1,7 +1,7 @@
 <template>
   <!-- <div class="product-card ma-2"> -->
 
-  <v-card class="product-card ma-2 pa-2" elevation="12">
+  <v-card class="card-main-layout ma-2 pa-2">
     <!-- NOTE: запись ниже говорит: выбери из массива только те элементы, которых нет в modelItem.hideShow-->
     <!-- NOTE: Object.keys(modelItem.props).filter((key) => !modelItem.hideShow[key])" -->
     <!-- <div>{{ item }}</div>

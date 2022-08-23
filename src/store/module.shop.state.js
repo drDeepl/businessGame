@@ -2,19 +2,29 @@ export const shopState = {
   namespaced: true,
   state: {
     created: false,
+    buyOffer: {
+      RUNNING: false,
+      ERROR: false,
+      COMPLETE: false,
+    },
     load: {
       mainLayout: false,
       offersTab: false,
       offerCard: false,
       longPoll: false,
       offersUpdate: false,
-      buyOffer: false,
     },
   },
   actions: {},
   getters: {
-    GET_buyOffer: (state) => {
-      return state.load.buyOffer;
+    GET_buyOffer_STATE_RUNNING: (state) => {
+      return state.buyOffer.RUNNING;
+    },
+    GET_buyOffer_STATE_COMPLETE: (state) => {
+      return state.buyOffer.COMPLETE;
+    },
+    GET_buyOffer_STATE_ERROR: (state) => {
+      return state.buyOffer.ERROR;
     },
     GET_STATE_CREATED: (state) => {
       return state.created;
@@ -36,14 +46,15 @@ export const shopState = {
     },
   },
   mutations: {
-    SET_buyOffer: function (state) {
+    SET_buyOffer_STATE: function (state, nameState) {
       console.warn('MODULE.SHOP.STATE');
-      state.load.buyOffer = true;
+      state.buyOffer[nameState] = true;
     },
-    SET_buyOffer_COMPLETE: function (state) {
+    SET_buyOffer_STATE_COMPLETE: function (state, nameState) {
       console.warn('MODULE.SHOP.STATE');
-      state.load.buyOffer = false;
+      state.buyOffer[nameState] = false;
     },
+
     SET_STATE_CREATED: function (state) {
       state.created = true;
     },

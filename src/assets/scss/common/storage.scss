@@ -1,0 +1,46 @@
+.card-container {
+  margin: 1em !important;
+  max-width: 20em !important;
+}
+.store-card-product-kit-wrapper {
+  display: grid !important;
+  justify-content: center !important;
+  grid-template-areas:
+    'subtitle subtitle'
+    'title title'
+    'count time'
+    'prepare prepare' !important;
+}
+
+.store-card-product-kit-title {
+  grid-area: title !important;
+}
+
+.store-card-product-kit-subtitle {
+  grid-area: subtitle !important;
+  //   align-self: center !important;
+  //   color: $color-red !important;
+}
+
+.store-card-product-kit-content-item-count {
+  grid-area: count !important;
+}
+
+.store-card-product-kit-content-item-time {
+  grid-area: time !important;
+}
+
+.store-product-kit-card-actions {
+  grid-area: prepare !important;
+  justify-content: center;
+}
+
+.store-product-card-btn small {
+  color: $color-green;
+}
+
+.row-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
