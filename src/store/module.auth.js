@@ -33,6 +33,9 @@ export const auth = {
     initState: (state) => {
       return state;
     },
+    isLoggedIn: (state) => {
+      return state.status.loggedIn;
+    },
     getToken: (state) => {
       return 'Bearer ' + state.user.acces;
     },

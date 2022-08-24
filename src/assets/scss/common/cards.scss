@@ -27,9 +27,10 @@
 //   border: 1px solid red !important;
 // }
 
-.offer-card-title {
+.offer-card-title,
+.offer-card-suibtitle {
   display: flex !important;
-  flex-direction: column;
+  flex-direction: column !important;
 }
 
 .offer-card-content {
@@ -38,24 +39,43 @@
 
   grid-template-areas:
     'head head'
-    'aside aside'
-    'price status';
+    'subtitle subtitle'
+    'price state' !important;
 }
 
-.product:nth-child(1) {
+.offer-card-item {
+  display: flex !important;
+  justify-content: center;
+}
+
+.offer-card-text {
+  padding: 0.4em !important;
+}
+
+.offer-card-text-main {
+  align-self: center;
+}
+
+.offer-card-text-subtitle {
+  font-size: 0.95em !important;
+}
+
+.offer-card-head {
   grid-area: head !important;
+  flex-direction: column;
+  align-items: center;
 }
 
-.product:nth-child(3) {
-  grid-area: aside !important;
+.offer-card-item.trader {
+  grid-area: subtitle !important;
 }
 
-.product:nth-child(-2) {
-  grid-area: status !important;
-}
-
-.product:nth-child(-1) {
+.offer-card-item.price {
   grid-area: price !important;
+}
+
+.offer-card-item.state {
+  grid-area: state !important;
 }
 
 .offer-card-text {
@@ -64,19 +84,22 @@
   align-items: center;
   font-size: 0.8em;
 }
+
+.offer-card-text-trader {
+  color: $color-orange;
+}
 .offer-card-text-main {
   font-size: 1.16em;
   border: 1px solid $color-green;
   border-radius: 15px;
   padding: 0.2em 1em;
   color: $color-green;
+  background-color: $color-background-green;
 }
 
 .offer-card-text-main.state {
-  // margin-top: 0.5em;
-  // margin-bottom: 0.3em;
-
   color: $color-purple;
+  background-color: $color-purple-background;
   border: 1px solid $color-purple;
   border-radius: 15px;
   text-transform: lowercase;
@@ -85,6 +108,7 @@
 .offer-card-text-main.price {
   color: $color-orange;
   border: 1px solid $color-orange;
+  background: $color-background-orange;
   border-radius: 15px;
 }
 
@@ -144,4 +168,11 @@
 .manufacturer-card-action {
   flex-direction: column;
   justify-content: center;
+}
+
+.offer-card-subtitle {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

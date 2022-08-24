@@ -28,7 +28,7 @@ export const manufacturerSidebarLinks = [
 ];
 
 export const customerSidebarLinks = [
-  // {title: 'Магазин', url: '/shop'},
+  {title: 'Магазин', url: '/shop'},
   // {title: 'Склад', url: '/storage'},
 ];
 

@@ -83,6 +83,8 @@ import Team from '@/store/models/Team';
 import Account from '@/store/models/Account';
 import Product from '@/store/models/Product';
 import Load from '@/UI/Load.vue';
+
+import {mapGetters} from 'vuex';
 // import Product from '@/store/models/Product';
 // import ProductKit from '@/store/models/ProductKit';
 export default {
@@ -112,6 +114,24 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapGetters({isLoggedIn: 'auth/isLoggedIn'}),
+    currentUser() {
+      return this.$store.state.auth.user;
+    },
+    currentTab() {
+      return this.$route.params;
+    },
+
+    users() {
+      return this.$store.$db().model('users').all();
+    },
+    sidebarLinks() {
+      return this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](
+        this.sidebarUserInfo.role
+      );
+    },
+  },
   async created() {
     // TODO [20.07.2022]: переделать страницу авторизации
     // TODO [20.07.2022]: оформить покупку продуктового набора через состояния
@@ -125,16 +145,19 @@ export default {
     // NOTE: 5.Отобразить имя, команду, баланс пользователя'
     console.warn(User.api());
 
-    if (this.$store.state.auth.status.loggedIn) {
+    if (this.isLoggedIn) {
       const username = this.currentUser.username;
       const responseUser = await this.$store.dispatch(
         'user/getUserDataByUsername',
         username
       );
+
       const dataUser = responseUser.data;
       const roleUser = dataUser.role.toLowerCase();
+
       await Product.api().getListProducts();
       await this.$store.dispatch('productKit/getProductKits');
+
       this.sidebar.links =
         this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
       if (dataUser.is_superuser) {
@@ -160,23 +183,7 @@ export default {
       this.$router.push('/');
     }
   },
-  computed: {
-    currentUser() {
-      return this.$store.state.auth.user;
-    },
-    currentTab() {
-      return this.$route.params;
-    },
 
-    users() {
-      return this.$store.$db().model('users').all();
-    },
-    sidebarLinks() {
-      return this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](
-        this.sidebarUserInfo.role
-      );
-    },
-  },
   methods: {
     async onClickMenu() {
       this.sidebar.isActive = !this.sidebar.isActive;

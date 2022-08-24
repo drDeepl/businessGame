@@ -36,6 +36,12 @@ export default class SaleOffer {
       state: '',
       product_kit: '',
     };
-    this.hideShow = {id: true, timestamp: true, product_kit: true};
+    this.hideShow = {
+      id: true,
+      timestamp: true,
+      product_kit: true,
+      product: true,
+      trader: true,
+    };
   }
 }

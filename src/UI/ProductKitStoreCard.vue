@@ -18,14 +18,16 @@
 
       <v-card-text
         :class="
-          'pa-1 row-container store-card-product-kit-content-item-' + property
+          'pa-1 row-container store-card-product-kit-content-item' +
+          ' ' +
+          property
         "
         v-for="property in Object.keys(modelProductKit.props).filter(
           (key) => !modelProductKit.hideShow[key]
         )"
         :key="property"
       >
-        <small>{{ modelProductKit.props[property] }}</small>
+        <small class="">{{ modelProductKit.props[property] }}</small>
         <span>{{ productKit[property] }}</span>
       </v-card-text>
 

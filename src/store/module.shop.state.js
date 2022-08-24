@@ -13,6 +13,7 @@ export const shopState = {
       offerCard: false,
       longPoll: false,
       offersUpdate: false,
+      prepareOffer: false,
     },
   },
   actions: {},
@@ -41,6 +42,9 @@ export const shopState = {
     GET_STATE_LONG_POLL: (state) => {
       return state.load.longPoll;
     },
+    GET_prepareOffer_STATE: (state) => {
+      return state.load.prepareOffer;
+    },
     GET_OFFERS_UPDATE: (state) => {
       return state.load.offersUpdate;
     },
@@ -67,6 +71,12 @@ export const shopState = {
     },
     SET_STATE_COMPLETE_mainLayout: function (state) {
       state.load.mainLayout = false;
+    },
+    SET_OFFER_PREPARE: function (state) {
+      state.load.prepareOffer = true;
+    },
+    SET_OFFER_PREPARE_COMPLETE: function (state) {
+      state.load.prepareOffer = false;
     },
     SET_OFFERS_UPDATE: function (state) {
       state.load.offersUpdate = true;

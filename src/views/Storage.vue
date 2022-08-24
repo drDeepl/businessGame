@@ -22,24 +22,26 @@
                   <span>приготовить продукт</span>
                 </v-btn>
               </v-card-actions>
-              <v-overlay
-                :absolute="true"
-                color="white"
-                :opacity="0.85"
-                :value="$store.getters['storageTeam/GET_STATE_CREATE_PRODUCT']"
-                class="load-layout"
-              >
+            </ProductKitCard>
+            <v-overlay
+              color="white"
+              :opacity="0.85"
+              :value="prepareProduct"
+              class="load-layout"
+            >
+              <v-card elevation="0" light class="storage-prepare-product-card">
+                <v-card-text>приготовление продукта</v-card-text>
                 <v-progress-circular
                   :rotate="360"
                   :size="100"
                   :width="15"
-                  :value="prepareProductKit.progress"
-                  color="deep-purple"
+                  :value="prepareProductProgress"
+                  color="deep-orange"
                 >
-                  {{ prepareProductKit.progress }}
+                  {{ prepareProductTimeToFinal }} сек.
                 </v-progress-circular>
-              </v-overlay>
-            </ProductKitCard>
+              </v-card>
+            </v-overlay>
           </div>
         </div>
       </v-tab-item>
@@ -51,9 +53,11 @@
 // TODO: улучшить дизайн карточки
 // TODO: создание продукта из продуктового набора
 // TODO: продажу продуктового набора клиенту
+import {mapGetters} from 'vuex';
+
 import ProductKitStorage from '@/store/models/ProductKitStorage';
 import User from '@/store/models/User';
-// import ProductKitStore from '@/models/model.productKitStore';
+
 import ProductKit from '@/models/model.productKit';
 
 import Load from '@/UI/Load.vue';
@@ -89,6 +93,11 @@ export default {
     // this.arrays.productKits = productKits;
   },
   computed: {
+    ...mapGetters({
+      prepareProductProgress: 'storageTeam/GET_prepareProduct_PROGRESS',
+      prepareProduct: 'storageTeam/GET_STATE_PREPARE_PRODUCT',
+      prepareProductTimeToFinal: 'storageTeam/GET_prepareProduct_TIME',
+    }),
     currentUserData() {
       let username = this.$store.state.auth.user.username;
       console.warn('Storage.vue\nusername ' + username);
@@ -118,18 +127,15 @@ export default {
       console.error(this.prepareProductKit.progress);
     },
     onClickPrepareProduct(productKit) {
-      this.$store.commit('storageTeam/SET_CREATE_PRODUCT');
+      productKit.time = 30;
+      this.$store.commit('storageTeam/SET_PREPARE_PRODUCT');
       console.warn('STORAGE: onClickPrepareProduct');
       console.warn(productKit);
-      this.$store.dispatch('storageTeam/prepareProduct', 210);
-      // let prepareProduct = setInterval(() => this.plusProgress(10), 1000);
-      // setTimeout(() => {
-      //   clearInterval(prepareProduct);
-      // }, 10000);
-      // this.$store.commit('storageTeam/SET_CREATE_PRODUCT_COMPLETE');
+      const timeToPrepare = Number.parseInt(productKit.time);
+      this.$store.dispatch('storageTeam/prepareProduct', timeToPrepare);
     },
     getProductName(productId) {
-      console.warn('MODULE.STORAGE: prepareProductKit()');
+      console.warn('MODULE.STORAGE: getProductName');
       const product = this.$store
         .$db()
         .model('products')

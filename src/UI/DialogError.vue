@@ -1,6 +1,6 @@
 <template>
   <div class="dialog-error-wrapper">
-    <v-dialog max-width="20em" v-model="active">
+    <v-dialog persistent max-width="20em" v-model="active">
       <v-card class="offer-low-balance">
         <v-card-title
           class="offer-card-text offer-low-balance-title text-subtitle-1"

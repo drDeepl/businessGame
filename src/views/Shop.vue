@@ -42,29 +42,20 @@
             v-for="offer in offers"
             :key="offer.id"
           >
+            <!-- {{ getProductKit(offer.product_kit) }} -->
+            <!-- <OfferCard v-if="!prepareOfferState" /> -->
             <OfferCard
-              :title="{
-                product: offer.productKit_data.product_data.name,
-              }"
-              :item="offer"
-              :itemReveal="offer.productKit_data"
-              :modelItem="cards.cardOffer.model"
-              :modelReveal="cards.cardOffer.reveal.model"
+              :traderId="offer.trader"
+              :product="offer.productKit_data.product_data.name"
+              :frontItem="offer"
+              :frontModelItem="cards.cardOffer.frontCard.model"
+              :backItem="offer.productKit_data"
+              :backModelItem="cards.cardOffer.backCard.model"
               :showLabel="true"
               :btnBuyOffer="onClickBuyOffer"
             >
-              <!-- <v-btn
-                v-if="currentUserData.role.toLowerCase() == 'player'"
-                class="ma-1"
-                outlined
-                rounded
-                color="#ee5544"
-                :loading="$store.getters['shopState/GET_buyOffer']"
-                @click="onClickBuyOffer(offer)"
-              >
-                <span>купить</span>
-              </v-btn> -->
             </OfferCard>
+
             <DialogError
               :title="'не хватает денег для покупки товара'"
               :active="lowBalance"
@@ -181,12 +172,8 @@ export default {
       revealCards: {},
       cards: {
         cardOffer: {
-          model: new SaleOffer(),
-          reveal: {
-            model: new ModelProductKit(),
-          },
-          currentCard: null,
-          active: [],
+          frontCard: {model: new SaleOffer()},
+          backCard: {model: new ModelProductKit()},
         },
         cardTransaction: {
           model: new ModelTransaction(),
@@ -206,24 +193,13 @@ export default {
       },
     };
   },
-  async created() {
-    this.$store.commit('shopState/SET_STATE_LOAD_mainLayout');
-    this.$store.commit('shopState/SET_STATE_CREATED');
-    await Offer.api().getListSaleOffers();
-    await Team.api().getListTeams();
-    this.$store.commit('shopState/SET_STATE_CREATED_COMPLETE');
-    const user = this.$store.state.auth.user;
-    console.error(user);
-    console.warn('USERNAME');
-
-    this.$store.commit('shopState/SET_STATE_COMPLETE_mainLayout');
-  },
 
   computed: {
     ...mapGetters({
       offerStateRunning: 'shopState/GET_buyOffer_STATE_RUNNING',
       offerStateComplete: 'shopState/GET_buyOffer_STATE_COMPLETE',
       offerStateError: 'shopState/GET_buyOffer_STATE_ERROR',
+      prepareOfferState: 'shopState/GET_prepareOffer_STATE',
     }),
     offers() {
       console.warn('SHOP:offers');
@@ -233,28 +209,18 @@ export default {
         .model('offers')
         .query()
         .with('productKit_data.product_data')
-        .all();
+
+        .get();
       console.warn(offers);
 
       this.$store.commit('shopState/SET_OFFERS_UPDATED');
       return offers;
     },
-
     transactions() {
       console.warn('SHOP: transactions');
       return this.$store.$db().model('transactions').query().all();
     },
-    getProductKit() {
-      return (productKitId) => {
-        return this.$store
-          .$db()
-          .model('productKits')
-          .query()
-          .where('id', productKitId)
-          .with('product_data')
-          .first();
-      };
-    },
+
     offersUpdated() {
       console.warn('SHOP: offersUpdated');
       return this.offers;
@@ -272,19 +238,30 @@ export default {
         .first();
     },
   },
-  methods: {
-    async prepareOffer(offer) {
-      console.warn('SHOP.VUE: prepareOffer');
-      console.warn(offer);
+  async created() {
+    this.$store.commit('shopState/SET_STATE_LOAD_mainLayout');
+    this.$store.commit('shopState/SET_STATE_CREATED');
 
-      const pk = this.$store
-        .$db()
-        .model('productKits')
-        .query()
-        .with('product_data')
-        .get();
-      console.warn(pk);
+    await Offer.api().getListSaleOffers();
+    await Team.api().getListTeams();
+    this.$store.commit('shopState/SET_STATE_CREATED_COMPLETE');
+    const user = this.$store.state.auth.user;
+    console.error(user);
+    console.warn('USERNAME');
+
+    this.$store.commit('shopState/SET_STATE_COMPLETE_mainLayout');
+  },
+
+  methods: {
+    getProductKitTitle(offer) {
+      let productKitTitle = {};
+      productKitTitle['product'] = offer.productKit_data.product_data.name;
+      return productKitTitle;
     },
+    async prepareOffer(offer) {
+      console.error('PREPARE OFFER\n', offer);
+    },
+
     getAccount(accountId) {
       console.warn('SHOP: getAccount');
       const team = this.$store
