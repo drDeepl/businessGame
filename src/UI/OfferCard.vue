@@ -98,7 +98,7 @@
           rounded
           color="#ee5544"
           :loading="loading"
-          @click="onClickBuyOffer(item)"
+          @click="onClickBuyOffer(frontItem)"
         >
           <span>купить</span>
         </v-btn>

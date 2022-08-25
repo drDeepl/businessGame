@@ -1,40 +1,35 @@
 import TeamService from '@/services/team.service';
+import Team from './models/Team';
 export const team = {
   namespaced: true,
   state: {
-    dataTeam: {
-      // INFO: idTeam: dataTeam
-      // INFO: useranme: dataTeam
-      // INFO: dataByName: {teamName:dataTeam}
-      dataByName: {}
-    }
+    getTeam: false,
+    getTeams: false,
+    getNamesTeams: {
+      getNames: false,
+      listNamesTeams: [],
+    },
+    getBalance: {
+      running: false,
+      value: 0,
+    },
   },
   actions: {
-    async getTeamData(context, JSON_usernameIdTeam) {
-      // INFO: getTeamData получает на вход объект {username: String, idTeam: Integer}
-      // INFO: JSON_username = {username: String, idTeam: Integer}
-      // INFO: Получает данные команды по idTeam
-      // INFO: Затем создает объект {usernmae: dataTeam}
-      // INFO: Сохраняет данные команды в хранилище в двух экземплярах
-      // INFO:   1. {idTeam: dataTeam}
-      // INFO:   2. {username: dataTeam}
+    async getDataTeam(context, teamId) {
       console.warn('MODULE.TEAM: getTeamData');
-      console.log(JSON_usernameIdTeam);
-      const username = JSON_usernameIdTeam.username;
-      const idTeam = JSON_usernameIdTeam.idTeam;
-      const data = await TeamService.getDataTeam(idTeam);
-      console.log(data);
-      const dataTeam = {
-        username: username,
-        dataTeam: data
-      };
-      context.commit('SET_TEAM_DATA', dataTeam);
+      context.commit('SET_GET_TEAM');
+      const responseWrap = await Team.api().getTeam(teamId);
+      context.commit('SET_GET_TEAM_COMPLETE');
+      return responseWrap.response.data;
     },
     async getTeams(context) {
       console.warn('MODULE.TEAM: getTeams');
-      const listTeams = await TeamService.getTeams();
-      context.commit('SET_TEAM_DATA_BY_NAME', listTeams);
-      return listTeams;
+      context.commit('SET_GET_TEAMS');
+      const responseWrap = await Team.api().getListTeams();
+      context.commit('SET_GET_TEAMS_COMPLETE');
+      const listTeams = responseWrap.response.data;
+      context.commit('SET_NAMES_TEAM', listTeams);
+      return responseWrap.response.data;
     },
     async createTeam(context, dataForCreate) {
       console.warn('MODULE.TEAM: createTeam');
@@ -47,40 +42,65 @@ export const team = {
       console.warn('TEAM.MODULE: deleteTeam');
       console.log(context);
       return TeamService.deleteTeam(teamId);
-    }
+    },
   },
   getters: {
-    GET_DATA_TEAM_BY_ID: state => id => {
+    GET_TEAM_STATE: (state) => {
+      return state.getTeam;
+    },
+    GET_BALANCE_VALUE: (state) => {
+      return state.getBalance.value;
+    },
+    GET_BALANCE_STATE_RUNNING: (state) => {
+      return state.getBalance.running;
+    },
+    GET_DATA_TEAM_BY_ID: (state) => (id) => {
       console.warn('MODULE.TEAM: GET_DATA_TEAM_BY_ID');
       return state.dataTeam[id];
     },
-    GET_DATA_TEAM_BY_USERNAME: state => username => {
+    GET_DATA_TEAM_BY_USERNAME: (state) => (username) => {
       return state.dataTeam[username];
     },
-    GET_LIST_NAMES_TEAMS: state => {
+    GET_LIST_NAMES_TEAMS: (state) => {
       console.warn('MODULE.TEAM: GET_LIST_NAMES_TEAMS');
       // INFO: Функция возвращает  объект с команлами
-      return state.dataTeam.dataByName;
+      return state.getNamesTeams.arrayNamesTeams;
     },
-    GET_DATA_TEAM_BY_TeamName: state => teamName => {
+    GET_DATA_TEAM_BY_TeamName: (state) => (teamName) => {
       return state.dataTeam.dataByName[teamName];
-    }
+    },
   },
   mutations: {
-    SET_TEAM_DATA: function(state, data) {
-      console.warn('MODULE.TEAM: SET_TEAM_DATA');
-      const username = data.username;
-      const dataTeam = data.dataTeam;
-      state.dataTeam[username] = dataTeam;
-      state.dataTeam[dataTeam.id] = dataTeam;
+    SET_BALANCE: function (state, balance) {
+      state.getBalance.value = balance;
     },
-    SET_TEAM_DATA_BY_NAME: function(state, listDataTeams) {
-      console.warn('MODULE.TEAM: SET_TEAM_DATA_BY_NAME');
-      console.log(listDataTeams);
-      for (let i in listDataTeams) {
-        let teamName = listDataTeams[i].name;
-        state.dataTeam.dataByName[teamName] = listDataTeams[i];
+    SET_BALANCE_RUNNING: function (state) {
+      state.getBalance.running = true;
+    },
+    SET_BALANCE_RUNNING_COMPLETE: function (state) {
+      state.getBalance.running = false;
+    },
+    SET_GET_TEAM: function (state) {
+      state.getTeam = true;
+    },
+    SET_GET_TEAM_COMPLETE: function (state) {
+      state.getTeam = false;
+    },
+    SET_GET_TEAMS: function (state) {
+      state.getTeams = true;
+    },
+    SET_GET_TEAMS_COMPLETE: function (state) {
+      state.getTeams = false;
+    },
+    SET_NAMES_TEAM: function (state, arrayNamesTeams) {
+      state.getNamesTeams.getNames = true;
+
+      let arrayNames = [];
+      for (let i = 0; i < arrayNamesTeams.length; i++) {
+        arrayNames.push(arrayNamesTeams[i].name);
       }
-    }
-  }
+      state.getNamesTeams.listNamesTeams = arrayNames;
+      state.getNamesTeams.getNames = false;
+    },
+  },
 };

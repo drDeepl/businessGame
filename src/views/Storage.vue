@@ -132,6 +132,7 @@ export default {
       console.warn('STORAGE: onClickPrepareProduct');
       console.warn(productKit);
       const timeToPrepare = Number.parseInt(productKit.time);
+
       this.$store.dispatch('storageTeam/prepareProduct', timeToPrepare);
     },
     getProductName(productId) {

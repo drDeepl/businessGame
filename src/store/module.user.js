@@ -17,9 +17,7 @@ export const user = {
       updating: false,
     },
     deleteUser: false,
-    userInfo: {
-      balanceTeam: null,
-    },
+    dataCurrentUser: null,
     linksSidebarByRole: {
       // INFO: role: [{title: String, url: String,}]
       player: playerSidebarLinks,
@@ -38,6 +36,7 @@ export const user = {
       context.commit('SET_GET_USER');
       const responseWrap = await User.api().getUserByUsername(username);
       const user = responseWrap.response;
+
       context.commit('SET_GET_USER_COMPLETE');
       return user;
     },
@@ -81,9 +80,8 @@ export const user = {
     },
   },
   getters: {
-    GET_USER_BALANCE: (state) => {
-      console.warn('MODULE.USER: GET_USER_BALANCE');
-      return state.userInfo.balanceTeam;
+    GET_DATA_CURRENT_USER: (state) => {
+      return state.dataCurrentUser;
     },
     GET_CREATE_USER: (state) => {
       console.warn('MODULE.USER: GET_CREATE_USER');
@@ -107,9 +105,8 @@ export const user = {
     },
   },
   mutations: {
-    SET_USER_BALANCE: function (state, balance) {
-      console.warn('SET_USER_BALANCE');
-      state.userInfo.balanceTeam = balance;
+    SET_DATA_CURRENT_USER: function (state, userData) {
+      state.dataCurrentUser = userData;
     },
     SET_CREATING_USER: function (state) {
       state.createUser = true;

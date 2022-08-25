@@ -8,7 +8,8 @@ import Team from './models/Team';
 import Account from './models/Account';
 import Product from './models/Product';
 import ProductKit from './models/ProductKit';
-import Offer from './models/Offer';
+import OfferSale from './models/OfferSale';
+import OfferPurchase from './models/OfferPurchase';
 import Transaction from './models/Transaction';
 import Token from './models/Token';
 
@@ -39,7 +40,7 @@ VuexORM.use(VuexORMAxios, {axios: instance});
 // INFO: create a new instance of Database
 const database = new VuexORM.Database();
 
-// INFO: Register model to Doatabase
+// INFO: Register model to Database
 database.register(ProductKitStorage);
 database.register(ProductStorage);
 database.register(Token);
@@ -48,7 +49,8 @@ database.register(Team);
 database.register(Account);
 database.register(Product);
 database.register(ProductKit);
-database.register(Offer);
+database.register(OfferSale);
+database.register(OfferPurchase);
 database.register(Transaction);
 
 export default new Vuex.Store({

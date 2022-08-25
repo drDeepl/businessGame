@@ -17,6 +17,9 @@ export default class ProductStorage extends Model {
         console.warn('MODEL.PRODUCT.STORAGE');
         return this.get('store/' + team_id + '/products/list');
       },
+      async addProduct(StoreProduct) {
+        return this.post('store/add-product', StoreProduct);
+      },
     },
   };
 }

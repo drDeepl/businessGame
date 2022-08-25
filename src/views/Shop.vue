@@ -20,7 +20,7 @@
 
         <!-- <v-expansion-panel-content> -->
         <v-progress-circular
-          v-if="$store.getters['shopState/GET_OFFERS_UPDATE']"
+          v-if="offersListUpdate"
           color="#ee5544"
           class="manufacturer-layout"
           indeterminate
@@ -29,7 +29,7 @@
         </v-progress-circular>
         <div
           class="shop-offers offers-not-found"
-          v-else-if="offers.length == 0"
+          v-else-if="offersSale.length == 0"
         >
           <span>нет активных предложений</span>
         </div>
@@ -39,7 +39,7 @@
 
           <v-card
             class="card-main-layout ma-2 pa-2"
-            v-for="offer in offers"
+            v-for="offer in offersSale"
             :key="offer.id"
           >
             <!-- {{ getProductKit(offer.product_kit) }} -->
@@ -58,19 +58,19 @@
 
             <DialogError
               :title="'не хватает денег для покупки товара'"
-              :active="lowBalance"
+              :active="lowBalance.isLow"
             >
               <v-card-text class="offer-card-text">
                 <small class="mb-1">Баланс вашей команды:</small>
                 <span class="offer-card-text-main price">
-                  {{ $store.getters['user/GET_USER_BALANCE'] }}
+                  {{ balanceTeam }}
                 </span>
               </v-card-text>
               <v-card-text class="offer-card-text">
                 <small class="mb-1">Стоимость комплекта: </small>
-                <span class="offer-card-text-main price">{{
-                  offer.price
-                }}</span>
+                <span class="offer-card-text-main price">
+                  {{ lowBalance.offerPrice }}
+                </span>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -139,25 +139,19 @@
 </template>
 
 <script>
-// import Form from '@/UI/Form.vue';
-
 import OfferCard from '@/UI/OfferCard.vue';
 import Load from '@/UI/Load.vue';
 import DialogError from '@/UI/DialogError.vue';
 
 import SaleOffer from '@/models/model.offer.sale';
-import AccountTransfer from '@/models/model.account.transfer';
 import ModelTransaction from '@/models/model.transaction';
-import AccountAcquire from '@/models/model.account.acquire';
 import ModelProductKit from '@/models/model.productKit';
 
-import Offer from '@/store/models/Offer';
-import Account from '@/store/models/Account';
+import OfferSale from '@/store/models/OfferSale';
 import Transaction from '@/store/models/Transaction';
-import User from '@/store/models/User';
 import Team from '@/store/models/Team';
+
 import {mapGetters} from 'vuex';
-import {prepareTypes} from '@/helpers/helper.form';
 
 // TODO: Синхронизировать данные между сервером через web socket или SSE
 // TODO: расшифровку для карточки
@@ -166,7 +160,10 @@ import {prepareTypes} from '@/helpers/helper.form';
 export default {
   data() {
     return {
-      lowBalance: false,
+      lowBalance: {
+        isLow: false,
+        offerPrice: 0,
+      },
 
       title: '',
       revealCards: {},
@@ -200,13 +197,17 @@ export default {
       offerStateComplete: 'shopState/GET_buyOffer_STATE_COMPLETE',
       offerStateError: 'shopState/GET_buyOffer_STATE_ERROR',
       prepareOfferState: 'shopState/GET_prepareOffer_STATE',
+      balanceTeam: 'team/GET_BALANCE_VALUE',
+      dataCurrentUser: 'user/GET_DATA_CURRENT_USER',
+      offersListUpdate: 'offer/GET_OFFERS_LIST_UPDATE',
     }),
-    offers() {
+    offersSale() {
+      // TODO переделать получение данных промежуточные запросы
       console.warn('SHOP:offers');
       this.$store.commit('shopState/SET_OFFERS_UPDATE');
       const offers = this.$store
         .$db()
-        .model('offers')
+        .model('offersSale')
         .query()
         .with('productKit_data.product_data')
 
@@ -242,14 +243,13 @@ export default {
     this.$store.commit('shopState/SET_STATE_LOAD_mainLayout');
     this.$store.commit('shopState/SET_STATE_CREATED');
 
-    await Offer.api().getListSaleOffers();
+    // await OfferSale.api().getListOffersSale();
+    await this.$store.dispatch('offer/getOffers');
     await Team.api().getListTeams();
     this.$store.commit('shopState/SET_STATE_CREATED_COMPLETE');
     const user = this.$store.state.auth.user;
     console.error(user);
     console.warn('USERNAME');
-
-    this.$store.commit('shopState/SET_STATE_COMPLETE_mainLayout');
   },
 
   methods: {
@@ -286,36 +286,36 @@ export default {
       console.warn('SHOP.VUE: onClickBuyOffer');
       console.error('offer\n', offer);
       this.$store.commit('shopState/SET_buyOffer_STATE', 'RUNNING');
-      const currentUserData = (
-        await User.api().getUserByUsername(this.currentUser)
-      ).response.data;
-      console.log('CURRENT USER\n', currentUserData);
-      const teamData = this.$store
-        .$db()
-        .model('teams')
-        .query()
-        .where('id', currentUserData.team)
-        .first();
-      console.log('DATA OF TEAM\n', teamData);
-      const accountData = (await Account.api().getAccount(teamData.account))
-        .response.data;
-      const balance = Number.parseInt(accountData.balance);
+      const balance = Number.parseInt(this.balanceTeam);
       const offerPrice = Number.parseInt(offer.price);
       if (balance < offerPrice) {
         console.error('BALANCE LOW PRICE OFFER');
-        this.lowBalance = true;
+        this.lowBalance.isLow = true;
+        this.lowBalance.offerPrice = offer.price;
         this.$store.commit('shopState/SET_buyOffer_STATE_COMPLETE', 'RUNNING');
       } else {
-        console.warn('CREATED OFFER', AccountTransfer, prepareTypes);
-        const accountAcquire = new AccountAcquire().data;
-        accountAcquire.offer_id = Number.parseInt(offer.id);
-        console.warn(accountAcquire);
         console.error('offer\n', offer);
         try {
-          const responseAccountAcquire = await Offer.api().offerSaleAcquire(
-            Number.parseInt(offer.id)
+          const offerId = offer.id;
+          this.$store.commit('team/SET_BALANCE_RUNNIG');
+          const teamId = this.dataCurrentUser.team;
+          const dataTeam = this.$store
+            .$db()
+            .model('teams')
+            .query()
+            .where('id', teamId)
+            .first();
+          const responseAccountAcquire = await OfferSale.api().offerSaleAcquire(
+            offerId
           );
+          const dataAccount = await this.$store.dispatch(
+            'account/getAccountById',
+            dataTeam.account
+          );
+          this.$store.commit('team/SET_BALANCE', dataAccount.balance);
           console.error(responseAccountAcquire.response.data);
+          this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
+          await this.$store.dispatch('offer/getOffers');
           this.$store.commit('shopState/SET_buyOffer_STATE', 'COMPLETE');
         } catch (e) {
           console.warn(e);
@@ -341,8 +341,8 @@ export default {
         console.error('LONG POLL RUNNING');
         setInterval(
           () =>
-            Offer.api()
-              .getListSaleOffers()
+            OfferSale.api()
+              .getListOffersSale()
               .then((result) => console.log(result.response.data)),
           10000
         );
@@ -351,13 +351,16 @@ export default {
     onClickOkLowBalance() {
       console.warn('SHOP.VUE: onClickOkLowBalances');
 
-      this.lowBalance = false;
+      this.lowBalance.isLow = false;
       this.$store.commit('shopState/SET_buyOffer_STATE_COMPLETE', 'RUNNING');
     },
     onClickCloseOfferError() {
       console.warn('SHOP.VUE" onClickCloseOfferError');
       this.$store.commit('shopState/SET_buyOffer_STATE_COMPLETE', 'ERROR');
     },
+  },
+  mounted() {
+    this.$store.commit('shopState/SET_STATE_COMPLETE_mainLayout');
   },
   components: {OfferCard, Load, DialogError},
 };

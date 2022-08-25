@@ -1,41 +1,29 @@
-import AccountService from '@/services/account.service';
+import Account from './models/Account';
 export const account = {
   namespaced: true,
   state: {
-    dataByIdTeam: {
-      // idTeam: dataAccount
-    }
+    getAccount: false,
   },
   actions: {
-    async getAccountById(context, model) {
-      // NOTE: getAccountById получает на  вход объект model
-      // NOTE: model = {idAccount: Integer, idTeam: Integer}\
-      // NOTE: По idAccount получает данные о счете\
-      // NOTE: Создает модель для хранения данных dataAccountByIdTeam
-      // NOTE: После сохраняет данные в state в виде {idTeam:dataAccount}\
-      console.warn('MODULE.ACCOUNT: getAccountById');
-      console.log(model);
-      console.log('Context\n', context);
-      const dataAccount = await AccountService.getAccount(model.idAccount);
-      console.log(dataAccount);
-      const setAccountData = {
-        idTeam: model.idTeam,
-        dataAccount: dataAccount
-      };
-      context.commit('SET_ACCOUNT_DATA', setAccountData);
-    }
+    async getAccountById(context, accountId) {
+      console.warn('MODULE.ACCOUNT');
+      context.commit('SET_GET_ACCOUNT');
+      const responseWrap = await Account.api().getAccount(accountId);
+      context.commit('SET_GET_ACCOUNT_COMPLETE');
+      return responseWrap.response.data;
+    },
   },
   getters: {
-    GET_DATA_BY_ID_TEAM: state => idTeam => {
-      return state.dataByIdTeam[idTeam];
-    }
+    GET_STATE_getAccount: (state) => {
+      return state.getAccount;
+    },
   },
   mutations: {
-    SET_ACCOUNT_DATA: (state, data) => {
-      console.warn('MODULE.ACCOUNT: SET_ACCOUNT_DATA');
-      console.log(state);
-      console.log(data);
-      state.dataByIdTeam[data.idTeam] = data.dataAccount;
-    }
-  }
+    SET_GET_ACCOUNT: function (state) {
+      state.getAccount = true;
+    },
+    SET_GET_ACCOUNT_COMPLETE: function (state) {
+      state.getAccount = false;
+    },
+  },
 };

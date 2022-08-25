@@ -300,9 +300,7 @@ export default {
     // await this.$store.dispatch('user/getUserDataByUsName', username);
     // const userData =
     //   this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](username);
-    // FIX: удалить после исправления ошибок
     userData.is_superuser = true;
-    // FIX: ================================
     if (!userData.is_superuser) {
       this.$router.push('/');
     } else {

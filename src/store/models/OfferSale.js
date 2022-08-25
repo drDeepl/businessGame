@@ -2,8 +2,8 @@ import {Model} from '@vuex-orm/core';
 import TokenService from '@/services/token.service';
 import ProductKit from './ProductKit';
 
-export default class Offer extends Model {
-  static entity = 'offers';
+export default class OfferSale extends Model {
+  static entity = 'offersSale';
   static fields() {
     return {
       id: this.attr(null),
@@ -20,8 +20,8 @@ export default class Offer extends Model {
       Authorization: TokenService.getLocalAccessToken(),
     },
     actions: {
-      async getListSaleOffers() {
-        console.warn('MODEL.OFFER: getListSaleOffers');
+      async getListOffersSale() {
+        console.warn('MODEL.OFFER: getListOffersSale');
 
         return this.get('offers/sale/list');
       },
@@ -36,21 +36,6 @@ export default class Offer extends Model {
         return this.post(
           'offers/sale/acquire?offer_id=' + modelOfferSaleAcquire
         );
-      },
-      async getListOfferPurchase() {
-        console.warn('MODEL.OFFER: getListOfferPurchase');
-
-        return this.get('offers/purchase/list');
-      },
-      async offerPurchasePlace(modelOfferPurchasePlace) {
-        console.warn('MODEL.OFFER: offerPurchasePlace');
-
-        return this.post('offers/purchase/place', modelOfferPurchasePlace);
-      },
-      async offerPurchaseAcquire(modelOfferPurchaseAcquire) {
-        console.warn('MODEL.OFFER: offerPurchaseAcquire');
-
-        return this.post('offers/purchase/acquir', modelOfferPurchaseAcquire);
       },
     },
   };

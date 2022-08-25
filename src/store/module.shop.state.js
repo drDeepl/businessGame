@@ -2,6 +2,7 @@ export const shopState = {
   namespaced: true,
   state: {
     created: false,
+    
     buyOffer: {
       RUNNING: false,
       ERROR: false,

@@ -24,21 +24,6 @@ export const storageTeam = {
         context.commit('SET_PREPARE_PRODUCT_COMPLETE');
         context.commit('SET_PREPARE_PRODUCT_CLEAR_PROGRESS');
       }, time * 1000);
-
-      // const changeProgress = new Promise((resolve, reject) => {
-      //   try {
-      //     let progressPrepare =
-      //       context.getters.GET_prepareProduct_PROGRESS == 100;
-      //     while (progressPrepare != 100) {
-      //       context.commit('SET_PREPARE_PRODUCT_PROGRESS', 10);
-      //     }
-      //     resolve(context.commit('SET_CREATE_PRODUCT_COMPLETE'));
-      //   } catch (e) {
-      //     reject(e);
-      //   }
-      // });
-
-      // queueMicrotask(() => {});
     },
   },
   getters: {

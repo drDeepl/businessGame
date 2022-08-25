@@ -7,24 +7,36 @@
       <div class="sidebar-container">
         <p id="sidebar-tittle" class="user-info">{{ title }}</p>
         <ul class="user-info" v-if="sidebarUserInfo.role.value == 'player'">
-          <!-- TODO: Оформить красивый вывод информации -->
-          <v-skeleton-loader
-            v-if="loading.sidebarUserInfo"
-            type="text@4"
-          ></v-skeleton-loader>
           <li
-            v-else
             :id="row"
             class="user-info-row"
-            v-for="row in Object.keys(sidebarUserInfo)"
+            v-for="row in Object.keys(sidebarUserInfo).filter(
+              (key) => key != 'balance'
+            )"
             :key="row"
           >
-            <span class="sidebar-user-info title">
-              <small>{{ sidebarUserInfo[row].title.toLowerCase() }}</small>
-            </span>
-            <span class="sidebar-user-info value" :id="row">{{
-              sidebarUserInfo[row].value.toLowerCase()
-            }}</span>
+            <div v-if="!!sidebarUserInfo[row].value">
+              <span class="sidebar-user-info title">
+                <small>
+                  {{ sidebarUserInfo[row].title.toLowerCase() }}
+                </small>
+              </span>
+              <span class="sidebar-user-info value" :id="row">
+                {{ sidebarUserInfo[row].value.toLowerCase() }}
+              </span>
+            </div>
+            <v-progress-circular v-else indeterminate></v-progress-circular>
+          </li>
+          <li id="balance" class="user-info-row">
+            <div v-if="!stateBalanceRunning">
+              <span class="sidebar-user-info title">
+                <small> баланс </small>
+              </span>
+              <span class="sidebar-user-info value" id="balance">
+                {{ balanceTeam }}
+              </span>
+            </div>
+            <v-progress-circular v-else indeterminate></v-progress-circular>
           </li>
         </ul>
         <hr id="sideBarWrapper" />
@@ -79,8 +91,7 @@
 <script>
 import {app} from '@/_config';
 import User from '@/store/models/User';
-import Team from '@/store/models/Team';
-import Account from '@/store/models/Account';
+
 import Product from '@/store/models/Product';
 import Load from '@/UI/Load.vue';
 
@@ -101,7 +112,6 @@ export default {
         username: {title: 'Имя пользователя', value: ''},
         role: {title: 'Роль', value: ''},
         team: {title: 'Команда', value: ''},
-        balance: {title: 'Баланс', value: ''},
       },
       sidebar: {
         isActive: false,
@@ -115,7 +125,12 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({isLoggedIn: 'auth/isLoggedIn'}),
+    ...mapGetters({
+      isLoggedIn: 'auth/isLoggedIn',
+      isGetTeam: 'team/GET_TEAM_STATE',
+      stateBalanceRunning: 'team/GET_BALANCE_STATE_RUNNING',
+      balanceTeam: 'team/GET_BALANCE_VALUE',
+    }),
     currentUser() {
       return this.$store.state.auth.user;
     },
@@ -153,6 +168,7 @@ export default {
       );
 
       const dataUser = responseUser.data;
+      this.$store.commit('user/SET_DATA_CURRENT_USER', dataUser);
       const roleUser = dataUser.role.toLowerCase();
 
       await Product.api().getListProducts();
@@ -162,22 +178,26 @@ export default {
         this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
       if (dataUser.is_superuser) {
         console.warn('GET TEAMS');
-        const teams = await Team.api().getListTeams();
-        console.warn(teams);
+        const teams = await this.$store.dispatch('team/getTeams');
+        console.warn('LIST TEAMS\n', teams);
       }
       if (roleUser == 'player' && !dataUser.is_superuser) {
         const teamId = dataUser.team;
         console.error('DATA USER\n', dataUser);
-        const resTeam = await Team.api().getTeam(teamId);
-        const dataTeam = resTeam.response.data;
-        const resAccount = await Account.api().getAccount(dataTeam.account);
-        const dataAccount = resAccount.response.data;
-        this.$store.commit('user/SET_USER_BALANCE', dataAccount.balance);
-        this.sidebarUserInfo.username.value = username;
+        this.$store.commit('team/SET_BALANCE_RUNNING');
+        const dataTeam = await this.$store.dispatch('team/getDataTeam', teamId);
+        const dataAccount = await this.$store.dispatch(
+          'account/getAccountById',
+          dataTeam.account
+        );
+
         this.sidebarUserInfo.role.value = roleUser;
+
+        this.sidebarUserInfo.username.value = username;
         this.sidebarUserInfo.team.value = dataTeam.name;
-        this.sidebarUserInfo.balance.value = dataAccount.balance;
-        this.loading.sidebarUserInfo = false;
+        // this.sidebarUserInfo.balance.value = dataAccount.balance;
+        this.$store.commit('team/SET_BALANCE', dataAccount.balance);
+        this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
       }
     } else {
       this.$router.push('/');
