@@ -10,7 +10,7 @@ export default class ProductKit extends Model {
     return {
       id: this.attr(null),
       product: this.attr(null),
-      product_data: this.belongsTo(Product, 'product', 'id'),
+      product_data: this.belongsTo(Product, 'product'),
       count: this.attr(null),
       time: this.attr(null),
     };

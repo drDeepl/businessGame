@@ -71,7 +71,7 @@
       </button>
       <nav class="nav-bar"></nav>
       <div class="tb-container">
-        <span class="tb">{{ tab.activeTab }}</span>
+        <span class="tb">{{ activeTab }}</span>
       </div>
       <div class="wrapper">
         <div class="container-fluid">
@@ -119,9 +119,6 @@ export default {
         template: 'Деловая игра',
         links: [],
       },
-      tab: {
-        activeTab: '',
-      },
     };
   },
   computed: {
@@ -130,6 +127,7 @@ export default {
       isGetTeam: 'team/GET_TEAM_STATE',
       stateBalanceRunning: 'team/GET_BALANCE_STATE_RUNNING',
       balanceTeam: 'team/GET_BALANCE_VALUE',
+      activeTab: 'mainLayout/GET_CURRENT_TAB',
     }),
     currentUser() {
       return this.$store.state.auth.user;
@@ -221,7 +219,7 @@ export default {
       this.sidebar.isActive = !this.sidebar.isActive;
     },
     setActiveTab(title) {
-      return (this.tab.activeTab = title);
+      this.$store.commit('mainLayout/SET_CURRENT_TAB', title);
     },
     OnLogOut() {
       this.$store.dispatch('auth/logout');

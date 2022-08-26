@@ -16,6 +16,6 @@ export default class ModelProduct {
       id: 0,
       name: '',
     };
-    this.hideShow = {id: true};
+    this.hideShow = {id: true, name: true};
   }
 }

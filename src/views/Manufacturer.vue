@@ -92,11 +92,16 @@
         <!-- INFO: список готовых продуктовых наборов -->
         <v-tab-item class="mt-2">
           <div class="products-cards">
+            <!-- <div>{{ productKits }}</div>
+            <div>
+              {{ getProduct(productKits[0].product) }}
+            </div> -->
+
             <ProductCard
               v-for="productKit in productKits"
               :key="productKit.id"
               :item="productKit"
-              :title="{product: productKit.product_data.name}"
+              :title="{product: getProduct(productKit.product).name}"
               :modelItem="modelsCard.productKit"
               :showLabel="true"
             >
@@ -156,9 +161,6 @@ import Product from '@/store/models/Product';
 
 // import Offer from '@/store/models/Offer';
 export default {
-  async created() {
-    console.warn('MANUFACTURER.VUE: CREATED');
-  },
   data() {
     return {
       test: '',
@@ -209,6 +211,9 @@ export default {
       },
     };
   },
+  async created() {
+    console.warn('MANUFACTURER.VUE: CREATED');
+  },
   computed: {
     stateProduct() {
       return this.$store.getters['stateShop/GET_STATE_PRODUCT'];
@@ -230,23 +235,16 @@ export default {
     },
     productKits() {
       console.warn('MANUFACTURER.VUE: productKits');
-      const productKits = this.$store
+      const listProductKits = this.$store
         .$db()
         .model('productKits')
         .query()
-        .with('product_data')
         .get();
-      return productKits;
+      return listProductKits;
     },
-    getProductNameById() {
+    getProduct() {
       return (id) =>
-        this.$store
-          .$db()
-          .model('products')
-          .query()
-          .where('id', id)
-          .get()
-          .first().name;
+        this.$store.$db().model('products').query().where('id', id).first();
     },
   },
   methods: {

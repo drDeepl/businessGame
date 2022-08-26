@@ -2,17 +2,18 @@ export const shopState = {
   namespaced: true,
   state: {
     created: false,
-    
+
     buyOffer: {
       RUNNING: false,
       ERROR: false,
       COMPLETE: false,
     },
+    longPoll: null,
     load: {
       mainLayout: false,
       offersTab: false,
       offerCard: false,
-      longPoll: false,
+
       offersUpdate: false,
       prepareOffer: false,
     },
@@ -40,8 +41,8 @@ export const shopState = {
     GET_STATE_offersTab: (state) => {
       return state.load.offersTab;
     },
-    GET_STATE_LONG_POLL: (state) => {
-      return state.load.longPoll;
+    GET_LONG_POLL_ID: (state) => {
+      return state.longPoll;
     },
     GET_prepareOffer_STATE: (state) => {
       return state.load.prepareOffer;
@@ -89,13 +90,9 @@ export const shopState = {
       console.warn('MODULE.shop.state: CHANGE_STATE_offersTab');
       state.load.offersTab = !state.load.offersTab;
     },
-    SET_LONG_POLL: function (state) {
+    SET_LONG_POLL_ID: function (state, longPollId) {
       console.warn('MODULE.shop.state: SET_LONG_POLL');
-      state.load.longPoll = true;
-    },
-    STOP_LONG_POLL: function (state) {
-      console.warn('MODULE.shop.state: SET_LONG_POLL');
-      state.load.longPoll = false;
+      state.longPoll = longPollId;
     },
   },
 };

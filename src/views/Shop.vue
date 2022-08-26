@@ -7,18 +7,16 @@
 
       <v-tab @click="onClickTabTransaction">Все транзакции</v-tab>
       <!-- INFO: Вкладка с предложениями о покупке продуктового набора -->
-
+      // FIX обновление предложений
       <v-tab-item>
-        <!-- <v-expansion-panels> -->
-        <!-- <v-expansion-panel> -->
-        <!-- <v-expansion-panel-header @click="onClickOffers">
-              <div class="shop-offer-header">
-                <arrow-icon class="offer-header-arrow" />
-                <span class="offer-header-item">Предложения</span>
-              </div>
-            </v-expansion-panel-header> -->
-
-        <!-- <v-expansion-panel-content> -->
+        <v-switch
+          dense
+          color="green"
+          class="ml-2 pl-2"
+          v-model="getOfferUpdate"
+          label="получать новые предложения"
+          @click="onClickUpdateOffers"
+        ></v-switch>
         <v-progress-circular
           v-if="offersListUpdate"
           color="#ee5544"
@@ -29,32 +27,28 @@
         </v-progress-circular>
         <div
           class="shop-offers offers-not-found"
-          v-else-if="offersSale.length == 0"
+          v-else-if="arrays.offers.length == 0"
         >
           <span>нет активных предложений</span>
         </div>
         <div v-else class="cards-container">
-          <!-- INFO revealId есть ключ во vuex state для отображения -->
-          <!-- INFO обратной стороны карточки -->
-
           <v-card
             class="card-main-layout ma-2 pa-2"
-            v-for="offer in offersSale"
+            v-for="offer in offers"
             :key="offer.id"
           >
-            <!-- {{ getProductKit(offer.product_kit) }} -->
-            <!-- <OfferCard v-if="!prepareOfferState" /> -->
-            <OfferCard
+            <span>расшифровать оффер</span>
+            <!-- <OfferCard
               :traderId="offer.trader"
-              :product="offer.productKit_data.product_data.name"
+              :product="offer.product_kit.product.name"
               :frontItem="offer"
               :frontModelItem="cards.cardOffer.frontCard.model"
-              :backItem="offer.productKit_data"
+              :backItem="offer.product_kit"
               :backModelItem="cards.cardOffer.backCard.model"
               :showLabel="true"
               :btnBuyOffer="onClickBuyOffer"
             >
-            </OfferCard>
+            </OfferCard> -->
 
             <DialogError
               :title="'не хватает денег для покупки товара'"
@@ -139,7 +133,7 @@
 </template>
 
 <script>
-import OfferCard from '@/UI/OfferCard.vue';
+// import OfferCard from '@/UI/OfferCard.vue';
 import Load from '@/UI/Load.vue';
 import DialogError from '@/UI/DialogError.vue';
 
@@ -160,6 +154,7 @@ import {mapGetters} from 'vuex';
 export default {
   data() {
     return {
+      getOfferUpdate: false,
       lowBalance: {
         isLow: false,
         offerPrice: 0,
@@ -186,7 +181,6 @@ export default {
         users: [],
         teams: [],
         offers: [],
-        state: this.$store.getters['shopState/GET_OFFERS_UPDATE'],
       },
     };
   },
@@ -197,69 +191,88 @@ export default {
       offerStateComplete: 'shopState/GET_buyOffer_STATE_COMPLETE',
       offerStateError: 'shopState/GET_buyOffer_STATE_ERROR',
       prepareOfferState: 'shopState/GET_prepareOffer_STATE',
+      longPollId: 'shopState/GET_LONG_POLL_ID',
       balanceTeam: 'team/GET_BALANCE_VALUE',
       dataCurrentUser: 'user/GET_DATA_CURRENT_USER',
       offersListUpdate: 'offer/GET_OFFERS_LIST_UPDATE',
+      currentUserData: 'user/GET_DATA_CURRENT_USER',
     }),
-    offersSale() {
-      // TODO переделать получение данных промежуточные запросы
-      console.warn('SHOP:offers');
-      this.$store.commit('shopState/SET_OFFERS_UPDATE');
-      const offers = this.$store
-        .$db()
-        .model('offersSale')
-        .query()
-        .with('productKit_data.product_data')
-
-        .get();
-      console.warn(offers);
-
-      this.$store.commit('shopState/SET_OFFERS_UPDATED');
-      return offers;
+    offers: {
+      get() {
+        return this.arrays.offers;
+      },
     },
+    getProductKit() {
+      return (productKitId) => {
+        const productKit = this.$store
+          .$db()
+          .model('productKits')
+          .query()
+          .where('id', productKitId)
+          .first();
+        return productKit;
+      };
+    },
+
     transactions() {
       console.warn('SHOP: transactions');
       return this.$store.$db().model('transactions').query().all();
     },
-
-    offersUpdated() {
-      console.warn('SHOP: offersUpdated');
-      return this.offers;
-    },
     currentUser: function () {
       return this.$store.state.auth.user.username;
-    },
-    currentUserData: function () {
-      let username = this.$store.state.auth.user.username;
-      return this.$store
-        .$db()
-        .model('users')
-        .query()
-        .where('username', username)
-        .first();
     },
   },
   async created() {
     this.$store.commit('shopState/SET_STATE_LOAD_mainLayout');
     this.$store.commit('shopState/SET_STATE_CREATED');
+    const roleCurrentUser = await this.$store.dispatch(
+      'user/getUserDataByUsername',
+      this.currentUser
+    ).role;
+    this.$store.commit('offer/SET_OFFERS_LIST_UPDATE');
 
-    // await OfferSale.api().getListOffersSale();
-    await this.$store.dispatch('offer/getOffers');
+    if (roleCurrentUser == 'cutomer') {
+      const listOffersPurchase = await this.$store.dispatch(
+        'offer/getOffersPurchase'
+      );
+      this.arrays.offers = listOffersPurchase;
+    } else {
+      const listOffersSale = await this.$store.dispatch('offer/getOffersSale');
+      this.arrays.offers = listOffersSale;
+      console.log(listOffersSale);
+    }
+
     await Team.api().getListTeams();
     this.$store.commit('shopState/SET_STATE_CREATED_COMPLETE');
     const user = this.$store.state.auth.user;
     console.error(user);
     console.warn('USERNAME');
   },
-
+  mounted() {
+    this.$store.commit('shopState/SET_STATE_COMPLETE_mainLayout');
+  },
+  prepareOffer(offer) {
+    const productKit = this.$store
+      .$db()
+      .model('productKits')
+      .query()
+      .where('id', offer.product_kit)
+      .first();
+    const product = this.$store
+      .$db()
+      .model('products')
+      .query()
+      .where('id', productKit.product)
+      .first();
+    productKit.product = product;
+    offer.product_kit = productKit;
+    return offer;
+  },
   methods: {
     getProductKitTitle(offer) {
       let productKitTitle = {};
       productKitTitle['product'] = offer.productKit_data.product_data.name;
       return productKitTitle;
-    },
-    async prepareOffer(offer) {
-      console.error('PREPARE OFFER\n', offer);
     },
 
     getAccount(accountId) {
@@ -328,24 +341,21 @@ export default {
       }
     },
 
-    onClickOffers() {
-      // FIX: костыль подобия long polling для
-      // FIX: динамического обновления предложений
-      console.warn('SHOP: onClickOffers');
-      const longPoll = this.$store.getters['shopState/GET_STATE_LONG_POLL'];
-      console.warn(longPoll);
-      if (longPoll) {
-        console.error('LONG POLL WORK');
-      } else {
-        this.$store.commit('shopState/SET_LONG_POLL');
-        console.error('LONG POLL RUNNING');
-        setInterval(
+    onClickUpdateOffers() {
+      if (this.getOfferUpdate) {
+        console.error('LONG POLL');
+        const longPollId = setInterval(
           () =>
             OfferSale.api()
               .getListOffersSale()
-              .then((result) => console.log(result.response.data)),
+              .then((result) => (this.arrays.offers = result.response.data)),
           10000
         );
+        this.$store.commit('shopState/SET_LONG_POLL_ID', longPollId);
+      } else {
+        console.warn('CLEAR INTERVAL');
+        console.warn(this.longPollId);
+        clearInterval(this.longPollId);
       }
     },
     onClickOkLowBalance() {
@@ -359,9 +369,7 @@ export default {
       this.$store.commit('shopState/SET_buyOffer_STATE_COMPLETE', 'ERROR');
     },
   },
-  mounted() {
-    this.$store.commit('shopState/SET_STATE_COMPLETE_mainLayout');
-  },
-  components: {OfferCard, Load, DialogError},
+
+  components: {Load, DialogError},
 };
 </script>

@@ -94,6 +94,7 @@ export default {
           if (userData.is_superuser) {
             this.$router.push('/admin');
           } else {
+            this.$store.commit('mainLayout/SET_CURRENT_TAB', role);
             this.$router.push('/' + role);
           }
 

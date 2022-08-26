@@ -12,9 +12,9 @@ export const offer = {
     },
   },
   actions: {
-    async getOffers(context) {
+    async getOffersSale(context) {
       console.warn('MODULE.OFFER: getOffers');
-      context.commit('SET_OFFERS_LIST_UPDATE');
+
       const responseWrap = await OfferSale.api().getListOffersSale();
       context.commit('SET_OFFERS_LIST_UPDATE_COMPLETE');
       return responseWrap.response.data;
@@ -33,6 +33,7 @@ export const offer = {
       await OfferPurchase.api().getListOfferPurchase();
       context.commit('SET_GET_OFFERS_PURCHASE_COMPLETE');
     },
+
   },
   getters: {
     GET_STATE_getOffersPurchase: (state) => {

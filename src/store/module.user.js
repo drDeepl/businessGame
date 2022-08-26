@@ -33,7 +33,7 @@ export const user = {
   actions: {
     async getUserDataByUsername(context, username) {
       console.warn('MODULE.USER: getUserByUsername');
-      context.commit('SET_GET_USER');
+
       const responseWrap = await User.api().getUserByUsername(username);
       const user = responseWrap.response;
 

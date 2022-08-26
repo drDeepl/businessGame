@@ -10,6 +10,13 @@
       <span></span>
       <div>{{ modelItem.props }}</div> -->
 
+    <v-card-title
+      class="product-card-title pa-1"
+      v-for="array in Object.entries(title)"
+      :key="array[0]"
+    >
+      <span>{{ array[1] }}</span>
+    </v-card-title>
     <div
       class="product-card-content"
       v-for="key in Object.keys(modelItem.props).filter(
@@ -18,11 +25,7 @@
       :key="key"
       :class="'product' + ' ' + key + ' ' + 'card-wrapper'"
     >
-      <v-card-title class="product-card-title pa-1" v-if="title[key]">
-        <!-- <small v-if="showLabel">{{ modelItem.props[key] }}</small> -->
-        <span>{{ title[key] }}</span>
-      </v-card-title>
-      <v-card-text v-else :class="'product-card-text pa-1' + ' ' + key">
+      <v-card-text :class="'product-card-text pa-1' + ' ' + key">
         <small class="product-card-text-label" v-if="showLabel">
           {{ modelItem.props[key] }}
         </small>
