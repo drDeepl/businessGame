@@ -57,7 +57,9 @@
         </v-tab>
         <!-- INFO: список готовых продуктов -->
         <v-tab-item class="mt-2">
-          <div class="products-cards">
+          <Load v-if="getListProducts" />
+          <p v-else-if="products.length == 0">нет готовых продуктов</p>
+          <div v-else class="products-cards">
             <ProductCard
               v-for="product in products"
               :key="product.id"
@@ -85,18 +87,51 @@
                   <span class="product-btn-action-text">cоздать комплект</span>
                 </v-btn>
               </v-card-actions>
+              <DialogError
+                :active="deleteState.run"
+                :title="'Вы уверены, что хотите удалить продукт?'"
+              >
+                <p class="text-md-center">
+                  "{{
+                    deleteState.data.hasOwnProperty('name')
+                      ? deleteState.data.name
+                      : ''
+                  }}"
+                </p>
+                <v-card-actions>
+                  <v-btn
+                    color="grey"
+                    rounded
+                    outlined
+                    @click="onClickCancelDeleteProduct"
+                  >
+                    <span>Отмена</span>
+                  </v-btn>
+                  <v-btn
+                    :loading="isDeleteProduct"
+                    color="red"
+                    rounded
+                    outlined
+                    @click="onClicApplykDeleteProduct"
+                  >
+                    <span>Да, удалить продукт</span>
+                  </v-btn>
+                </v-card-actions>
+              </DialogError>
+              <DialogError
+                :active="deleteState.errors.length > 0"
+                :title="'При удалении продукта возникли ошибки:'"
+              >
+                <p v-for="i in Object.keys(deleteState.errors)" :key="i">
+                  {{ deleteState.errors[i] }}
+                </p>
+              </DialogError>
             </ProductCard>
-            <!-- NOTE: id - мнимая часть этой карточки <span>{{ product.id }}</span> -->
           </div>
         </v-tab-item>
         <!-- INFO: список готовых продуктовых наборов -->
         <v-tab-item class="mt-2">
           <div class="products-cards">
-            <!-- <div>{{ productKits }}</div>
-            <div>
-              {{ getProduct(productKits[0].product) }}
-            </div> -->
-
             <ProductCard
               v-for="productKit in productKits"
               :key="productKit.id"
@@ -111,18 +146,19 @@
                   outlined
                   rounded
                   color="#ee5544"
-                  @click.prevent="onClickSellProductKit(productKit)"
+                  @click.prevent="onClickDeleteProductKit(productKit)"
                 >
-                  <span>продать</span>
+                  <span>удалить</span>
                 </v-btn>
+                <slot></slot>
                 <v-btn
                   class="mb-1"
                   outlined
                   rounded
                   color="#ee5544"
-                  @click.prevent="onClickDeleteProductKit(productKit)"
+                  @click.prevent="onClickSellProductKit(productKit)"
                 >
-                  <span>удалить</span>
+                  <span>продать</span>
                 </v-btn>
               </v-card-actions>
             </ProductCard>
@@ -155,15 +191,28 @@ import ModelProductKit from '@/models/model.productKit';
 import CreateProduct from '@/models/model.create.product';
 import CreateProductKit from '@/models/model.productKit.create';
 import CreateSellOffer from '@/models/model.productKit.sell';
+
 import Form from '@/UI/Form.vue';
 import ProductCard from '@/UI/ProductCard.vue';
-import Product from '@/store/models/Product';
+import DialogError from '@/UI/DialogError.vue';
+import Load from '@/UI/Load.vue';
+import {mapGetters} from 'vuex';
 
-// import Offer from '@/store/models/Offer';
 export default {
+  components: {
+    Load,
+    DialogError,
+    Form,
+    ProductCard,
+  },
   data() {
     return {
       test: '',
+      deleteState: {
+        run: false,
+        errors: [],
+        data: {},
+      },
       tabs: {
         tabsAction: this.$store.getters['products/GET_LIST_TABS_ACTION'],
         tabsView: this.$store.getters['products/GET_LIST_TABS_VIEW'],
@@ -215,6 +264,10 @@ export default {
     console.warn('MANUFACTURER.VUE: CREATED');
   },
   computed: {
+    ...mapGetters({
+      isDeleteProduct: 'products/GET_STATE_DELETE_PRODUCT',
+      getListProducts: 'products/GET_STATE_getListProducts',
+    }),
     stateProduct() {
       return this.$store.getters['stateShop/GET_STATE_PRODUCT'];
     },
@@ -310,9 +363,33 @@ export default {
       }
       this.$store.commit('productKit/SET_CREATE_PRODUCT_KIT_COMPLETE');
     },
-    async onClickDeleteProduct(product) {
-      console.warn('MANUFACTURER.VUE: onClickDeleteProduct', product);
-      await Product.api().deleteProduct(product.id, this.getJWT);
+    onClickDeleteProduct(product) {
+      this.deleteState.data = product;
+      this.deleteState.run = true;
+    },
+    onClickCancelDeleteProduct() {
+      this.deleteState.run = false;
+      this.deleteState.data = {};
+    },
+    async onClicApplykDeleteProduct() {
+      console.warn('MANUFACTURER.VUE: onClickDeleteProduct');
+      this.$store.commit('products/SET_DELETE_PRODUCT');
+      const product = this.deleteState.data;
+      console.warn(product);
+
+      try {
+        const response = await this.$store.dispatch(
+          'products/deleteProduct',
+          product.id
+        );
+        await this.$store.dispatch('products/getProducts');
+        this.onClickCancelDeleteProduct();
+        console.warn(response);
+        await this.$store.dispatch('products/getProducts');
+      } catch (error) {
+        console.warn(error);
+        this.deleteState.errors.push(error.name);
+      }
     },
     onClickDeleteProductKit(productKit) {
       console.warn(productKit);
@@ -330,15 +407,12 @@ export default {
     },
     async onClickApplySellProductKit(saleOfferProductKit) {
       console.warn('MANUFACTURER: onClickApplySellProductKit');
-      // TODO [18.07.2022]: осуществление продажи продуктового набора
+
       this.$store.commit('offer/SET_offerSale');
       console.warn(saleOfferProductKit);
       saleOfferProductKit.price = Number.parseInt(saleOfferProductKit.price);
       console.error(saleOfferProductKit);
-      // const offer = await Offer.api().offerSalePlace(
-      //   saleOfferProductKit,
-      //   this.getJWT
-      // );
+
       const offer = await this.$store.dispatch(
         'offer/offerSalePlace',
         saleOfferProductKit
@@ -351,10 +425,6 @@ export default {
       console.error(activeForm);
       this.forms[activeForm].active = false;
     },
-  },
-  components: {
-    Form,
-    ProductCard,
   },
 };
 </script>

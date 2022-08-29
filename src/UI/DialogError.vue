@@ -6,12 +6,13 @@
       v-model="active"
       class="card-main-layout"
     >
-      <v-card class="offer-low-balance" elevation="0">
+      <v-card class="dialog-error" elevation="0">
         <v-card-title
-          class="offer-card-text offer-low-balance-title text-subtitle-1"
+          class="offer-card-text dialog-error-title text-subtitle-1"
         >
-          <span class="offer-low-balance-title-text">{{ title }}</span>
+          <span class="dialog-error-title-text">{{ title }}</span>
         </v-card-title>
+
         <slot></slot>
       </v-card>
     </v-dialog>
@@ -23,6 +24,13 @@ export default {
   props: {
     title: {type: String, required: true},
     active: {type: Boolean, required: true},
+    error: {
+      type: Boolean,
+      required: false,
+      default() {
+        return true;
+      },
+    },
   },
 };
 </script>

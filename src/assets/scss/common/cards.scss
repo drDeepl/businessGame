@@ -7,7 +7,13 @@
   box-shadow: 1em 0.2em 40px rgba(13, 39, 80, 0.2) !important;
   border: 2px solid rgba(13, 39, 80, 0.2) !important;
   border-radius: $card-radius !important;
+  background-color: linear-gradient(
+    0deg,
+    rgba(90, 97, 112, 0.3496586134453782) 0%,
+    rgba(13, 39, 80, 1) 100%
+  );
 }
+
 .products-cards {
   display: grid;
   grid-template-columns: 15rem 15rem;
@@ -31,6 +37,10 @@
 .offer-card-suibtitle {
   display: flex !important;
   flex-direction: column !important;
+}
+
+.offer-card-title-text {
+  letter-spacing: 0.4em;
 }
 
 .offer-card-content {

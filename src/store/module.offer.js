@@ -10,11 +10,15 @@ export const offer = {
     load: {
       offerPrepare: false,
     },
+    offerPurchaseAcquire: {
+      error: false,
+      complete: false,
+      run: false,
+    },
   },
   actions: {
     async getOffersSale(context) {
       console.warn('MODULE.OFFER: getOffers');
-
       const responseWrap = await OfferSale.api().getListOffersSale();
       context.commit('SET_OFFERS_LIST_UPDATE_COMPLETE');
       return responseWrap.response.data;
@@ -33,9 +37,18 @@ export const offer = {
       await OfferPurchase.api().getListOfferPurchase();
       context.commit('SET_GET_OFFERS_PURCHASE_COMPLETE');
     },
-
+    async offerPurchaseAcquire(context, offer_id) {
+      const responseWrap = await OfferPurchase.api().offerPurchaseAcquire(
+        offer_id
+      );
+      context.commit('SET_OFFER_ACQUIRE_COMPLETE');
+      return responseWrap;
+    },
   },
   getters: {
+    // TODO getter for offerPurchaseAcquire => [error, run, complete]
+    // TODO: clear state offerPurchaseAcquire
+    // TODO: setter offerPurchaseAcquire => [error,]
     GET_STATE_getOffersPurchase: (state) => {
       return state.getOffersPurchase;
     },
@@ -94,6 +107,26 @@ export const offer = {
     SET_OFFER_PREPARE_COMPLETE: function (state) {
       console.warn('MODULE.OFFER: SET_OFFER_PREPARE_COMPLETE');
       state.load.offerPrepare = false;
+    },
+    SET_OFFER_ACQUIRE: function (state) {
+      console.warn('MODULE.OFFER: SET_OFFER_ACQUIRE_COMPLETE');
+      state.offerPurchaseAcquire.run = true;
+    },
+    SET_OFFER_ACQUIRE_COMPLETE: function (state) {
+      console.warn('MODULE.OFFER: SET_OFFER_ACQUIRE_COMPLETE');
+      state.offerPurchaseAcquire.run = false;
+      state.offerPurchaseAcquire.complete = true;
+    },
+    SET_OFFER_ACQUIRE_ERROR: function (state) {
+      state.offerPurchaseAcquire.error = true;
+    },
+    CLEAR_OFFER_ACQUIRE_ERROR: function (state) {
+      state.offerPurchaseAcquire.error = false;
+    },
+    CLEAR_STATES_OFFER_AQUIRE: function (state) {
+      for (let key in Object.keys(state.offerPurchaseAcquire)) {
+        state.offerPurchaseAcquire[key] = false;
+      }
     },
   },
 };

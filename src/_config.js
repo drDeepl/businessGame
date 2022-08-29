@@ -19,7 +19,6 @@ export const card = {
 export const playerSidebarLinks = [
   {title: 'Склад', url: '/storage'},
   {title: 'Магазин', url: '/shop'},
-  {title: 'Обо мне', url: '/profile'},
 ];
 
 export const manufacturerSidebarLinks = [
@@ -28,74 +27,12 @@ export const manufacturerSidebarLinks = [
 ];
 
 export const customerSidebarLinks = [
-  {title: 'Магазин', url: '/shop'},
   // {title: 'Склад', url: '/storage'},
-];
-
-export const rowUpdateUser = {
-  first_name: 'Имя',
-  last_name: 'Фамилия',
-  team_name: 'Название команды',
-};
-
-export const selectUpdateUser = [
-  {
-    id: 'role',
-    title: 'Роль',
-    options: {
-      manufacturer: 'Поставщик',
-      player: 'Игрок',
-      customer: 'Клиент',
-    },
-  },
 ];
 
 export const app = {
   title: 'Деловая игра',
 };
-
-export const usersTableHeader = {
-  id: 'id',
-  username: 'Имя пользователя',
-  role: 'Роль',
-  team: 'Идентификатор команды',
-  account: 'Идентификатор счёта',
-  email: 'Емайл',
-  is_superuser: 'Администратор',
-  data_joined: 'Дата создания аккаунта',
-  last_login: 'Последняя авторизация',
-  first_name: 'Имя',
-  last_name: 'Фамилия',
-};
-
-export const accountsTableHeader = {
-  id: 'id',
-  balance: 'Баланс',
-  is_unlimited: 'Безлимитный',
-};
-
-export const transactionsTableHeader = {
-  from_account: 'Отправитель',
-  to_account: 'Получатель',
-  amount: 'Сумма',
-  timestamp: 'Дата',
-};
-
-export const teamsTableHeader = {
-  id: 'id',
-  name: 'Название',
-  account: 'Счёт',
-};
-
-export const adminTabs = [
-  {title: 'Пользователи', url: 'users'},
-  {title: 'Команды', url: 'teams'},
-  {title: 'Счета', url: 'accounts'},
-  {
-    title: 'Транзакции',
-    url: 'transactions',
-  },
-];
 
 export const colors = {
   purple: '#6b4ee6',

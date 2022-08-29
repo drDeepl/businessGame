@@ -6,10 +6,9 @@ export const products = {
   namespaced: true,
   state: {
     createProduct: false,
+    getListProducts: false,
     getProductsStore: true,
-    products: {}, // NOTE: {productId: data}
-    productsByName: {}, // NOTE: {product_name: data}
-    productKits: {}, // NOTE: {productKit_id: data}
+    deleteProduct: false,
     arrays: {
       tabsAction: [
         {form: 'formAddProduct', label: 'Добавить продукт'},
@@ -37,17 +36,17 @@ export const products = {
       context.commit('SET_STATE_GET_PRODUCTS_STORE_COMPLETE');
       return listProductsStore;
     },
-    async getListProducts() {
-      console.warn('MODULE.PRODUCTS: getListProduct');
-      // const listProducts = await ProductService.getListProducts();
-      // context.commit('SET_LIST_PRODUCTS', listProducts);
-      console.warn(Product.api());
+    async getProducts(context) {
+      await Product.api().getListProducts();
+      context.commit('SET_GET_LIST_PRODUCTS_COMPLETE');
     },
     async deleteProduct(context, productId) {
+      const id = Number.parseInt(productId);
       console.warn('MODULE.PRODUCTS: deleteProduct');
-      const detailDelete = await ProductService.deleteProduct(productId);
-      console.log(detailDelete);
-      return context.dispatch('getListProducts');
+      const responseWrap = await Product.api().deleteProduct(id);
+      console.log(responseWrap);
+      context.commit('SET_DELETE_PRODUCT_COMPLETE');
+      return responseWrap.response;
     },
     async productCreate(context, createdProduct) {
       console.warn('MODULE.PRODUCTS: createProduct');
@@ -57,6 +56,12 @@ export const products = {
     },
   },
   getters: {
+    GET_STATE_DELETE_PRODUCT: (state) => {
+      return state.deleteProduct;
+    },
+    GET_STATE_getListProducts: (state) => {
+      return state.getListProducts;
+    },
     GET_STATE_createProduct: (state) => {
       console.warn('MODULE.product: GET_STATE_createProduct');
       return state.createProduct;
@@ -79,6 +84,13 @@ export const products = {
     },
   },
   mutations: {
+    SET_GET_LIST_PRODUCTS_RUN: function (state) {
+      state.getListProducts = true;
+    },
+    SET_GET_LIST_PRODUCTS_COMPLETE: function (state) {
+      state.getListProducts = false;
+    },
+
     SET_PRODUCT_CREATE: function (state) {
       console.warn('MODULE.product: SET_PRODUCT_CREATE');
       state.createProduct = true;
@@ -94,6 +106,12 @@ export const products = {
     SET_STATE_GET_PRODUCTS_STORE_COMPLETE: function (state) {
       console.warn('MODULE.PRODUCTS: SET_STATE_GET_PRODUCTS_STORE');
       state.getProductsStore = false;
+    },
+    SET_DELETE_PRODUCT: function (state) {
+      state.deleteProduct = true;
+    },
+    SET_DELETE_PRODUCT_COMPLETE: function (state) {
+      state.deleteProduct = false;
     },
   },
 };

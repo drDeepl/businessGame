@@ -7,7 +7,6 @@
 
       <v-tab @click="onClickTabTransaction">Все транзакции</v-tab>
       <!-- INFO: Вкладка с предложениями о покупке продуктового набора -->
-      // FIX обновление предложений
       <v-tab-item>
         <v-switch
           dense
@@ -17,6 +16,7 @@
           label="получать новые предложения"
           @click="onClickUpdateOffers"
         ></v-switch>
+
         <v-progress-circular
           v-if="offersListUpdate"
           color="#ee5544"
@@ -33,22 +33,32 @@
         </div>
         <div v-else class="cards-container">
           <v-card
-            class="card-main-layout ma-2 pa-2"
+            class="card-main-layout card-sheet ma-2 pa-2"
             v-for="offer in offers"
             :key="offer.id"
           >
-            <span>расшифровать оффер</span>
-            <!-- <OfferCard
+            <!-- <div>{{ getProductKit(offer.product_kit) }}</div> -->
+
+            <OfferCard
               :traderId="offer.trader"
-              :product="offer.product_kit.product.name"
+              :product="getProductKitTitle(offer)"
               :frontItem="offer"
               :frontModelItem="cards.cardOffer.frontCard.model"
-              :backItem="offer.product_kit"
+              :backItem="getProductKit(offer.product_kit)"
               :backModelItem="cards.cardOffer.backCard.model"
               :showLabel="true"
-              :btnBuyOffer="onClickBuyOffer"
             >
-            </OfferCard> -->
+              <v-btn
+                v-if="currentUserData.role == 'PLAYER'"
+                class="buy ma-1"
+                outlined
+                rounded
+                color="#ee5544"
+                @click="onClickBuyOffer(offer)"
+              >
+                <span>купить</span>
+              </v-btn>
+            </OfferCard>
 
             <DialogError
               :title="'не хватает денег для покупки товара'"
@@ -84,9 +94,6 @@
             </DialogError>
           </v-card>
         </div>
-        <!-- </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels> -->
       </v-tab-item>
       <!-- INFO: Вкладка с транзакциями -->
       <v-tab-item>
@@ -133,7 +140,7 @@
 </template>
 
 <script>
-// import OfferCard from '@/UI/OfferCard.vue';
+import OfferCard from '@/UI/OfferCard.vue';
 import Load from '@/UI/Load.vue';
 import DialogError from '@/UI/DialogError.vue';
 
@@ -152,7 +159,7 @@ import {mapGetters} from 'vuex';
 // TODO: показ кнопки купить в зависимости от роли
 
 export default {
-  data() {
+  data: function () {
     return {
       getOfferUpdate: false,
       lowBalance: {
@@ -202,17 +209,6 @@ export default {
         return this.arrays.offers;
       },
     },
-    getProductKit() {
-      return (productKitId) => {
-        const productKit = this.$store
-          .$db()
-          .model('productKits')
-          .query()
-          .where('id', productKitId)
-          .first();
-        return productKit;
-      };
-    },
 
     transactions() {
       console.warn('SHOP: transactions');
@@ -251,28 +247,19 @@ export default {
   mounted() {
     this.$store.commit('shopState/SET_STATE_COMPLETE_mainLayout');
   },
-  prepareOffer(offer) {
-    const productKit = this.$store
-      .$db()
-      .model('productKits')
-      .query()
-      .where('id', offer.product_kit)
-      .first();
-    const product = this.$store
-      .$db()
-      .model('products')
-      .query()
-      .where('id', productKit.product)
-      .first();
-    productKit.product = product;
-    offer.product_kit = productKit;
-    return offer;
-  },
+
   methods: {
+    getProductKit(productKitId) {
+      return this.$store.$db().model('productKits').find(productKitId);
+    },
     getProductKitTitle(offer) {
-      let productKitTitle = {};
-      productKitTitle['product'] = offer.productKit_data.product_data.name;
-      return productKitTitle;
+      const productKit = this.getProductKit(offer.product_kit);
+      const product = this.$store
+        .$db()
+        .model('products')
+        .find(productKit.product);
+
+      return product.name;
     },
 
     getAccount(accountId) {
@@ -294,10 +281,8 @@ export default {
       this.arrays.transactions = transactionList;
     },
     async onClickBuyOffer(offer) {
-      // // NOTE: функция находит account_id_to по trader
-      // // NOTE: account_id_from находится по текующему пользователю
       console.warn('SHOP.VUE: onClickBuyOffer');
-      console.error('offer\n', offer);
+
       this.$store.commit('shopState/SET_buyOffer_STATE', 'RUNNING');
       const balance = Number.parseInt(this.balanceTeam);
       const offerPrice = Number.parseInt(offer.price);
@@ -307,7 +292,6 @@ export default {
         this.lowBalance.offerPrice = offer.price;
         this.$store.commit('shopState/SET_buyOffer_STATE_COMPLETE', 'RUNNING');
       } else {
-        console.error('offer\n', offer);
         try {
           const offerId = offer.id;
           this.$store.commit('team/SET_BALANCE_RUNNIG');
@@ -328,7 +312,7 @@ export default {
           this.$store.commit('team/SET_BALANCE', dataAccount.balance);
           console.error(responseAccountAcquire.response.data);
           this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
-          await this.$store.dispatch('offer/getOffers');
+          await this.$store.dispatch('offer/getOffersSale');
           this.$store.commit('shopState/SET_buyOffer_STATE', 'COMPLETE');
         } catch (e) {
           console.warn(e);
@@ -370,6 +354,6 @@ export default {
     },
   },
 
-  components: {Load, DialogError},
+  components: {OfferCard, Load, DialogError},
 };
 </script>

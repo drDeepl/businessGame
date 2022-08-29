@@ -2,19 +2,17 @@
   <div class="card-main-layout card-container pa-1">
     <v-card class="store-card-product-kit-wrapper" elevation="0">
       <v-badge
-        :value="countProductKits"
-        :content="countProductKits"
+        :value="countItems"
+        :content="countItems"
         color="red"
         class="store-card-product-kit-subtitle mt-2"
       >
         <v-card-title class="store-card-product-kit-title row-container pa-0">
-          <small>Комплект для продукта:</small>
+          <small v-if="isProductKit">Комплект для продукта:</small>
           <span>{{ nameProduct }}</span>
         </v-card-title>
       </v-badge>
-      <!-- <v-card-subtitle class="row-container pa-0 ma-0">
-        {{ countProductKits }} шт.
-      </v-card-subtitle> -->
+      
 
       <v-card-text
         :class="
@@ -22,13 +20,13 @@
           ' ' +
           property
         "
-        v-for="property in Object.keys(modelProductKit.props).filter(
-          (key) => !modelProductKit.hideShow[key]
+        v-for="property in Object.keys(modelItem.props).filter(
+          (key) => !modelItem.hideShow[key]
         )"
         :key="property"
       >
-        <small class="">{{ modelProductKit.props[property] }}</small>
-        <span>{{ productKit[property] }}</span>
+        <small class="">{{ modelItem.props[property] }}</small>
+        <span>{{ item[property] }}</span>
       </v-card-text>
 
       <slot></slot>
@@ -39,10 +37,17 @@
 <script>
 export default {
   props: {
+    isProductKit: {
+      type: Boolean,
+      required: false,
+      default() {
+        return true;
+      },
+    },
     nameProduct: {type: String, required: true},
-    countProductKits: {type: Number, required: false},
-    productKit: {type: Object, required: true},
-    modelProductKit: {type: Object, required: true},
+    countItems: {type: Number, required: false},
+    item: {type: Object, required: true},
+    modelItem: {type: Object, required: true},
   },
 };
 </script>

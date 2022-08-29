@@ -1,15 +1,5 @@
 <template>
-  <!-- <div class="product-card ma-2"> -->
-
   <v-card class="card-main-layout ma-2 pa-2">
-    <!-- NOTE: запись ниже говорит: выбери из массива только те элементы, которых нет в modelItem.hideShow-->
-    <!-- NOTE: Object.keys(modelItem.props).filter((key) => !modelItem.hideShow[key])" -->
-    <!-- <div>{{ item }}</div>
-      <span></span>
-      <div>{{ title }}</div>
-      <span></span>
-      <div>{{ modelItem.props }}</div> -->
-
     <v-card-title
       class="product-card-title pa-1"
       v-for="array in Object.entries(title)"
@@ -36,13 +26,11 @@
     </div>
     <slot></slot>
   </v-card>
-  <!-- </div> -->
 </template>
 
 <script>
 export default {
   props: {
-    // NOTE: value of title is key in modelItem
     title: {
       type: Object,
 
@@ -50,7 +38,7 @@ export default {
         return {};
       },
     },
-    // NOTE: item - это сам объект с набором свойств key
+
     item: {
       type: Object,
       required: true,
@@ -58,7 +46,7 @@ export default {
         return false;
       },
     },
-    // NOTE: model - объект, расшифровывающий свойства key в item
+
     modelItem: {
       type: Object,
       required: true,

@@ -11,13 +11,13 @@
   margin: 2em !important;
 }
 
-.offer-low-balance {
+.dialog-error {
   display: flex !important;
   flex-direction: column;
   align-content: center !important;
 }
 
-.offer-low-balance-title {
+.dialog-error-title {
   border-top: 10px solid $color-red;
 
   opacity: 0.75;

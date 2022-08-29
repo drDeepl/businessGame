@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card tile flat class="front-card">
+    <v-card tile flat class="front-card" :disable="offerStateRunning">
       <!-- NOTE: запись ниже говорит: выбери из массива только те элементы, которых нет в modelItem.hideShow-->
       <!-- NOTE: Object.keys(modelItem.props).filter((key) => !modelItem.hideShow[key])" -->
 
@@ -14,8 +14,10 @@
               >
                 <small>Комплект для продукта:</small>
               </v-card-title>
-              <v-card-subtitle class="pa-2 offer-card-text-subtitle">
-                <span>{{ product }}</span>
+              <v-card-subtitle class="pa-2 pt-4 offer-card-text-subtitle">
+                <span class="offer-card-title-text">
+                  {{ product }}
+                </span>
               </v-card-subtitle>
             </div>
 
@@ -92,19 +94,8 @@
         >
           <span>подробнее</span>
         </v-btn>
-        <v-btn
-          class="buy ma-1"
-          outlined
-          rounded
-          color="#ee5544"
-          :loading="loading"
-          @click="onClickBuyOffer(frontItem)"
-        >
-          <span>купить</span>
-        </v-btn>
+        <slot> </slot>
       </v-card-actions>
-
-      <slot> </slot>
     </v-card>
   </div>
 </template>
@@ -140,7 +131,6 @@ export default {
     },
     frontModelItem: {type: Object},
     backModelItem: {type: Object},
-    btnBuyOffer: {type: Function},
   },
   data() {
     return {

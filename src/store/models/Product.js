@@ -28,7 +28,7 @@ export default class Product extends Model {
       async deleteProduct(id) {
         console.warn('STORE.MODEL.PRODUCT: deleteProduct');
 
-        return this.delete('products/' + id, {delete: Number.parseInt(id)});
+        return this.delete('products/' + id, {delete: id});
       },
     },
   };

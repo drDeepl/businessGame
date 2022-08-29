@@ -92,7 +92,6 @@
 import {app} from '@/_config';
 import User from '@/store/models/User';
 
-import Product from '@/store/models/Product';
 import Load from '@/UI/Load.vue';
 
 import {mapGetters} from 'vuex';
@@ -169,7 +168,7 @@ export default {
       this.$store.commit('user/SET_DATA_CURRENT_USER', dataUser);
       const roleUser = dataUser.role.toLowerCase();
 
-      await Product.api().getListProducts();
+      await this.$store.dispatch('products/getProducts');
       await this.$store.dispatch('productKit/getProductKits');
 
       this.sidebar.links =

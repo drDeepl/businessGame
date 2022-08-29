@@ -2,15 +2,16 @@
   <div class="productKit-store-page">
     <v-tabs color="#6C63FF">
       <v-tab>продуктовые наборы</v-tab>
+      <v-tab>продукты</v-tab>
       <v-tab-item>
         <Load v-if="productKits.length == 0" />
         <div v-else>
           <div v-for="productKit in productKits" :key="productKit.id">
             <ProductKitCard
               :nameProduct="getProductName(productKit.product_kit.product)"
-              :countProductKits="productKit.count"
-              :modelProductKit="cards.productKit.model"
-              :productKit="productKit.product_kit"
+              :countItems="productKit.count"
+              :modelItem="cards.productKit.model"
+              :item="productKit.product_kit"
             >
               <v-card-actions class="store-product-kit-card-actions ma-0 pa-0">
                 <v-btn
@@ -45,6 +46,20 @@
           </div>
         </div>
       </v-tab-item>
+      <v-tab-item>
+        <div v-if="products.length == 0">
+          <p>У вашей команды ещё нет продуктов</p>
+        </div>
+        <div v-else v-for="product in products" :key="product['$id']">
+          <ProductCard
+            :isProductKit="false"
+            :nameProduct="product.product.name"
+            :item="product.count"
+            :modelItem="cards.product.model"
+          >
+          </ProductCard>
+        </div>
+      </v-tab-item>
     </v-tabs>
   </div>
 </template>
@@ -59,11 +74,11 @@ import ProductKitStorage from '@/store/models/ProductKitStorage';
 import User from '@/store/models/User';
 
 import ProductKit from '@/models/model.productKit';
+import Product from '@/models/model.product';
 
 import Load from '@/UI/Load.vue';
-import ProductKitStoreCard from '@/UI/ProductKitStoreCard.vue';
+import ItemStoreCard from '@/UI/ItemStoreCard.vue';
 
-// TODO: [28.07.2022] отображение продуктового набора в виде карточки + заголовки
 export default {
   data() {
     return {
@@ -75,6 +90,9 @@ export default {
       cards: {
         productKit: {
           model: new ProductKit(),
+        },
+        product: {
+          model: new Product(),
         },
       },
     };
@@ -109,7 +127,10 @@ export default {
         .first();
     },
     productKits() {
-      return this.arrays.productKits;
+      return this.$store.$db().model('productKits_storage').all();
+    },
+    products() {
+      return this.$store.$db().model('products_storage').all();
     },
     progressBar: {
       get() {
@@ -149,7 +170,8 @@ export default {
 
   components: {
     Load,
-    ProductKitCard: ProductKitStoreCard,
+    ProductKitCard: ItemStoreCard,
+    ProductCard: ItemStoreCard,
   },
 };
 </script>
