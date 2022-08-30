@@ -9,16 +9,25 @@
           <div class="offer-card-content" v-if="!active">
             <div class="offer-card-item offer-card-head">
               <v-card-title
-                v-if="frontItem.hasOwnProperty('product_kit')"
+                v-if="isOfferProductKit"
                 class="offer-card-title pa-1"
               >
                 <small>Комплект для продукта:</small>
               </v-card-title>
-              <v-card-subtitle class="pa-2 pt-4 offer-card-text-subtitle">
+              <v-card-subtitle
+                v-if="!!backCardData"
+                class="pa-2 pt-4 offer-card-text-subtitle"
+              >
                 <span class="offer-card-title-text">
-                  {{ product }}
+                  {{ backCardData.product_data.name }}
                 </span>
               </v-card-subtitle>
+              <v-skeleton-loader
+                v-else
+                type="text"
+                class="offer-card-item trader"
+              >
+              </v-skeleton-loader>
             </div>
 
             <div v-if="!!traderName" class="offer-card-item trader">
@@ -69,7 +78,7 @@
                   {{ backModelItem.props[key] }}
                 </small>
                 <span :class="'offer-card-text-main ' + key">
-                  {{ backItem[key] }}
+                  {{ backCardData[key] }}
                 </span>
               </v-card-text>
             </div>
@@ -86,10 +95,11 @@
       </div>
       <v-card-actions>
         <v-btn
-          v-if="!active"
+          v-if="!active && backCardProductKit"
           class="ma-1"
           text
           color="#ee5544"
+          :loading="!backCardData"
           @click="onClickOpenLearnMore"
         >
           <span>подробнее</span>
@@ -109,7 +119,7 @@ export default {
       required: false,
     },
     product: {
-      type: String,
+      type: Number,
       required: false,
       default() {
         return '';
@@ -119,8 +129,8 @@ export default {
       type: Object,
       required: true,
     },
-    backItem: {
-      type: Object,
+    backCardProductKit: {
+      type: Number,
       required: false,
     },
     showLabel: {
@@ -131,18 +141,35 @@ export default {
     },
     frontModelItem: {type: Object},
     backModelItem: {type: Object},
+    isOfferProductKit: {
+      type: Boolean,
+      required: false,
+      default() {
+        false;
+      },
+    },
   },
+
   data() {
     return {
       active: false,
       loading: false,
       traderName: null,
+      backCardData: null,
     };
   },
   async created() {
     this.$store.commit('shopState/SET_OFFER_PREPARE');
     const userData = await this.$store.dispatch('user/getUser', this.traderId);
     this.traderName = userData.username;
+
+    const productKit = this.$store
+      .$db()
+      .model('productKits')
+      .query()
+      .with('product_data')
+      .find(this.backCardProductKit);
+    this.backCardData = productKit;
     this.$store.commit('shopState/SET_OFFER_PREPARE_COMPLETE');
   },
   computed: {

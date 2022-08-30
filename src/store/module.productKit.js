@@ -5,6 +5,10 @@ export const productKit = {
     getProductKits: false,
     getProductKit: null,
     createProductKit: false,
+    deleteProductKit: {
+      RUN: false,
+      ERROR: false,
+    },
   },
   actions: {
     async getProductKits(context) {
@@ -17,8 +21,23 @@ export const productKit = {
       context.commit('SET_CREATE_PRODUCT_KIT');
       await ProductKit.api().createProductKit(productKit);
     },
+    async delProductKit(context, productKitId) {
+      console.warn('STORE.MODULE.PRODUCT_KIT: deleteProductKit');
+      const responseWrap = await ProductKit.api().deleteProductKit(
+        productKitId
+      );
+      context.commit('SET_PRODUCT_KIT_RUN_DELETE_COMPLETE');
+      return responseWrap.response.data;
+    },
   },
   getters: {
+    GET_PRODUCT_KIT_DELETE_RUN: (state) => {
+      return state.deleteProductKit.RUN;
+    },
+    GET_PRODUCT_KIT_DELETE_ERROR: (state) => {
+      return state.deleteProductKit.ERROR;
+    },
+
     STATUS_getProductKits: (state) => {
       return state.getProductKits;
     },
@@ -46,6 +65,18 @@ export const productKit = {
     },
     SET_CREATE_PRODUCT_KIT_COMPLETE: function (state) {
       state.createProductKit = false;
+    },
+    SET_PRODUCT_KIT_DELETE_RUN: function (state) {
+      state.deleteProductKit.RUN = true;
+    },
+    SET_PRODUCT_KIT_DELETE_RUN_COMPLETE: function (state) {
+      state.deleteProductKit.RUN = false;
+    },
+    SET_PRODUCT_KIT_DELETE_ERROR: function (state) {
+      state.deleteProductKit.ERROR = true;
+    },
+    SET_PRODUCT_KIT_DELETE_ERROR_COMPLETE: function (state) {
+      state.deleteProductKit.ERROR = false;
     },
   },
 };

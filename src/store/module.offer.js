@@ -10,7 +10,7 @@ export const offer = {
     load: {
       offerPrepare: false,
     },
-    offerPurchaseAcquire: {
+    offerAcquire: {
       error: false,
       complete: false,
       run: false,
@@ -31,6 +31,13 @@ export const offer = {
       console.warn(responseWrap);
       context.commit('SET_offerSale_COMPLETE');
     },
+    async offerSaleAcquire(context, offerId) {
+      const responseAccountAcquire = await OfferSale.api().offerSaleAcquire(
+        offerId
+      );
+      context.commit('SET_OFFER_ACQUIRE_COMPLETE');
+      return responseAccountAcquire.response;
+    },
     async getOffersPurchase(context) {
       context.commit('SET_GET_OFFERS_PURCHASE');
       console.warn('MODULE.OFFER: getListOffersPurchase');
@@ -46,9 +53,15 @@ export const offer = {
     },
   },
   getters: {
-    // TODO getter for offerPurchaseAcquire => [error, run, complete]
-    // TODO: clear state offerPurchaseAcquire
-    // TODO: setter offerPurchaseAcquire => [error,]
+    GET_OFFER_ACQUIRE_COMPLETE: (state) => {
+      return state.offerAcquire.complete;
+    },
+    GET_OFFER_ACQUIRE_RUN: (state) => {
+      return state.offerAcquire.run;
+    },
+    GET_OFFER_ACQUIRE_ERROR: (state) => {
+      state.offerAcquire.error;
+    },
     GET_STATE_getOffersPurchase: (state) => {
       return state.getOffersPurchase;
     },
@@ -110,22 +123,23 @@ export const offer = {
     },
     SET_OFFER_ACQUIRE: function (state) {
       console.warn('MODULE.OFFER: SET_OFFER_ACQUIRE_COMPLETE');
-      state.offerPurchaseAcquire.run = true;
+      state.offerAcquire.run = true;
     },
     SET_OFFER_ACQUIRE_COMPLETE: function (state) {
       console.warn('MODULE.OFFER: SET_OFFER_ACQUIRE_COMPLETE');
-      state.offerPurchaseAcquire.run = false;
-      state.offerPurchaseAcquire.complete = true;
+      state.offerAcquire.run = false;
+      state.offerAcquire.complete = true;
     },
     SET_OFFER_ACQUIRE_ERROR: function (state) {
-      state.offerPurchaseAcquire.error = true;
+      state.offerAcquire.run = false;
+      state.offerAcquire.error = true;
     },
     CLEAR_OFFER_ACQUIRE_ERROR: function (state) {
-      state.offerPurchaseAcquire.error = false;
+      state.offerAcquire.error = false;
     },
     CLEAR_STATES_OFFER_AQUIRE: function (state) {
-      for (let key in Object.keys(state.offerPurchaseAcquire)) {
-        state.offerPurchaseAcquire[key] = false;
+      for (let key in Object.keys(state.offerAcquire)) {
+        state.offerAcquire[key] = false;
       }
     },
   },

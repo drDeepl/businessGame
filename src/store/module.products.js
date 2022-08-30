@@ -7,6 +7,7 @@ export const products = {
   state: {
     createProduct: false,
     getListProducts: false,
+    listProductsUpdate: false,
     getProductsStore: true,
     deleteProduct: false,
     arrays: {
@@ -37,8 +38,10 @@ export const products = {
       return listProductsStore;
     },
     async getProducts(context) {
-      await Product.api().getListProducts();
+      const responseWrap = await Product.api().getListProducts();
+
       context.commit('SET_GET_LIST_PRODUCTS_COMPLETE');
+      return responseWrap.response.data;
     },
     async deleteProduct(context, productId) {
       const id = Number.parseInt(productId);
@@ -56,6 +59,9 @@ export const products = {
     },
   },
   getters: {
+    GET_LIST_PRODUCTS_UPDATE: (state) => {
+      return state.listProductsUpdate;
+    },
     GET_STATE_DELETE_PRODUCT: (state) => {
       return state.deleteProduct;
     },
@@ -112,6 +118,12 @@ export const products = {
     },
     SET_DELETE_PRODUCT_COMPLETE: function (state) {
       state.deleteProduct = false;
+    },
+    SET_LIST_PRODUCT_UPDATE_RUN: function (state) {
+      state.listProductsUpdate = true;
+    },
+    SET_LIST_PRODUCT_UPDATE_COMPLETE: function (state) {
+      state.listProductsUpdate = false;
     },
   },
 };

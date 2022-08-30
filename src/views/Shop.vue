@@ -9,6 +9,7 @@
       <!-- INFO: Вкладка с предложениями о покупке продуктового набора -->
       <v-tab-item>
         <v-switch
+          v-if="currentUserData.role == 'PLAYER'"
           dense
           color="green"
           class="ml-2 pl-2"
@@ -37,16 +38,15 @@
             v-for="offer in offers"
             :key="offer.id"
           >
-            <!-- <div>{{ getProductKit(offer.product_kit) }}</div> -->
-
             <OfferCard
               :traderId="offer.trader"
-              :product="getProductKitTitle(offer)"
+              :product="offer.product_kit"
               :frontItem="offer"
               :frontModelItem="cards.cardOffer.frontCard.model"
-              :backItem="getProductKit(offer.product_kit)"
               :backModelItem="cards.cardOffer.backCard.model"
+              :backCardProductKit="offer.product_kit"
               :showLabel="true"
+              :isOfferProductKit="true"
             >
               <v-btn
                 v-if="currentUserData.role == 'PLAYER'"
@@ -148,7 +148,6 @@ import SaleOffer from '@/models/model.offer.sale';
 import ModelTransaction from '@/models/model.transaction';
 import ModelProductKit from '@/models/model.productKit';
 
-import OfferSale from '@/store/models/OfferSale';
 import Transaction from '@/store/models/Transaction';
 import Team from '@/store/models/Team';
 
@@ -195,14 +194,15 @@ export default {
   computed: {
     ...mapGetters({
       offerStateRunning: 'shopState/GET_buyOffer_STATE_RUNNING',
-      offerStateComplete: 'shopState/GET_buyOffer_STATE_COMPLETE',
       offerStateError: 'shopState/GET_buyOffer_STATE_ERROR',
       prepareOfferState: 'shopState/GET_prepareOffer_STATE',
       longPollId: 'shopState/GET_LONG_POLL_ID',
+      isOffersUpdateComplete: 'shopState/GET_OFFERS_UPDATE_COMPLETE',
       balanceTeam: 'team/GET_BALANCE_VALUE',
       dataCurrentUser: 'user/GET_DATA_CURRENT_USER',
       offersListUpdate: 'offer/GET_OFFERS_LIST_UPDATE',
       currentUserData: 'user/GET_DATA_CURRENT_USER',
+      isOfferAcquireError: 'offer/GET_OFFER_ACQUIRE_ERROR',
     }),
     offers: {
       get() {
@@ -216,6 +216,21 @@ export default {
     },
     currentUser: function () {
       return this.$store.state.auth.user.username;
+    },
+  },
+  watch: {
+    isOffersUpdateComplete(offersUpdateComplete) {
+      console.error('WATCH: isOffersUpdateComplete ', offersUpdateComplete);
+      if (offersUpdateComplete) {
+        let listOffersSale = this.$store
+          .$db()
+          .model('offersSale')
+          .all()
+          .filter((key) => !!key.trader);
+        console.warn(listOffersSale);
+        this.arrays.offers = listOffersSale;
+        this.$store.commit('shopState/SET_OFFERS_UPDATED');
+      }
     },
   },
   async created() {
@@ -250,16 +265,27 @@ export default {
 
   methods: {
     getProductKit(productKitId) {
-      return this.$store.$db().model('productKits').find(productKitId);
+      if (productKitId) {
+        console.error('SHOP.VUE: getProductKit');
+        console.warn(productKitId);
+        return this.$store.$db().model('productKits').find(productKitId);
+      }
     },
     getProductKitTitle(offer) {
-      const productKit = this.getProductKit(offer.product_kit);
-      const product = this.$store
-        .$db()
-        .model('products')
-        .find(productKit.product);
+      if (offer) {
+        console.error('SHOP.VUE: getProductKitTitle');
+        console.warn(offer);
+        const productKit = this.getProductKit(offer.product_kit);
+        console.warn(productKit);
 
-      return product.name;
+        const product = this.$store
+          .$db()
+          .model('products')
+          .find(productKit.product);
+        if (product) {
+          return product.name;
+        }
+      }
     },
 
     getAccount(accountId) {
@@ -294,7 +320,13 @@ export default {
       } else {
         try {
           const offerId = offer.id;
-          this.$store.commit('team/SET_BALANCE_RUNNIG');
+          const response = await this.$store.dispatch(
+            'offer/offerSaleAcquire',
+            offerId
+          );
+          this.$store.$db().model('offersSale').delete(offer.id);
+          console.error('OFFER ACQUIRE RESPONSE\n', response);
+          this.$store.commit('team/SET_BALANCE_RUNNING');
           const teamId = this.dataCurrentUser.team;
           const dataTeam = this.$store
             .$db()
@@ -302,18 +334,23 @@ export default {
             .query()
             .where('id', teamId)
             .first();
-          const responseAccountAcquire = await OfferSale.api().offerSaleAcquire(
-            offerId
-          );
+
           const dataAccount = await this.$store.dispatch(
             'account/getAccountById',
             dataTeam.account
           );
+          console.warn(dataTeam);
+          // TODO реактивное изменение баланса
           this.$store.commit('team/SET_BALANCE', dataAccount.balance);
-          console.error(responseAccountAcquire.response.data);
+          this.$store.commit('offer/SET_OFFER_ACQUIRE');
+          console.warn(offerId);
+
           this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
-          await this.$store.dispatch('offer/getOffersSale');
-          this.$store.commit('shopState/SET_buyOffer_STATE', 'COMPLETE');
+          this.$store.commit('shopState/SET_OFFERS_UPDATE_RUNNING');
+          this.$store.commit(
+            'shopState/SET_buyOffer_STATE_COMPLETE',
+            'RUNNING'
+          );
         } catch (e) {
           console.warn(e);
           this.$store.commit(
@@ -321,6 +358,7 @@ export default {
             'RUNNING'
           );
           this.$store.commit('shopState/SET_buyOffer_STATE', 'ERROR');
+          // NOTE как обрабатытывать ошибки продажи
         }
       }
     },
@@ -328,13 +366,9 @@ export default {
     onClickUpdateOffers() {
       if (this.getOfferUpdate) {
         console.error('LONG POLL');
-        const longPollId = setInterval(
-          () =>
-            OfferSale.api()
-              .getListOffersSale()
-              .then((result) => (this.arrays.offers = result.response.data)),
-          10000
-        );
+        const longPollId = setInterval(() => {
+          this.$store.commit('shopState/SET_OFFERS_UPDATE_RUNNING');
+        }, 10000);
         this.$store.commit('shopState/SET_LONG_POLL_ID', longPollId);
       } else {
         console.warn('CLEAR INTERVAL');

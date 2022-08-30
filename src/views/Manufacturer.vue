@@ -91,12 +91,11 @@
                 :active="deleteState.run"
                 :title="'Вы уверены, что хотите удалить продукт?'"
               >
-                <p class="text-md-center">
-                  "{{
-                    deleteState.data.hasOwnProperty('name')
-                      ? deleteState.data.name
-                      : ''
-                  }}"
+                <p
+                  class="text-md-center"
+                  v-if="deleteState.data.hasOwnProperty('name')"
+                >
+                  "{{ deleteState.data.name }}"
                 </p>
                 <v-card-actions>
                   <v-btn
@@ -140,25 +139,26 @@
               :modelItem="modelsCard.productKit"
               :showLabel="true"
             >
-              <v-card-actions class="manufacturer-card-action ma-2 pa-2">
-                <v-btn
+              <v-card-actions class="manufacturer-card-action pa-2">
+                <!-- <v-btn
                   class="mb-1"
                   outlined
                   rounded
                   color="#ee5544"
+                  :loading="isDeleteProductKitRun"
                   @click.prevent="onClickDeleteProductKit(productKit)"
                 >
                   <span>удалить</span>
-                </v-btn>
+                </v-btn> -->
                 <slot></slot>
                 <v-btn
-                  class="mb-1"
+                  class="mr-1 btn-put-to-sell"
                   outlined
                   rounded
                   color="#ee5544"
                   @click.prevent="onClickSellProductKit(productKit)"
                 >
-                  <span>продать</span>
+                  <span class="btn-put-to-sell-text">выставить на продажу</span>
                 </v-btn>
               </v-card-actions>
             </ProductCard>
@@ -174,6 +174,17 @@
               :load="$store.getters['offer/GET_offerSale']"
             >
             </Form>
+            <!-- <DialogError
+              :active="isErrorDeleteProductKit"
+              title="при удалении комплекта произошла ошибка"
+            >
+              <v-btn
+                color="deep-orange"
+                text
+                @click="onClickCloseDeleteProductKitError"
+                >закрыть</v-btn
+              >
+            </DialogError> -->
           </div>
         </v-tab-item>
       </v-tabs>
@@ -207,7 +218,9 @@ export default {
   },
   data() {
     return {
-      test: '',
+      arrays: {
+        products: [],
+      },
       deleteState: {
         run: false,
         errors: [],
@@ -262,11 +275,17 @@ export default {
   },
   async created() {
     console.warn('MANUFACTURER.VUE: CREATED');
+    const products = await this.$store.dispatch('products/getProducts');
+    console.error(products);
+    this.arrays.products = products;
   },
   computed: {
     ...mapGetters({
       isDeleteProduct: 'products/GET_STATE_DELETE_PRODUCT',
       getListProducts: 'products/GET_STATE_getListProducts',
+      isProductsUpdate: 'products/GET_LIST_PRODUCTS_UPDATE',
+      isErrorDeleteProductKit: 'productKit/GET_PRODUCT_KIT_DELETE_ERROR',
+      isDeleteProductKitRun: 'productKit/GET_PRODUCT_KIT_DELETE_RUN',
     }),
     stateProduct() {
       return this.$store.getters['stateShop/GET_STATE_PRODUCT'];
@@ -284,11 +303,11 @@ export default {
     },
     products() {
       console.warn('MANUFACTURER.VUE: products');
-      return this.$store.$db().model('products').all();
+      return this.$store.$db().model('products').query().get();
     },
     productKits() {
       console.warn('MANUFACTURER.VUE: productKits');
-      const listProductKits = this.$store
+      let listProductKits = this.$store
         .$db()
         .model('productKits')
         .query()
@@ -298,6 +317,14 @@ export default {
     getProduct() {
       return (id) =>
         this.$store.$db().model('products').query().where('id', id).first();
+    },
+  },
+  watch: {
+    getListProduct(getProducts) {
+      if (getProducts) {
+        this.arrays.products = this.$db().model('products').all();
+        this.$store.commit('products/SET_GET_LIST_PRODUCTS_COMPLETE');
+      }
     },
   },
   methods: {
@@ -332,6 +359,7 @@ export default {
         this.forms.formAddProduct.errors.push(message);
       }
       this.$store.commit('products/SET_PRODUCT_CREATED');
+      this.$store.commit('products/SET_LIST_PRODUCT_UPDATE_RUN');
     },
     onClickCreateProductKit(product) {
       console.warn('MANUFACTURER.VUE: onClickCreateProductKit');
@@ -382,23 +410,35 @@ export default {
           'products/deleteProduct',
           product.id
         );
-        await this.$store.dispatch('products/getProducts');
         this.onClickCancelDeleteProduct();
-        console.warn(response);
         await this.$store.dispatch('products/getProducts');
+
+        console.warn(response);
       } catch (error) {
         console.warn(error);
-        this.deleteState.errors.push(error.name);
+        this.deleteState.errors.push(error);
       }
     },
-    onClickDeleteProductKit(productKit) {
-      console.warn(productKit);
-    },
+    // async onClickDeleteProductKit(productKit) {
+    //   const productId = Number.parseInt(productKit.product);
+    //   this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_RUN');
+    //   try {
+    //     const response = await this.$store.dispatch(
+    //       'productKit/delProductKit',
+    //       productId
+    //     );
+    //     console.warn(response);
+    //   } catch (error) {
+    //     console.warn(error);
+
+    //     this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_ERROR');
+    //   }
+    // },
     onClickSellProductKit(productKit) {
       console.warn('MANUFACTURER.VUE: onClickSellProductKit');
       console.warn(productKit);
       this.forms.activeForm = 'formSellProductKit';
-      this.forms.titleForm = 'Продать продуктовый набор';
+      this.forms.titleForm = 'выставить на продажу';
       this.forms.formSellProductKit.disableFields['product_kit_id'] = true;
       this.forms.formSellProductKit.model.data['product_kit_id'] =
         productKit.id;
@@ -425,6 +465,10 @@ export default {
       console.error(activeForm);
       this.forms[activeForm].active = false;
     },
+    //   onClickCloseDeleteProductKitError() {
+    //     this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_ERROR_COMPLETE');
+    //     this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_RUN_COMPLETE');
+    //   },
   },
 };
 </script>

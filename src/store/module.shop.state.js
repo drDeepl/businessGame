@@ -9,12 +9,16 @@ export const shopState = {
       COMPLETE: false,
     },
     longPoll: null,
+    offersUpdate: {
+      RUNNING: false,
+      COMPLETE: false,
+      ERROR: false,
+    },
     load: {
       mainLayout: false,
       offersTab: false,
       offerCard: false,
 
-      offersUpdate: false,
       prepareOffer: false,
     },
   },
@@ -47,9 +51,18 @@ export const shopState = {
     GET_prepareOffer_STATE: (state) => {
       return state.load.prepareOffer;
     },
-    GET_OFFERS_UPDATE: (state) => {
-      return state.load.offersUpdate;
+    GET_OFFERS_UPDATE_RUNNING: (state) => {
+      return state.offersUpdate.RUNNING;
     },
+    GET_OFFERS_UPDATE_COMPLETE: (state) => {
+      return state.offersUpdate.COMPLETE;
+    },
+    GET_OFFERS_UPDATE_ERROR: (state) => {
+      return state.offersUpdate.ERROR;
+    },
+    GET_OFFERS_UPDATED: state =>{
+      return state.offers.Update.COMPLETE
+    }
   },
   mutations: {
     SET_buyOffer_STATE: function (state, nameState) {
@@ -80,11 +93,21 @@ export const shopState = {
     SET_OFFER_PREPARE_COMPLETE: function (state) {
       state.load.prepareOffer = false;
     },
-    SET_OFFERS_UPDATE: function (state) {
-      state.load.offersUpdate = true;
+    SET_OFFERS_UPDATE_RUNNING: function (state) {
+      state.offersUpdate.RUNNING = true;
     },
+    SET_OFFERS_UPDATE_ERROR: function (state) {
+      state.offersUpdate.RUNNING = false;
+      state.offersUpdate.ERROR = true;
+    },
+    SET_OFFERS_UPDATE_COMPLETE: function (state) {
+      state.offersUpdate.ERROR = false;
+      state.offersUpdate.RUNNING = false;
+      state.offersUpdate.COMPLETE = true;
+    },
+
     SET_OFFERS_UPDATED: function (state) {
-      state.load.offersUpdate = false;
+      state.offersUpdate.COMPLETE = false;
     },
     CHANGE_STATE_offersTab: function (state) {
       console.warn('MODULE.shop.state: CHANGE_STATE_offersTab');

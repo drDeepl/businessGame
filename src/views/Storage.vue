@@ -20,7 +20,7 @@
                   text
                   @click="onClickPrepareProduct(productKit.product_kit)"
                 >
-                  <span>приготовить продукт</span>
+                  <span>создать</span>
                 </v-btn>
               </v-card-actions>
             </ProductKitCard>
@@ -148,7 +148,6 @@ export default {
       console.error(this.prepareProductKit.progress);
     },
     onClickPrepareProduct(productKit) {
-      productKit.time = 30;
       this.$store.commit('storageTeam/SET_PREPARE_PRODUCT');
       console.warn('STORAGE: onClickPrepareProduct');
       console.warn(productKit);

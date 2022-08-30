@@ -34,6 +34,14 @@
   margin-bottom: -1.8em;
 }
 
+.btn-put-to-sell {
+  width: 15em !important;
+}
+
+.btn-put-to-sell-text {
+  font-size: 0.89em;
+}
+
 div[class*='disabled'] label[class*='disabled'],
 input[disabled] {
   color: $color-green !important;

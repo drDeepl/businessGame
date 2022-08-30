@@ -127,6 +127,8 @@ export default {
       stateBalanceRunning: 'team/GET_BALANCE_STATE_RUNNING',
       balanceTeam: 'team/GET_BALANCE_VALUE',
       activeTab: 'mainLayout/GET_CURRENT_TAB',
+      isOffersUpdate: 'shopState/GET_OFFERS_UPDATE_RUNNING',
+      isProductsUpdate: 'producs/GET_LIST_PRODUCTS_UPDATE',
     }),
     currentUser() {
       return this.$store.state.auth.user;
@@ -142,6 +144,28 @@ export default {
       return this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](
         this.sidebarUserInfo.role
       );
+    },
+  },
+  watch: {
+    async isOffersUpdate(offersUpdate) {
+      console.error('WATCH: isOffersUpdate', offersUpdate);
+      if (offersUpdate) {
+        // OfferSale.api()
+        //   .getListOffersSale()
+        //   .then((result) => {
+        //     this.arrays.offers = result.response.data;
+        //   });
+        await this.$store.dispatch('offer/getOffersSale');
+        await this.$store.dispatch('products/getProducts');
+        await this.$store.dispatch('productKit/getProductKits');
+        this.$store.commit('shopState/SET_OFFERS_UPDATE_COMPLETE');
+      }
+    },
+    async isProductsUpdate(productsUpdate) {
+      if (productsUpdate) {
+        await this.$store.dispatch('products/getProducts');
+        this.$store.commit('products/SET_LIST_PRODUCT_UPDATE_COMPLETE');
+      }
     },
   },
   async created() {
