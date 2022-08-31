@@ -159,7 +159,7 @@
                   </span>
 
                   <v-btn
-                    class="admin-row-user-btn"
+                    class="admin-row-user-btn mr-2"
                     outlined
                     color="#31c48d"
                     rounded
@@ -168,7 +168,6 @@
                   >
 
                   <v-btn
-                    class="ml-1 mr-0 mt-0 mb-0 pa-0"
                     outlined
                     color="red"
                     rounded

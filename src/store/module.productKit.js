@@ -14,8 +14,9 @@ export const productKit = {
     async getProductKits(context) {
       console.warn('STORE.MODULE.PRODUCT_KIT: getListProdKit');
       context.commit('SET_STATE_getProductKits');
-      await ProductKit.api().getListProductKits();
+      const responseWrap = await ProductKit.api().getListProductKits();
       context.commit('SET_getProductKits_COMPLETE');
+      return responseWrap.response.data;
     },
     async createProductKit(context, productKit) {
       context.commit('SET_CREATE_PRODUCT_KIT');
@@ -38,7 +39,7 @@ export const productKit = {
       return state.deleteProductKit.ERROR;
     },
 
-    STATUS_getProductKits: (state) => {
+    STATE_getProductKits: (state) => {
       return state.getProductKits;
     },
     GET_PRODUCT_KIT: () => {

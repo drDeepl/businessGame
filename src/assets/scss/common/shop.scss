@@ -17,6 +17,15 @@
   align-content: center !important;
 }
 
+.dialog-error-li {
+  list-style-type: disc;
+  color: $color-red;
+}
+
+.dialog-error-text {
+  color: $color-grey;
+}
+
 .dialog-error-title {
   border-top: 10px solid $color-red;
 

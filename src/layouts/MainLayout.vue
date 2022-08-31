@@ -48,7 +48,7 @@
           :key="key.url"
           @click.prevent="onClickTab"
         >
-          <span @click.prevent="setActiveTab(key.title)">
+          <span @click="setActiveTab(key.title)">
             <router-link :to="key.url">
               <span class="mainLayout-sidebar-row-text">{{ key.title }}</span>
             </router-link>
@@ -194,12 +194,14 @@ export default {
 
       await this.$store.dispatch('products/getProducts');
       await this.$store.dispatch('productKit/getProductKits');
-
-      this.sidebar.links =
+      let sidebarLinks =
         this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](roleUser);
+
       if (dataUser.is_superuser) {
         console.warn('GET TEAMS');
         const teams = await this.$store.dispatch('team/getTeams');
+        const adminRow = {title: 'Панель администратора', url: '/admin'};
+        sidebarLinks.push(adminRow);
         console.warn('LIST TEAMS\n', teams);
       }
       if (roleUser == 'player' && !dataUser.is_superuser) {
@@ -220,6 +222,7 @@ export default {
         this.$store.commit('team/SET_BALANCE', dataAccount.balance);
         this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
       }
+      this.sidebar.links = sidebarLinks;
     } else {
       this.$router.push('/');
     }

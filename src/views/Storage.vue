@@ -4,8 +4,13 @@
       <v-tab>продуктовые наборы</v-tab>
       <v-tab>продукты</v-tab>
       <v-tab-item>
-        <Load v-if="productKits.length == 0" />
+        {{ currentUserData }}
+        <Load v-if="isGetProductKits" />
+        <p v-else-if="productKits.length == 0">
+          в вашей команде ещё нет комплектов продуктов
+        </p>
         <div v-else>
+          {{ productKits[0] }}
           <div v-for="productKit in productKits" :key="productKit.id">
             <ProductKitCard
               :nameProduct="getProductName(productKit.product_kit.product)"
@@ -70,7 +75,7 @@
 // TODO: продажу продуктового набора клиенту
 import {mapGetters} from 'vuex';
 
-import ProductKitStorage from '@/store/models/ProductKitStorage';
+// import ProductKitStorage from '@/store/models/ProductKitStorage';
 import User from '@/store/models/User';
 
 import ProductKit from '@/models/model.productKit';
@@ -104,10 +109,10 @@ export default {
     console.error(userData);
     const team_id = userData.team;
     console.error(team_id);
-    const response = await ProductKitStorage.api().getListProductKits(team_id);
+    this.$store.commit('storageTeam/SET_GET_PRODUCTS_KIT_TEAM_RUN');
+    await this.$store.dispatch('storageTeam/getTeamProductKits', team_id);
 
-    const listProductKitTeam = response.response.data;
-    this.arrays.productKits = listProductKitTeam;
+    this.$store.commit('storageTeam/SET_GET_PRODUCTS_KIT_TEAM_RUN_COMPLETE');
     // this.arrays.productKits = productKits;
   },
   computed: {
@@ -115,6 +120,7 @@ export default {
       prepareProductProgress: 'storageTeam/GET_prepareProduct_PROGRESS',
       prepareProduct: 'storageTeam/GET_STATE_PREPARE_PRODUCT',
       prepareProductTimeToFinal: 'storageTeam/GET_prepareProduct_TIME',
+      isGetProductKits: 'storageTeam/GET_STATE_TEAM_PRODUCTS_KIT_RUN',
     }),
     currentUserData() {
       let username = this.$store.state.auth.user.username;

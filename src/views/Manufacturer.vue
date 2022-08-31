@@ -52,9 +52,11 @@
     </Form>
     <div>
       <v-tabs color="#6c63ff" class="manufacturer-layout mt-2">
-        <v-tab color="#6c63ff" v-for="tab in tabs.tabsView" :key="tab.view">
+        <!-- <v-tab color="#6c63ff" v-for="tab in tabs.tabsView" :key="tab.view">
           {{ tab.label }}
-        </v-tab>
+        </v-tab> -->
+        <v-tab>продукты</v-tab>
+        <v-tab @click="onClickTabProductKits">продуктовые наборы</v-tab>
         <!-- INFO: список готовых продуктов -->
         <v-tab-item class="mt-2">
           <Load v-if="getListProducts" />
@@ -69,6 +71,7 @@
             >
               <v-card-actions class="manufacturer-card-action">
                 <v-btn
+                  v-if="dataCurrentUser.is_superuser"
                   class="mt-1 manufacturer-action-btn"
                   outlined
                   rounded
@@ -88,7 +91,7 @@
                 </v-btn>
               </v-card-actions>
               <DialogError
-                :active="deleteState.run"
+                :active="isDeleteProductRun"
                 :title="'Вы уверены, что хотите удалить продукт?'"
               >
                 <p
@@ -97,6 +100,24 @@
                 >
                   "{{ deleteState.data.name }}"
                 </p>
+                <v-card-text class="text-md-left pl-4 mb-0 pb-0">
+                  После удаления продукта так же удалится у всех пользователей
+                  следующая информация:
+                </v-card-text>
+                <v-card-text class="text-md-left pl-4 mt-0 pt-0">
+                  <ul class="dialog-errors-container">
+                    <li class="dialog-error-li mt-2 pa-1">
+                      <span class="dialog-error-text"
+                        >продуктовые комплекты</span
+                      >
+                    </li>
+                    <li class="dialog-error-li mt-2 pa-1">
+                      <span class="dialog-error-text"
+                        >предложения в магазине</span
+                      >
+                    </li>
+                  </ul></v-card-text
+                >
                 <v-card-actions>
                   <v-btn
                     color="grey"
@@ -107,7 +128,6 @@
                     <span>Отмена</span>
                   </v-btn>
                   <v-btn
-                    :loading="isDeleteProduct"
                     color="red"
                     rounded
                     outlined
@@ -118,7 +138,7 @@
                 </v-card-actions>
               </DialogError>
               <DialogError
-                :active="deleteState.errors.length > 0"
+                :active="isDeleteProductError"
                 :title="'При удалении продукта возникли ошибки:'"
               >
                 <p v-for="i in Object.keys(deleteState.errors)" :key="i">
@@ -129,7 +149,7 @@
           </div>
         </v-tab-item>
         <!-- INFO: список готовых продуктовых наборов -->
-        <v-tab-item class="mt-2">
+        <v-tab-item class="mt-2" v-if="isGetProductKitspm ">
           <div class="products-cards">
             <ProductCard
               v-for="productKit in productKits"
@@ -141,11 +161,11 @@
             >
               <v-card-actions class="manufacturer-card-action pa-2">
                 <!-- <v-btn
+                  v-if="dataCurrentUser.is_superuser"
                   class="mb-1"
                   outlined
                   rounded
                   color="#ee5544"
-                  :loading="isDeleteProductKitRun"
                   @click.prevent="onClickDeleteProductKit(productKit)"
                 >
                   <span>удалить</span>
@@ -220,9 +240,9 @@ export default {
     return {
       arrays: {
         products: [],
+        productKits: [],
       },
       deleteState: {
-        run: false,
         errors: [],
         data: {},
       },
@@ -276,16 +296,20 @@ export default {
   async created() {
     console.warn('MANUFACTURER.VUE: CREATED');
     const products = await this.$store.dispatch('products/getProducts');
-    console.error(products);
+
     this.arrays.products = products;
   },
   computed: {
     ...mapGetters({
-      isDeleteProduct: 'products/GET_STATE_DELETE_PRODUCT',
+      isDeleteProductRun: 'products/GET_STATE_DELETE_PRODUCT_RUN',
+      isDeleteProductError: 'products/GET_STATE_DELETE_PRODUCT_ERROR',
       getListProducts: 'products/GET_STATE_getListProducts',
       isProductsUpdate: 'products/GET_LIST_PRODUCTS_UPDATE',
       isErrorDeleteProductKit: 'productKit/GET_PRODUCT_KIT_DELETE_ERROR',
       isDeleteProductKitRun: 'productKit/GET_PRODUCT_KIT_DELETE_RUN',
+      isGetProductKits: 'productKit/STATE_getProductKits',
+
+      dataCurrentUser: 'user/GET_DATA_CURRENT_USER',
     }),
     stateProduct() {
       return this.$store.getters['stateShop/GET_STATE_PRODUCT'];
@@ -307,16 +331,17 @@ export default {
     },
     productKits() {
       console.warn('MANUFACTURER.VUE: productKits');
-      let listProductKits = this.$store
-        .$db()
-        .model('productKits')
-        .query()
-        .get();
-      return listProductKits;
+      return this.arrays.productKits;
     },
     getProduct() {
-      return (id) =>
-        this.$store.$db().model('products').query().where('id', id).first();
+      return (id) => {
+        return this.$store
+          .$db()
+          .model('products')
+          .query()
+          .where('id', id)
+          .first();
+      };
     },
   },
   watch: {
@@ -328,6 +353,14 @@ export default {
     },
   },
   methods: {
+    async onClickTabProductKits() {
+      console.warn('MANUFACTURER.VUE: onClickTabProductKits');
+      const listProductsKits = await this.$store.dispatch(
+        'productKit/getProductKits'
+      );
+
+      this.arrays.productKits = listProductsKits;
+    },
     onClickActionTab(form, title) {
       this.forms.activeForm = form;
       this.forms.titleForm = title;
@@ -392,11 +425,10 @@ export default {
       this.$store.commit('productKit/SET_CREATE_PRODUCT_KIT_COMPLETE');
     },
     onClickDeleteProduct(product) {
+      this.$store.commit('products/SET_DELETE_PRODUCT_RUN');
       this.deleteState.data = product;
-      this.deleteState.run = true;
     },
     onClickCancelDeleteProduct() {
-      this.deleteState.run = false;
       this.deleteState.data = {};
     },
     async onClicApplykDeleteProduct() {
@@ -406,34 +438,37 @@ export default {
       console.warn(product);
 
       try {
+        this.$store.$db().model('products').delete(product.id);
         const response = await this.$store.dispatch(
           'products/deleteProduct',
           product.id
         );
-        this.onClickCancelDeleteProduct();
+        await this.onClickTabProductKits();
         await this.$store.dispatch('products/getProducts');
 
         console.warn(response);
+        this.onClickCancelDeleteProduct();
       } catch (error) {
         console.warn(error);
+        this.$store.commit('products/SET_DELETE_PRODUCT_ERROR');
         this.deleteState.errors.push(error);
       }
     },
-    // async onClickDeleteProductKit(productKit) {
-    //   const productId = Number.parseInt(productKit.product);
-    //   this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_RUN');
-    //   try {
-    //     const response = await this.$store.dispatch(
-    //       'productKit/delProductKit',
-    //       productId
-    //     );
-    //     console.warn(response);
-    //   } catch (error) {
-    //     console.warn(error);
+    async onClickDeleteProductKit(productKit) {
+      const productId = Number.parseInt(productKit.product);
+      this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_RUN');
+      try {
+        const response = await this.$store.dispatch(
+          'productKit/delProductKit',
+          productId
+        );
+        console.warn(response);
+      } catch (error) {
+        console.warn(error);
 
-    //     this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_ERROR');
-    //   }
-    // },
+        this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_ERROR');
+      }
+    },
     onClickSellProductKit(productKit) {
       console.warn('MANUFACTURER.VUE: onClickSellProductKit');
       console.warn(productKit);

@@ -31,9 +31,7 @@ export default class ProductKit extends Model {
       },
       async deleteProductKit(productId) {
         console.warn('STORE.MODEL.PRODUCT_KIT: deleteProductKit');
-        const responseWrap = await this.delete('product-kits/' + productId, {
-          delete: productId,
-        });
+        const responseWrap = await this.delete('product-kits/' + productId);
         return responseWrap;
       },
     },

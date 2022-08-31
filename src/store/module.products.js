@@ -9,7 +9,11 @@ export const products = {
     getListProducts: false,
     listProductsUpdate: false,
     getProductsStore: true,
-    deleteProduct: false,
+    deleteProduct: {
+      RUN: false,
+      COMPLETE: false,
+      ERROR: false,
+    },
     arrays: {
       tabsAction: [
         {form: 'formAddProduct', label: 'Добавить продукт'},
@@ -62,8 +66,11 @@ export const products = {
     GET_LIST_PRODUCTS_UPDATE: (state) => {
       return state.listProductsUpdate;
     },
-    GET_STATE_DELETE_PRODUCT: (state) => {
-      return state.deleteProduct;
+    GET_STATE_DELETE_PRODUCT_RUN: (state) => {
+      return state.deleteProduct.RUN;
+    },
+    GET_STATE_DELETE_PRODUCT_ERROR: (state) => {
+      return state.deleteProduct.ERROR;
     },
     GET_STATE_getListProducts: (state) => {
       return state.getListProducts;
@@ -113,11 +120,21 @@ export const products = {
       console.warn('MODULE.PRODUCTS: SET_STATE_GET_PRODUCTS_STORE');
       state.getProductsStore = false;
     },
-    SET_DELETE_PRODUCT: function (state) {
-      state.deleteProduct = true;
+    SET_DELETE_PRODUCT_RUN: function (state) {
+      state.deleteProduct.RUN = true;
     },
     SET_DELETE_PRODUCT_COMPLETE: function (state) {
-      state.deleteProduct = false;
+      state.deleteProduct.RUN = false;
+      state.deleteProduct.COMPLETE = true;
+    },
+    SET_DELETE_PRODUCT_ERROR: function (state) {
+      state.deleteProduct.RUN = false;
+      state.deleteProduct.ERROR = true;
+    },
+    CLEAR_STATE_DELETE_PRODUCT: function (state) {
+      for (let i = 0; i < state.deleteProduct.length; i++) {
+        state.deleteProduct[i] = false;
+      }
     },
     SET_LIST_PRODUCT_UPDATE_RUN: function (state) {
       state.listProductsUpdate = true;

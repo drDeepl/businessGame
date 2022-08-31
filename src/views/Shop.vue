@@ -5,7 +5,7 @@
     <v-tabs color="#6C63FF" v-else>
       <v-tab>Предложения</v-tab>
 
-      <v-tab @click="onClickTabTransaction">Все транзакции</v-tab>
+      <!-- <v-tab @click="onClickTabTransaction">Все транзакции</v-tab> -->
       <!-- INFO: Вкладка с предложениями о покупке продуктового набора -->
       <v-tab-item>
         <v-switch
@@ -96,7 +96,7 @@
         </div>
       </v-tab-item>
       <!-- INFO: Вкладка с транзакциями -->
-      <v-tab-item>
+      <!-- <v-tab-item>
         <Load />
         <div class="transaction-container">
           <v-simple-table>
@@ -134,7 +134,7 @@
             </template>
           </v-simple-table>
         </div>
-      </v-tab-item>
+      </v-tab-item> -->
     </v-tabs>
   </div>
 </template>
