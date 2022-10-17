@@ -17,6 +17,10 @@ export default class ProductKitStorage extends Model {
         console.warn('MODEL.PRODUCT.STORAGE');
         return this.get('store/' + team_id + '/product-kits/list');
       },
+      async getListProducts(team_id) {
+        console.warn('MODEL.PRODUCT.STORAGE');
+        return this.get('store/' + team_id + '/products/list');
+      },
     },
   };
 }

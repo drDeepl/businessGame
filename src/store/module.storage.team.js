@@ -46,6 +46,20 @@ export const storageTeam = {
         return [];
       }
     },
+    async getTeamProducts(context, teamId) {
+      const responseWrap = await ProductKitStorage.api().getListProducts(
+        teamId
+      );
+
+      if (responseWrap.response.status == 200) {
+        return responseWrap.response.data;
+      } else {
+        // TODO: добавить состояние ошибки для списка продуктов
+        console.warn(context);
+        // context.commit('SET_GET_PRODUCTS_KIT_TEAM_ERROR');
+        return [];
+      }
+    },
   },
   getters: {
     GET_STATE_TEAM_PRODUCTS_KIT_RUN: (state) => {

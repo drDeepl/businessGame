@@ -149,7 +149,8 @@
           </div>
         </v-tab-item>
         <!-- INFO: список готовых продуктовых наборов -->
-        <v-tab-item class="mt-2" v-if="isGetProductKitspm ">
+        <!-- FIX  v-tab-item v-if="isGetProductKits" -->
+        <v-tab-item class="mt-2">
           <div class="products-cards">
             <ProductCard
               v-for="productKit in productKits"
@@ -316,7 +317,6 @@ export default {
     },
     STATE_createProduct() {
       return this.$store.getters['products/GET_STATE_createProduct'];
-      // return this.$store.state.products.createProduct;
     },
     STATE_createProductKit() {
       return this.$store.getters['productKits/GET_PRODUCT_KIT_CREATE'];
@@ -500,10 +500,6 @@ export default {
       console.error(activeForm);
       this.forms[activeForm].active = false;
     },
-    //   onClickCloseDeleteProductKitError() {
-    //     this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_ERROR_COMPLETE');
-    //     this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_RUN_COMPLETE');
-    //   },
   },
 };
 </script>

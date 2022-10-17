@@ -4,7 +4,7 @@
       <v-tab>продуктовые наборы</v-tab>
       <v-tab>продукты</v-tab>
       <v-tab-item>
-        {{ currentUserData }}
+        <!-- NOTE: данные пользователя {{ currentUserData }} -->
         <Load v-if="isGetProductKits" />
         <p v-else-if="productKits.length == 0">
           в вашей команде ещё нет комплектов продуктов
@@ -121,6 +121,7 @@ export default {
       prepareProduct: 'storageTeam/GET_STATE_PREPARE_PRODUCT',
       prepareProductTimeToFinal: 'storageTeam/GET_prepareProduct_TIME',
       isGetProductKits: 'storageTeam/GET_STATE_TEAM_PRODUCTS_KIT_RUN',
+      dataCurrentUser: 'user/GET_DATA_CURRENT_USER',
     }),
     currentUserData() {
       let username = this.$store.state.auth.user.username;
@@ -133,9 +134,11 @@ export default {
         .first();
     },
     productKits() {
+      // TODO: show arryas through variable
       return this.$store.$db().model('productKits_storage').all();
     },
     products() {
+      // TODO: show arryas through variable
       return this.$store.$db().model('products_storage').all();
     },
     progressBar: {
@@ -148,18 +151,33 @@ export default {
       },
     },
   },
+  watch: {
+    async prepareProduct(value) {
+      // FIX проверить на баги
+      console.error('PREPARE PRODUCT: ' + value);
+      if (!value) {
+        let teamId = this.dataCurrentUser.team;
+        await this.$store.dispatch('storageTeam/getTeamProductKits', teamId);
+        const products = await this.$store.dispatch(
+          'storageTeam/getTeamProducts',
+          teamId
+        );
+        console.error(products);
+      }
+    },
+  },
   methods: {
     async plusProgress(count) {
       this.prepareProductKit.progress = this.prepareProductKit.progress + count;
       console.error(this.prepareProductKit.progress);
     },
-    onClickPrepareProduct(productKit) {
+    async onClickPrepareProduct(productKit) {
       this.$store.commit('storageTeam/SET_PREPARE_PRODUCT');
       console.warn('STORAGE: onClickPrepareProduct');
       console.warn(productKit);
       const timeToPrepare = Number.parseInt(productKit.time);
 
-      this.$store.dispatch('storageTeam/prepareProduct', timeToPrepare);
+      await this.$store.dispatch('storageTeam/prepareProduct', timeToPrepare);
     },
     getProductName(productId) {
       console.warn('MODULE.STORAGE: getProductName');
