@@ -56,12 +56,21 @@
           <p>У вашей команды ещё нет продуктов</p>
         </div>
         <div v-else v-for="product in products" :key="product['$id']">
+          <!-- TODO: UI продуктовой карточки -->
+          {{ product }}
           <ProductCard
             :isProductKit="false"
             :nameProduct="product.product.name"
-            :item="product.count"
+            :item="product"
+            :countItems="product.count"
             :modelItem="cards.product.model"
           >
+            <v-btn
+              class="ma-0 pa-0 store-product-card-btn"
+              color="deep-orange"
+              text
+              ><span>продать</span></v-btn
+            >
           </ProductCard>
         </div>
       </v-tab-item>
@@ -91,7 +100,7 @@ export default {
         timer: 0,
         progress: 0,
       },
-      arrays: {productKits: []},
+      arrays: {productKits: [], products: []},
       cards: {
         productKit: {
           model: new ProductKit(),
@@ -110,10 +119,16 @@ export default {
     const team_id = userData.team;
     console.error(team_id);
     this.$store.commit('storageTeam/SET_GET_PRODUCTS_KIT_TEAM_RUN');
-    await this.$store.dispatch('storageTeam/getTeamProductKits', team_id);
+    this.arrays.productKits = await this.$store.dispatch(
+      'storageTeam/getTeamProductKits',
+      team_id
+    );
+    this.arrays.products = await this.$store.dispatch(
+      'storageTeam/getTeamProducts',
+      team_id
+    );
 
     this.$store.commit('storageTeam/SET_GET_PRODUCTS_KIT_TEAM_RUN_COMPLETE');
-    // this.arrays.productKits = productKits;
   },
   computed: {
     ...mapGetters({
@@ -135,11 +150,13 @@ export default {
     },
     productKits() {
       // TODO: show arryas through variable
-      return this.$store.$db().model('productKits_storage').all();
+
+      return this.arrays.productKits;
     },
     products() {
       // TODO: show arryas through variable
-      return this.$store.$db().model('products_storage').all();
+      return this.arrays.products;
+      // return this.$store.$db().model('products_storage').all();
     },
     progressBar: {
       get() {
@@ -157,7 +174,10 @@ export default {
       console.error('PREPARE PRODUCT: ' + value);
       if (!value) {
         let teamId = this.dataCurrentUser.team;
-        await this.$store.dispatch('storageTeam/getTeamProductKits', teamId);
+        this.arrays.productKits = await this.$store.dispatch(
+          'storageTeam/getTeamProductKits',
+          teamId
+        );
         const products = await this.$store.dispatch(
           'storageTeam/getTeamProducts',
           teamId
