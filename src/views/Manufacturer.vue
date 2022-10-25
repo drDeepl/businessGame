@@ -224,6 +224,7 @@ import CreateProduct from '@/models/model.create.product';
 import CreateProductKit from '@/models/model.productKit.create';
 import CreateSellOffer from '@/models/model.productKit.sell';
 
+
 import Form from '@/UI/Form.vue';
 import ProductCard from '@/UI/ProductCard.vue';
 import DialogError from '@/UI/DialogError.vue';

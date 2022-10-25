@@ -6,9 +6,14 @@
       <v-tab-item>
         <!-- NOTE: данные пользователя {{ currentUserData }} -->
         <Load v-if="isGetProductKits" />
-        <p v-else-if="productKits.length == 0">
-          в вашей команде ещё нет комплектов продуктов
-        </p>
+        <div v-else-if="productKits.length == 0">
+          <p>в вашей команде ещё нет комплектов продуктов</p>
+          <p>TODO</p>
+          <p>Клиент создает запрос на покупку</p>
+          <p>Пользователь принимает запрос</p>
+          <p>Запускается продажа продукта</p>
+        </div>
+
         <div v-else>
           {{ productKits[0] }}
           <div v-for="productKit in productKits" :key="productKit.id">
@@ -69,9 +74,32 @@
               class="ma-0 pa-0 store-product-card-btn"
               color="deep-orange"
               text
-              ><span>продать</span></v-btn
+              @click="choicedOfferToSell(product)"
+            >
+              <span>продать</span></v-btn
             >
           </ProductCard>
+
+          <Form
+            v-if="forms.createOfferProduct.active"
+            :activate="forms.createOfferProduct.active"
+            :title="
+              'Продажа ' +
+              ' \'\'' +
+              product.product.name +
+              '\'\' ' +
+              product.count +
+              ' шт.'
+            "
+            :model="forms.createOfferProduct.model"
+            :applySucces="offerPurchaseComplete"
+            :parenFunction="onClickSellProduct"
+            :load="offerPurchaseInProgress"
+            :cancelForm="() => (forms.createOfferProduct.active = false)"
+            :parentFunction="onClickSellProduct"
+          >
+            <!-- // FIX: Удалить -->
+          </Form>
         </div>
       </v-tab-item>
     </v-tabs>
@@ -84,18 +112,27 @@
 // TODO: продажу продуктового набора клиенту
 import {mapGetters} from 'vuex';
 
-// import ProductKitStorage from '@/store/models/ProductKitStorage';
 import User from '@/store/models/User';
+import OfferPurchasePlace from '@/models/model.offer.purchase.place';
 
 import ProductKit from '@/models/model.productKit';
 import Product from '@/models/model.product';
 
 import Load from '@/UI/Load.vue';
 import ItemStoreCard from '@/UI/ItemStoreCard.vue';
+import Form from '@/UI/Form.vue';
 
 export default {
   data() {
     return {
+      forms: {
+        // FIX: Удлаить
+        createOfferProduct: {
+          active: false,
+          model: new OfferPurchasePlace(),
+          preOffer: null,
+        },
+      },
       prepareProductKit: {
         timer: 0,
         progress: 0,
@@ -137,6 +174,8 @@ export default {
       prepareProductTimeToFinal: 'storageTeam/GET_prepareProduct_TIME',
       isGetProductKits: 'storageTeam/GET_STATE_TEAM_PRODUCTS_KIT_RUN',
       dataCurrentUser: 'user/GET_DATA_CURRENT_USER',
+      offerPurchaseComplete: 'offer/GET_OFFER_ACQUIRE_COMPLETE',
+      offerPurchaseInProgress: 'offer/GET_STATE_OFFER_PREPARE',
     }),
     currentUserData() {
       let username = this.$store.state.auth.user.username;
@@ -170,7 +209,6 @@ export default {
   },
   watch: {
     async prepareProduct(value) {
-      // FIX проверить на баги
       console.error('PREPARE PRODUCT: ' + value);
       if (!value) {
         let teamId = this.dataCurrentUser.team;
@@ -209,12 +247,32 @@ export default {
         .first();
       return product.name;
     },
+
+    choicedOfferToSell(product) {
+      // FIX: Удлаить
+      this.forms.createOfferProduct.active = true;
+      this.forms.createOfferProduct.preOffer = product;
+    },
+
+    async onClickSellProduct(product) {
+      // FIX: Удлаить
+      this.$store.commit('ofer/SET_OFFER_PREPARE');
+      product.count = this.forms.createOfferProduct.preOffer.count;
+      product.product_id = this.forms.createOfferProduct.preOffer.product.id;
+      console.warn(product);
+      const purchaseOffer = await this.$store.dispatch(
+        'offer/createOfferPurchase',
+        product
+      );
+      console.error(purchaseOffer);
+    },
   },
 
   components: {
     Load,
     ProductKitCard: ItemStoreCard,
     ProductCard: ItemStoreCard,
+    Form,
   },
 };
 </script>

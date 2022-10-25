@@ -2,7 +2,12 @@
   <v-dialog v-model="activate" persistent>
     <v-form ref="form" class="admin-form pt-2 pb-2">
       <div class="form-title">{{ title }}</div>
-      <div v-for="textField in Object.keys(model.props)" :key="textField">
+      <div
+        v-for="textField in Object.keys(model.props).filter(
+          (key) => !model.hideShow[key]
+        )"
+        :key="textField"
+      >
         <!-- // NOTE: Если свойство модели совпадает со свойством select -->
         <!-- // NOTE: То текстовое поле не отображается -->
         <div v-if="Object.keys(select).indexOf(textField) >= 0">
@@ -76,9 +81,9 @@ export default {
   props: {
     activate: {type: Boolean},
     title: String,
-    titleForm: String,
+
     model: Object,
-    // TODO: выбор значения для поля
+
     values: {
       type: Object,
       default() {
