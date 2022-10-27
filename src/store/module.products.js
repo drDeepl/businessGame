@@ -35,11 +35,18 @@ export const products = {
     async getListProductInStore(context, team_id) {
       console.warn('MODULE.PRODUCTS: getListProductInStore');
       context.commit('SET_STATE_GET_PRODUCTS_STORE');
-      const response = await ProductStorage.api().getListProducts(team_id);
-
-      const listProductsStore = response.response.data;
-      context.commit('SET_STATE_GET_PRODUCTS_STORE_COMPLETE');
-      return listProductsStore;
+      console.error(team_id);
+      try {
+        const response = await ProductStorage.api()
+          .getListProducts(team_id)
+          .catch((err) => err);
+        let listProductsStore = response.response.data;
+        return listProductsStore;
+      } catch {
+        return;
+      } finally {
+        context.commit('SET_STATE_GET_PRODUCTS_STORE_COMPLETE');
+      }
     },
     async getProducts(context) {
       const responseWrap = await Product.api().getListProducts();

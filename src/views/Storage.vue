@@ -9,6 +9,7 @@
         <div v-else-if="productKits.length == 0">
           <p>в вашей команде ещё нет комплектов продуктов</p>
           <p>TODO</p>
+          <p>ПЕРЕДЕЛАТЬ ЛОГИКУ ПРИГОТОВЛЕПНИЯ ПРОДУКТА</p>
           <p>Клиент создает запрос на покупку</p>
           <p>Пользователь принимает запрос</p>
           <p>Запускается продажа продукта</p>
@@ -209,11 +210,16 @@ export default {
   },
   watch: {
     async prepareProduct(value) {
+      // FIX Переделать приготовление продукта
       console.error('PREPARE PRODUCT: ' + value);
       if (!value) {
         let teamId = this.dataCurrentUser.team;
         this.arrays.productKits = await this.$store.dispatch(
           'storageTeam/getTeamProductKits',
+          teamId
+        );
+        await this.$store.dispatch(
+          'storageTeam/checkCreatedProductKits',
           teamId
         );
         const products = await this.$store.dispatch(

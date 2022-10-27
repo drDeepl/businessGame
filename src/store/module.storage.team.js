@@ -60,6 +60,9 @@ export const storageTeam = {
         return [];
       }
     },
+    async checkCreatedProductKits(context, teamId) {
+      await ProductKitStorage.api().checkCreatedProductKits(teamId);
+    },
   },
   getters: {
     GET_STATE_TEAM_PRODUCTS_KIT_RUN: (state) => {
