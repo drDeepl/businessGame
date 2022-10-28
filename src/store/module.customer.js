@@ -1,20 +1,20 @@
 export const customer = {
   namespaced: true,
   state: {
-    arrays: {
-      teams: null,
-      products: null,
-    },
+    createTeamProducts: false,
   },
   actions: {},
   getters: {
-    GET_PRODUCTS_TEAMS: (state) => {
-      return state.arrays.products;
+    GET_CREATE_TEAM_PRODUCTS: (state) => {
+      return state.createTeamProducts;
     },
   },
-  mutatations: {
-    SET_TEAM_PRODUCTS: function (state, teamsProducts) {
-      state.arrays.products = teamsProducts;
+  mutations: {
+    SET_CREATE_TEAM_PRODUCTS_IN_PROCESS: function (state) {
+      state.createTeamProducts = true;
+    },
+    SET_CREATE_TEAM_PRODUCTS_COMPLETE: function (state) {
+      state.createTeamProducts = false;
     },
   },
 };

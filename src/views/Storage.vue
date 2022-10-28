@@ -3,6 +3,7 @@
     <v-tabs color="#6C63FF">
       <v-tab>продуктовые наборы</v-tab>
       <v-tab>продукты</v-tab>
+
       <v-tab-item>
         <!-- NOTE: данные пользователя {{ currentUserData }} -->
         <Load v-if="isGetProductKits" />
@@ -64,6 +65,7 @@
         <div v-else v-for="product in products" :key="product['$id']">
           <!-- TODO: UI продуктовой карточки -->
           {{ product }}
+
           <ProductCard
             :isProductKit="false"
             :nameProduct="product.product.name"
@@ -71,19 +73,12 @@
             :countItems="product.count"
             :modelItem="cards.product.model"
           >
-            <v-btn
-              class="ma-0 pa-0 store-product-card-btn"
-              color="deep-orange"
-              text
-              @click="choicedOfferToSell(product)"
-            >
-              <span>продать</span></v-btn
-            >
           </ProductCard>
 
+          <!-- FIX: Исправить или удалить -->
           <Form
-            v-if="forms.createOfferProduct.active"
-            :activate="forms.createOfferProduct.active"
+            v-if="false"
+            :activate="false"
             :title="
               'Продажа ' +
               ' \'\'' +
@@ -114,7 +109,7 @@
 import {mapGetters} from 'vuex';
 
 import User from '@/store/models/User';
-import OfferPurchasePlace from '@/models/model.offer.purchase.place';
+// import OfferPurchasePlace from '@/models/model.offer.purchase.place';
 
 import ProductKit from '@/models/model.productKit';
 import Product from '@/models/model.product';
@@ -126,14 +121,6 @@ import Form from '@/UI/Form.vue';
 export default {
   data() {
     return {
-      forms: {
-        // FIX: Удлаить
-        createOfferProduct: {
-          active: false,
-          model: new OfferPurchasePlace(),
-          preOffer: null,
-        },
-      },
       prepareProductKit: {
         timer: 0,
         progress: 0,
@@ -196,7 +183,6 @@ export default {
     products() {
       // TODO: show arryas through variable
       return this.arrays.products;
-      // return this.$store.$db().model('products_storage').all();
     },
     progressBar: {
       get() {
@@ -210,18 +196,18 @@ export default {
   },
   watch: {
     async prepareProduct(value) {
-      // FIX Переделать приготовление продукта
       console.error('PREPARE PRODUCT: ' + value);
       if (!value) {
         let teamId = this.dataCurrentUser.team;
-        this.arrays.productKits = await this.$store.dispatch(
-          'storageTeam/getTeamProductKits',
-          teamId
-        );
         await this.$store.dispatch(
           'storageTeam/checkCreatedProductKits',
           teamId
         );
+        this.arrays.productKits = await this.$store.dispatch(
+          'storageTeam/getTeamProductKits',
+          teamId
+        );
+
         const products = await this.$store.dispatch(
           'storageTeam/getTeamProducts',
           teamId
@@ -252,25 +238,6 @@ export default {
         .where('id', productId)
         .first();
       return product.name;
-    },
-
-    choicedOfferToSell(product) {
-      // FIX: Удлаить
-      this.forms.createOfferProduct.active = true;
-      this.forms.createOfferProduct.preOffer = product;
-    },
-
-    async onClickSellProduct(product) {
-      // FIX: Удлаить
-      this.$store.commit('ofer/SET_OFFER_PREPARE');
-      product.count = this.forms.createOfferProduct.preOffer.count;
-      product.product_id = this.forms.createOfferProduct.preOffer.product.id;
-      console.warn(product);
-      const purchaseOffer = await this.$store.dispatch(
-        'offer/createOfferPurchase',
-        product
-      );
-      console.error(purchaseOffer);
     },
   },
 

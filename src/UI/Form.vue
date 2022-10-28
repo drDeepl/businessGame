@@ -5,7 +5,7 @@
       <!-- v-for="textField in Object.keys(model.props).filter(
           (key) => !model.hideShow[key]
         )" -->
-        <!-- INFO: Проверка на показ элементов -->
+      <!-- INFO: Проверка на показ элементов -->
       <div v-for="textField in Object.keys(model.props)" :key="textField">
         <!-- // NOTE: Если свойство модели совпадает со свойством select -->
         <!-- // NOTE: То текстовое поле не отображается -->
@@ -79,7 +79,12 @@ export default {
   // INFO: А после отправлять родителю
   props: {
     activate: {type: Boolean},
-    title: String,
+    title: {
+      type: String,
+      default() {
+        return '';
+      },
+    },
 
     model: Object,
 

@@ -25,7 +25,7 @@ export default class OfferPurchase extends Model {
       },
       async offerPurchasePlace(modelOfferPurchasePlace) {
         console.warn('MODEL.OFFER: offerPurchasePlace');
-
+        console.log(modelOfferPurchasePlace);
         return this.post('offers/purchase/place', modelOfferPurchasePlace);
       },
       async offerPurchaseAcquire(offerId) {

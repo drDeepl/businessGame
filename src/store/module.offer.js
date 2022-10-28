@@ -45,11 +45,14 @@ export const offer = {
       context.commit('SET_GET_OFFERS_PURCHASE_COMPLETE');
     },
     async createOfferPurchase(context, modelOfferPurchase) {
+      console.warn('MODULE.OFFER: createOfferPurchase');
+      console.log(modelOfferPurchase);
+      let requestData = Object.assign({}, modelOfferPurchase);
       const responseWrap = await OfferPurchase.api().offerPurchasePlace(
-        modelOfferPurchase
+        requestData
       );
       context.commit('SET_offerSale_COMPLETE');
-      return responseWrap.response;
+      return responseWrap.response.data;
     },
     async offerPurchaseAcquire(context, offer_id) {
       const responseWrap = await OfferPurchase.api().offerPurchaseAcquire(
