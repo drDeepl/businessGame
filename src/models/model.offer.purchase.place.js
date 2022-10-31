@@ -22,7 +22,6 @@ export default class OfferPurchasePlace {
     };
     this.hideShow = {
       product_id: true,
-      count: true,
     };
   }
 }

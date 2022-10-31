@@ -8,20 +8,34 @@
         <v-expand-transition :hide-on-leave="true" mode="out-in">
           <div class="offer-card-content" v-if="!active">
             <div class="offer-card-item offer-card-head">
-              <v-card-title
-                v-if="isOfferProductKit"
-                class="offer-card-title pa-1"
-              >
-                <small>Комплект для продукта:</small>
+              <v-card-title class="offer-card-title pa-1">
+                <small>{{ title }}</small>
               </v-card-title>
+              <!-- v-if="!!backCardData" -->
               <v-card-subtitle
-                v-if="!!backCardData"
+                v-if="!isOfferProductKit"
                 class="pa-2 pt-4 offer-card-text-subtitle"
               >
                 <span class="offer-card-title-text">
-                  {{ backCardData.product_data.name }}
+                  <v-badge
+                    class="pl-2"
+                    color="red lighten-1"
+                    :content="badgeValue + ' шт.'"
+                    inline
+                  >
+                    <span>
+                      {{ productName }}
+                    </span>
+                  </v-badge>
                 </span>
               </v-card-subtitle>
+              <v-card-subtitle
+                v-else-if="isOfferProductKit && !!backCardData"
+                class="pa-2 pt-4 offer-card-text-subtitle"
+              >
+                {{ backCardData.product_data.name }}
+              </v-card-subtitle>
+
               <v-skeleton-loader
                 v-else
                 type="text"
@@ -114,6 +128,20 @@
 import {mapGetters} from 'vuex';
 export default {
   props: {
+    title: {
+      type: String,
+      required: false,
+      default() {
+        return '';
+      },
+    },
+    badgeValue: {
+      type: String,
+      required: false,
+      default() {
+        return '';
+      },
+    },
     traderId: {
       type: Number,
       required: false,
@@ -122,7 +150,7 @@ export default {
       type: Number,
       required: false,
       default() {
-        return '';
+        return -1;
       },
     },
     frontItem: {
@@ -156,6 +184,7 @@ export default {
       loading: false,
       traderName: null,
       backCardData: null,
+      productName: '',
     };
   },
   async created() {
@@ -163,13 +192,19 @@ export default {
     const userData = await this.$store.dispatch('user/getUser', this.traderId);
     this.traderName = userData.username;
 
-    const productKit = this.$store
-      .$db()
-      .model('productKits')
-      .query()
-      .with('product_data')
-      .find(this.backCardProductKit);
-    this.backCardData = productKit;
+    if (this.isOfferProductKit) {
+      const productKit = this.$store
+        .$db()
+        .model('productKits')
+        .query()
+        .with('product_data')
+        .find(this.backCardProductKit);
+      this.backCardData = productKit;
+    } else {
+      const product = this.$store.$db().model('products').find(this.product);
+      this.productName = product.name;
+    }
+
     this.$store.commit('shopState/SET_OFFER_PREPARE_COMPLETE');
   },
   computed: {

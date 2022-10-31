@@ -10,14 +10,13 @@ import Vuex from 'vuex';
 import vuetify from '@/plugins/vuetify';
 import Close from 'vue-material-design-icons/Close.vue';
 import Delete from 'vue-material-design-icons/Delete.vue';
+import BackupRestore from 'vue-material-design-icons/BackupRestore.vue';
 import ChevronDown from 'vue-material-design-icons/ChevronDown';
 import MainLayout from './layouts/MainLayout.vue';
 import setupInterceptors from './services/setupInterceptors';
 import VueSSE from 'vue-sse';
 
 Vue.config.productionTip = false;
-
-
 
 Vue.use(VueSSE);
 Vue.use(VeeValidate);
@@ -26,6 +25,7 @@ Vue.use(VeeValidate);
 Vue.component('arrow-icon', ChevronDown);
 Vue.component('close-icon', Close);
 Vue.component('delete-icon', Delete);
+Vue.component('restore-icon', BackupRestore);
 Vue.use(Vuex);
 
 Vue.use(MainLayout);

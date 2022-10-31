@@ -41,8 +41,9 @@ export const offer = {
     async getOffersPurchase(context) {
       context.commit('SET_GET_OFFERS_PURCHASE');
       console.warn('MODULE.OFFER: getListOffersPurchase');
-      await OfferPurchase.api().getListOfferPurchase();
+      const responseWrap = await OfferPurchase.api().getListOfferPurchase();
       context.commit('SET_GET_OFFERS_PURCHASE_COMPLETE');
+      return responseWrap.response.data;
     },
     async createOfferPurchase(context, modelOfferPurchase) {
       console.warn('MODULE.OFFER: createOfferPurchase');

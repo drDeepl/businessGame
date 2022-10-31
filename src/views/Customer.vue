@@ -44,12 +44,18 @@
         "
         :activate="forms.offerPlace.active"
         :model="models.offerPlace"
-        :disableFields="{product_id: true, count: true}"
+        :disableFields="{product_id: true}"
         :cancelForm="() => (forms.offerPlace.active = false)"
         :parentFunction="onClickCreateOffer"
         :load="offerCreate"
       />
-      <DialogError></DialogError>
+      <DialogError
+        v-if="forms.offerPlace.errors.length > 0"
+        :active="forms.offerPlace.errors.length > 0"
+        :title="forms.errorMessage.title"
+      >
+        <v-card-text>Решение: {{ forms.errorMessage.reloadPage }}</v-card-text>
+      </DialogError>
     </div>
   </div>
 </template>
@@ -64,6 +70,8 @@ import Form from '@/UI/Form.vue';
 
 import ModelProduct from '@/models/model.product';
 import OfferPurchasePlace from '@/models/model.offer.purchase.place';
+
+import ErrorMessage from '@/errors/messages';
 export default {
   data() {
     return {
@@ -76,9 +84,11 @@ export default {
         offerPlace: new OfferPurchasePlace(),
       },
       forms: {
+        errorMessage: new ErrorMessage(),
         offerPlace: {
           active: false,
           choicedProduct: '',
+          errors: [],
         },
       },
     };
@@ -126,14 +136,18 @@ export default {
       this.$store.commit('offer/SET_offerSale');
       const choicedProduct = this.forms.offerPlace.choicedProduct;
       // console.log(choicedProduct);
-      modelOfferPurchase.count = choicedProduct.count;
+      // modelOfferPurchase.count = choicedProduct.count;
       modelOfferPurchase.product_id = choicedProduct.product.id;
       console.log(modelOfferPurchase);
-      const createdOffer = await this.$store.dispatch(
-        'offer/createOfferPurchase',
-        modelOfferPurchase
-      );
-      console.log(createdOffer);
+      try {
+        await this.$store.dispatch(
+          'offer/createOfferPurchase',
+          modelOfferPurchase
+        );
+      } catch {
+        const reloadPage = new ErrorMessage().reloadPage;
+        this.forms.offerPlace.errors.push(reloadPage);
+      }
     },
   },
 

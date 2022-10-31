@@ -3,20 +3,25 @@
     <Load v-if="$store.getters['shopState/GET_STATE_CREATED']" />
 
     <v-tabs color="#6C63FF" v-else>
-      <v-tab>Предложения</v-tab>
+      <v-tab>Предложения поставщика</v-tab>
+      <v-tab>Предложения клиента</v-tab>
 
       <!-- <v-tab @click="onClickTabTransaction">Все транзакции</v-tab> -->
-      <!-- INFO: Вкладка с предложениями о покупке продуктового набора -->
+      <!-- INFO: Вкладка с предложениями о покупке продуктового набора у поставщика -->
       <v-tab-item>
-        <v-switch
+        <v-btn
           v-if="currentUserData.role == 'PLAYER'"
-          dense
-          color="green"
-          class="ml-2 pl-2"
-          v-model="getOfferUpdate"
-          label="получать новые предложения"
+          small
+          rounded
+          outlined
+          :elevation="9"
+          color="green accent-3"
+          class="mt-2 ml-2"
+          :load="offersListUpdate"
           @click="onClickUpdateOffers"
-        ></v-switch>
+        >
+          <v-spacer><restore-icon /></v-spacer>
+        </v-btn>
 
         <v-progress-circular
           v-if="offersListUpdate"
@@ -28,17 +33,18 @@
         </v-progress-circular>
         <div
           class="shop-offers offers-not-found"
-          v-else-if="arrays.offers.length == 0"
+          v-else-if="arrays.offers.sale.length == 0"
         >
           <span>нет активных предложений</span>
         </div>
         <div v-else class="cards-container">
           <v-card
             class="card-main-layout card-sheet ma-2 pa-2"
-            v-for="offer in offers"
+            v-for="offer in offersSale"
             :key="offer.id"
           >
             <OfferCard
+              title="Комплект для продукта:"
               :traderId="offer.trader"
               :product="offer.product_kit"
               :frontItem="offer"
@@ -83,58 +89,77 @@
                 </v-btn>
               </v-card-actions>
             </DialogError>
-            <DialogError
-              v-if="offerStateError"
-              :title="'произошла ошибка при покупке комплекта'"
-              :active="offerStateError"
-            >
-              <v-btn text color="red" @click="onClickCloseOfferError"
-                >закрыть</v-btn
-              >
-            </DialogError>
           </v-card>
         </div>
       </v-tab-item>
-      <!-- INFO: Вкладка с транзакциями -->
-      <!-- <v-tab-item>
-        <Load />
-        <div class="transaction-container">
-          <v-simple-table>
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th
-                    v-for="head in cards.cardTransaction.model.props"
-                    :key="head"
-                  >
-                    {{ head }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="transaction in transactions" :key="transaction.id">
-                  <td
-                    v-for="item in Object.keys(transaction).filter(
-                      (item) => !/^\$/.test(item)
-                    )"
-                    :key="item"
-                  >
-                    <span v-if="transaction[item] != null">
-                      <span v-if="/account/.test(item)">
-                        {{ getAccount(transaction[item]) }}
-                      </span>
-                      <span :class="'transaction-table-row ' + item" v-else>
-                        {{ transaction[item] }}
-                      </span>
-                    </span>
-                    <span v-else>данные отсутствуют</span>
-                  </td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
+      <!-- INFO: Вкладка с предложениями клиента о покупке -->
+      <v-tab-item>
+        <v-btn
+          v-if="currentUserData.role == 'PLAYER'"
+          small
+          rounded
+          outlined
+          :elevation="9"
+          color="green accent-3"
+          class="mt-2 ml-2"
+          :load="offersListUpdate"
+          @click="onClickUpdatePurchaseOffers"
+        >
+          <v-spacer><restore-icon /></v-spacer>
+        </v-btn>
+
+        <v-progress-circular
+          v-if="offersListUpdate"
+          color="#ee5544"
+          class="manufacturer-layout"
+          indeterminate
+          size="64"
+        >
+        </v-progress-circular>
+        <div
+          class="shop-offers offers-not-found"
+          v-else-if="arrays.offers.purchase.length == 0"
+        >
+          <span>нет активных предложений</span>
         </div>
-      </v-tab-item> -->
+        <div v-else class="cards-container">
+          <v-card
+            class="card-main-layout card-sheet ma-2 pa-2"
+            v-for="offer in offersPurchase"
+            :key="offer.id"
+          >
+            <OfferCard
+              title="Продукт"
+              :badgeValue="offer.count + ''"
+              :traderId="offer.trader"
+              :product="offer.product"
+              :frontItem="offer"
+              :frontModelItem="cards.cardOffer.frontCard.model"
+              :backModelItem="cards.cardOffer.backCard.model"
+              :backCardProductKit="offer.product_kit"
+              :showLabel="true"
+            >
+              <v-btn
+                v-if="currentUserData.role == 'PLAYER'"
+                class="buy ma-1"
+                outlined
+                rounded
+                color="#ee5544"
+                @click="onClickSaleOffer(offer)"
+              >
+                <span>Продать</span>
+              </v-btn>
+            </OfferCard>
+          </v-card>
+        </div>
+      </v-tab-item>
+      <DialogError
+        v-if="offerStateError"
+        :title="'произошла ошибка при покупке комплекта'"
+        :active="offerStateError"
+      >
+        <v-btn text color="red" @click="onClickCloseOfferError">закрыть</v-btn>
+      </DialogError>
     </v-tabs>
   </div>
 </template>
@@ -160,7 +185,7 @@ import {mapGetters} from 'vuex';
 export default {
   data: function () {
     return {
-      getOfferUpdate: false,
+      // getOfferUpdate: false,
       lowBalance: {
         isLow: false,
         offerPrice: 0,
@@ -183,10 +208,9 @@ export default {
         },
       },
       arrays: {
-        transactions: [],
         users: [],
         teams: [],
-        offers: [],
+        offers: {sale: [], purchase: []},
       },
     };
   },
@@ -204,9 +228,14 @@ export default {
       currentUserData: 'user/GET_DATA_CURRENT_USER',
       isOfferAcquireError: 'offer/GET_OFFER_ACQUIRE_ERROR',
     }),
-    offers: {
+    offersSale: {
       get() {
-        return this.arrays.offers;
+        return this.arrays.offers.sale;
+      },
+    },
+    offersPurchase: {
+      get() {
+        return this.arrays.offers.purchase;
       },
     },
 
@@ -228,7 +257,7 @@ export default {
           .all()
           .filter((key) => !!key.trader);
         console.warn(listOffersSale);
-        this.arrays.offers = listOffersSale;
+        this.arrays.offers.sale = listOffersSale;
         this.$store.commit('shopState/SET_OFFERS_UPDATED');
       }
     },
@@ -236,28 +265,17 @@ export default {
   async created() {
     this.$store.commit('shopState/SET_STATE_LOAD_mainLayout');
     this.$store.commit('shopState/SET_STATE_CREATED');
-    const roleCurrentUser = await this.$store.dispatch(
-      'user/getUserDataByUsername',
-      this.currentUser
-    ).role;
     this.$store.commit('offer/SET_OFFERS_LIST_UPDATE');
-
-    if (roleCurrentUser == 'cutomer') {
-      const listOffersPurchase = await this.$store.dispatch(
-        'offer/getOffersPurchase'
-      );
-      this.arrays.offers = listOffersPurchase;
-    } else {
-      const listOffersSale = await this.$store.dispatch('offer/getOffersSale');
-      this.arrays.offers = listOffersSale;
-      console.log(listOffersSale);
-    }
-
+    const listOffersPurchase = await this.$store.dispatch(
+      'offer/getOffersPurchase'
+    );
+    console.log(listOffersPurchase);
+    this.arrays.offers.purchase = listOffersPurchase;
+    const listOffersSale = await this.$store.dispatch('offer/getOffersSale');
+    this.arrays.offers.sale = listOffersSale;
+    console.log(listOffersSale);
     await Team.api().getListTeams();
     this.$store.commit('shopState/SET_STATE_CREATED_COMPLETE');
-    const user = this.$store.state.auth.user;
-    console.error(user);
-    console.warn('USERNAME');
   },
   mounted() {
     this.$store.commit('shopState/SET_STATE_COMPLETE_mainLayout');
@@ -299,6 +317,28 @@ export default {
       console.warn(team);
       return team ? team.name : 'команды с таким счетом не существует';
     },
+    async updateTeamBalance() {
+      this.$store.commit('team/SET_BALANCE_RUNNING');
+      const teamId = this.dataCurrentUser.team;
+      const dataTeam = this.$store
+        .$db()
+        .model('teams')
+        .query()
+        .where('id', teamId)
+        .first();
+
+      const dataAccount = await this.$store.dispatch(
+        'account/getAccountById',
+        dataTeam.account
+      );
+      console.warn(dataTeam);
+
+      this.$store.commit('team/SET_BALANCE', dataAccount.balance);
+      this.$store.commit('offer/SET_OFFER_ACQUIRE');
+      this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
+      this.$store.commit('shopState/SET_OFFERS_UPDATE_RUNNING');
+      this.$store.commit('shopState/SET_buyOffer_STATE_COMPLETE', 'RUNNING');
+    },
     async onClickTabTransaction() {
       console.warn('SHOP.VUE: onClickTabTransaction');
       const response = await Transaction.api().getListTransactions();
@@ -326,31 +366,32 @@ export default {
           );
           this.$store.$db().model('offersSale').delete(offer.id);
           console.error('OFFER ACQUIRE RESPONSE\n', response);
-          this.$store.commit('team/SET_BALANCE_RUNNING');
-          const teamId = this.dataCurrentUser.team;
-          const dataTeam = this.$store
-            .$db()
-            .model('teams')
-            .query()
-            .where('id', teamId)
-            .first();
+          await this.updateTeamBalance();
+          // this.$store.commit('team/SET_BALANCE_RUNNING');
+          // const teamId = this.dataCurrentUser.team;
+          // const dataTeam = this.$store
+          //   .$db()
+          //   .model('teams')
+          //   .query()
+          //   .where('id', teamId)
+          //   .first();
 
-          const dataAccount = await this.$store.dispatch(
-            'account/getAccountById',
-            dataTeam.account
-          );
-          console.warn(dataTeam);
-          // TODO реактивное изменение баланса
-          this.$store.commit('team/SET_BALANCE', dataAccount.balance);
-          this.$store.commit('offer/SET_OFFER_ACQUIRE');
-          console.warn(offerId);
+          // const dataAccount = await this.$store.dispatch(
+          //   'account/getAccountById',
+          //   dataTeam.account
+          // );
+          // console.warn(dataTeam);
 
-          this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
-          this.$store.commit('shopState/SET_OFFERS_UPDATE_RUNNING');
-          this.$store.commit(
-            'shopState/SET_buyOffer_STATE_COMPLETE',
-            'RUNNING'
-          );
+          // this.$store.commit('team/SET_BALANCE', dataAccount.balance);
+          // this.$store.commit('offer/SET_OFFER_ACQUIRE');
+          // console.warn(offerId);
+
+          // this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
+          // this.$store.commit('shopState/SET_OFFERS_UPDATE_RUNNING');
+          // this.$store.commit(
+          //   'shopState/SET_buyOffer_STATE_COMPLETE',
+          //   'RUNNING'
+          // );
         } catch (e) {
           console.warn(e);
           this.$store.commit(
@@ -358,22 +399,37 @@ export default {
             'RUNNING'
           );
           this.$store.commit('shopState/SET_buyOffer_STATE', 'ERROR');
-          // NOTE как обрабатытывать ошибки продажи
         }
       }
     },
 
-    onClickUpdateOffers() {
-      if (this.getOfferUpdate) {
-        console.error('LONG POLL');
-        const longPollId = setInterval(() => {
-          this.$store.commit('shopState/SET_OFFERS_UPDATE_RUNNING');
-        }, 10000);
-        this.$store.commit('shopState/SET_LONG_POLL_ID', longPollId);
-      } else {
-        console.warn('CLEAR INTERVAL');
-        console.warn(this.longPollId);
-        clearInterval(this.longPollId);
+    async onClickUpdateOffers() {
+      this.$store.commit('offer/SET_OFFERS_LIST_UPDATE');
+      const listOffersSale = await this.$store.dispatch('offer/getOffersSale');
+      this.arrays.offers.sale = listOffersSale;
+    },
+    async onClickUpdatePurchaseOffers() {
+      const listOffersSale = await this.$store.dispatch(
+        'offer/getOffersPurchase'
+      );
+      this.arrays.offers.purchase = listOffersSale.reverse();
+    },
+    async onClickSaleOffer(offer) {
+      this.$store.commit('shopState/SET_buyOffer_STATE', 'RUNNING');
+      try {
+        const offerId = offer.id;
+        const response = await this.$store.dispatch(
+          'offer/offerPurchaseAcquire',
+          offerId
+        );
+        this.$store.commit('shopState/SET_buyOffer_STATE_COMPLETE', 'RUNNING');
+        this.$store.$db().model('offersPurchase').delete(offer.id);
+        console.error('OFFER ACQUIRE RESPONSE\n', response);
+        await this.updateTeamBalance();
+      } catch (e) {
+        console.warn(e);
+        this.$store.commit('shopState/SET_buyOffer_STATE_COMPLETE', 'RUNNING');
+        this.$store.commit('shopState/SET_buyOffer_STATE', 'ERROR');
       }
     },
     onClickOkLowBalance() {

@@ -22,7 +22,13 @@
 <script>
 export default {
   props: {
-    title: {type: String, required: true},
+    title: {
+      type: String,
+      required: false,
+      default() {
+        return '';
+      },
+    },
     active: {type: Boolean, required: true},
     error: {
       type: Boolean,
