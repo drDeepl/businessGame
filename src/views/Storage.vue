@@ -7,17 +7,9 @@
       <v-tab-item>
         <!-- NOTE: данные пользователя {{ currentUserData }} -->
         <Load v-if="isGetProductKits" />
-        <div v-else-if="productKits.length == 0">
-          <p>в вашей команде ещё нет комплектов продуктов</p>
-          <p>TODO</p>
-          <p>ПЕРЕДЕЛАТЬ ЛОГИКУ ПРИГОТОВЛЕПНИЯ ПРОДУКТА</p>
-          <p>Клиент создает запрос на покупку</p>
-          <p>Пользователь принимает запрос</p>
-          <p>Запускается продажа продукта</p>
-        </div>
+        <div v-else-if="productKits.length == 0"></div>
 
         <div v-else>
-          {{ productKits[0] }}
           <div v-for="productKit in productKits" :key="productKit.id">
             <ProductKitCard
               :nameProduct="getProductName(productKit.product_kit.product)"
@@ -63,9 +55,6 @@
           <p>У вашей команды ещё нет продуктов</p>
         </div>
         <div v-else v-for="product in products" :key="product['$id']">
-          <!-- TODO: UI продуктовой карточки -->
-          {{ product }}
-
           <ProductCard
             :isProductKit="false"
             :nameProduct="product.product.name"

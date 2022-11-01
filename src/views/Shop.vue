@@ -155,9 +155,13 @@
       </v-tab-item>
       <DialogError
         v-if="offerStateError"
-        :title="'произошла ошибка при покупке комплекта'"
+        :title="errors.messages.title"
         :active="offerStateError"
       >
+        <v-card-text v-for="message in errors.offerPurchase" :key="message">
+          <span>{{ message }}</span>
+        </v-card-text>
+
         <v-btn text color="red" @click="onClickCloseOfferError">закрыть</v-btn>
       </DialogError>
     </v-tabs>
@@ -176,6 +180,7 @@ import ModelProductKit from '@/models/model.productKit';
 import Transaction from '@/store/models/Transaction';
 import Team from '@/store/models/Team';
 
+import ErrorMessage from '@/errors/messages';
 import {mapGetters} from 'vuex';
 
 // TODO: Синхронизировать данные между сервером через web socket или SSE
@@ -211,6 +216,10 @@ export default {
         users: [],
         teams: [],
         offers: {sale: [], purchase: []},
+      },
+      errors: {
+        messages: new ErrorMessage(),
+        offerPurchase: [],
       },
     };
   },
@@ -427,7 +436,14 @@ export default {
         console.error('OFFER ACQUIRE RESPONSE\n', response);
         await this.updateTeamBalance();
       } catch (e) {
-        console.warn(e);
+        console.warn(Object.keys(e));
+        if (e.response.data.includes('TeamHaveNot')) {
+          console.warn(e.response.data);
+          this.errors.offerPurchase.push(
+            this.errors.messages.teamHaveNotProduct
+          );
+        }
+
         this.$store.commit('shopState/SET_buyOffer_STATE_COMPLETE', 'RUNNING');
         this.$store.commit('shopState/SET_buyOffer_STATE', 'ERROR');
       }
