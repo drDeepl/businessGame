@@ -109,18 +109,6 @@
               </v-alert>
             </Form>
           </v-tab-item>
-          <!-- // INFO: Форма создания счета команды
-          <v-tab-item>
-            <Form
-              :activate="forms.formCreateUser.active"
-              :title="titleCurrentForm"
-              :model="forms.formCreateUser.model"
-              :select="{role: arrays.role, team_id: arrays.team}"
-              :cancelForm="onClickCancelForm"
-              :parentFunction="onClickCreateUser"
-            >
-            </Form>
-          </v-tab-item> -->
         </v-tabs>
         <!-- // INFO: Список пользователей -->
         <v-expansion-panels>
@@ -206,6 +194,37 @@
               </div>
             </v-expansion-panel-content>
           </v-expansion-panel>
+          <v-expansion-panel @click="onClickListProducts">
+            <v-expansion-panel-header>
+              <span>Список продуктов</span>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <div
+                class="admin-panel-products-layout"
+                v-if="products.length > 0"
+              >
+                <ProductCard
+                  v-for="product in products"
+                  :key="product.id"
+                  :title="{name: product.name}"
+                  :item="product"
+                  :modelItem="models.modelProduct"
+                >
+                  <v-card-actions>
+                    <v-btn
+                      color="red darken-1"
+                      icon
+                      @click="onClickDeleteProduct(product)"
+                    >
+                      <v-spacer><delete-icon /></v-spacer>
+                    </v-btn>
+                  </v-card-actions>
+                </ProductCard>
+              </div>
+              <div><v-card-text>Нет созданных продуктов</v-card-text></div>
+              <Load v-if="getProducts || isDeleteProductRun" />
+            </v-expansion-panel-content>
+          </v-expansion-panel>
         </v-expansion-panels>
       </div>
     </div>
@@ -213,9 +232,12 @@
 </template>
 
 <script>
-import Form from '@/UI/Form.vue';
+import {mapGetters} from 'vuex';
+
 import {codeErrorResponse} from '@/helpers/helper.error';
 import {createRandomUser} from '@/helpers/helper.fake';
+
+import ModelProduct from '@/models/model.product';
 import ModelUserCreate from '@/models/model.user.create';
 import ModelUpdateUser from '@/models/model.user.update';
 import ModelCreateTeam from '@/models/model.team.create';
@@ -224,6 +246,10 @@ import UserService from '@/services/user.service';
 
 import User from '@/store/models/User';
 import Team from '@/store/models/Team';
+
+import Form from '@/UI/Form.vue';
+import Load from '@/UI/Load.vue';
+import ProductCard from '@/UI/ProductCard.vue';
 
 export default {
   data() {
@@ -234,17 +260,24 @@ export default {
       loading: {
         users: true,
       },
+      expansionPanels: {
+        listProducts: {
+          open: false,
+        },
+      },
       titles:
         this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE']('SUPERUSER')[0],
       models: {
         user: new ModelUser(),
         modelCreateUser: new ModelUserCreate(),
         modelUpdateUser: new ModelUpdateUser(),
+        modelProduct: new ModelProduct(),
       },
       arrays: {
         role: null,
         teams: null, // INFO: {nameTeam: data team}
         users: null,
+        products: [],
       },
 
       forms: {
@@ -296,9 +329,7 @@ export default {
     const username = currentUser.username;
     console.error(username);
     const userData = await User.api().getUserByUsername(username);
-    // await this.$store.dispatch('user/getUserDataByUsName', username);
-    // const userData =
-    //   this.$store.getters['user/GET_USER_INFO_BY_USERNAME'](username);
+
     userData.is_superuser = true;
     if (!userData.is_superuser) {
       this.$router.push('/');
@@ -314,6 +345,10 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      getProducts: 'products/GET_STATE_getListProducts',
+      isDeleteProductRun: 'products/GET_STATE_DELETE_PRODUCT_RUN',
+    }),
     teamNames() {
       console.warn('ADMIN.VUE: teamNames');
       const listTeams = this.$store.$db().model('teams').query().all();
@@ -322,6 +357,9 @@ export default {
     },
     users() {
       return this.$store.$db().model('users').query().all();
+    },
+    products() {
+      return this.arrays.products;
     },
   },
   methods: {
@@ -425,15 +463,6 @@ export default {
       };
       await this.$store.dispatch('user/updateUser', dataForUpdateUser);
       this.$store.commit('user/SET_USER_UPDATED');
-
-      // if (responseOrError.error) {
-      //   console.warn('ERROR USER 422');
-      //   this.forms.formCreateUser.errors.push(responseOrError.error);
-      // } else {
-      //   const listUsers = this.$store.$db().model('users').query().all();
-      //   this.arrays.users = listUsers;
-      //   this.arrays.users.reverse();
-      // }
     },
 
     async onClickDeleteUser(user) {
@@ -454,10 +483,36 @@ export default {
       const new_model = createRandomUser(model);
       this.forms.formCreateUser.model.data = new_model;
     },
+    async updateListProduct() {
+      console.warn('updateListProduct');
+      const products = await this.$store.dispatch('products/getProducts');
+      this.arrays.products = products;
+    },
+    async onClickListProducts() {
+      console.warn('onClickListProducts');
+      this.$store.commit('products/SET_GET_LIST_PRODUCTS_RUN');
+      this.expansionPanels.listProducts.open =
+        !this.expansionPanels.listProducts.open;
+      if (this.expansionPanels.listProducts.open) {
+        console.log('open panel with products');
+        await this.updateListProduct();
+      }
+    },
+
+    async onClickDeleteProduct(product) {
+      console.warn('onClickDeleteProduct');
+      this.$store.commit('products/SET_DELETE_PRODUCT_RUN');
+      console.error('TODO');
+      console.log(product);
+      await this.$store.dispatch('products/deleteProduct', product.id);
+      await this.updateListProduct();
+    },
   },
 
   components: {
     Form,
+    Load,
+    ProductCard,
   },
 };
 </script>

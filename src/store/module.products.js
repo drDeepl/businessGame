@@ -55,8 +55,8 @@ export const products = {
       return responseWrap.response.data;
     },
     async deleteProduct(context, productId) {
-      const id = Number.parseInt(productId);
       console.warn('MODULE.PRODUCTS: deleteProduct');
+      const id = Number.parseInt(productId);
       const responseWrap = await Product.api().deleteProduct(id);
       console.log(responseWrap);
       context.commit('SET_DELETE_PRODUCT_COMPLETE');

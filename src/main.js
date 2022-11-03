@@ -12,6 +12,7 @@ import Close from 'vue-material-design-icons/Close.vue';
 import Delete from 'vue-material-design-icons/Delete.vue';
 import BackupRestore from 'vue-material-design-icons/BackupRestore.vue';
 import ChevronDown from 'vue-material-design-icons/ChevronDown';
+import DeleteCircleOutline from 'vue-material-design-icons/DeleteCircleOutline';
 import MainLayout from './layouts/MainLayout.vue';
 import setupInterceptors from './services/setupInterceptors';
 import VueSSE from 'vue-sse';
@@ -26,6 +27,7 @@ Vue.component('arrow-icon', ChevronDown);
 Vue.component('close-icon', Close);
 Vue.component('delete-icon', Delete);
 Vue.component('restore-icon', BackupRestore);
+Vue.component('delete-icon', DeleteCircleOutline);
 Vue.use(Vuex);
 
 Vue.use(MainLayout);
