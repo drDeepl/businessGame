@@ -55,7 +55,7 @@
           </span>
         </li>
         <li class="sidebar-logout mainLayout-sidebar-row">
-          <a class="sidebar-link" href @click.prevent="OnLogOut">Выйти </a>
+          <a class="sidebar-link" href @click="OnLogOut">Выйти </a>
         </li>
       </ul>
     </aside>
@@ -201,7 +201,9 @@ export default {
         console.warn('GET TEAMS');
         const teams = await this.$store.dispatch('team/getTeams');
         const adminRow = {title: 'Панель администратора', url: '/admin'};
+        sidebarLinks.shift();
         sidebarLinks.push(adminRow);
+
         console.warn('LIST TEAMS\n', teams);
       }
       if (roleUser == 'player' && !dataUser.is_superuser) {

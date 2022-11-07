@@ -11,6 +11,32 @@
   flex-wrap: wrap;
 }
 
-.admin-panel-products-layout {
+.manufacturer-layout {
   display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 84vw;
+}
+
+.panel-tabs.container {
+  display: flex !important;
+  justify-content: center !important;
+}
+
+@media (max-width: 480px) {
+  .panel-tabs {
+    width: 84vw !important;
+  }
+  .panel-tabs.text {
+    font-size: 3vw;
+  }
+  .panel-tabs.container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .panel-tabs.tabs {
+    width: 2vw !important;
+  }
 }

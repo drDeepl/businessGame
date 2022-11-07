@@ -14,6 +14,7 @@ export const products = {
       COMPLETE: false,
       ERROR: false,
     },
+    deleteAllProducts: false,
     arrays: {
       tabsAction: [
         {form: 'formAddProduct', label: 'Добавить продукт'},
@@ -79,6 +80,9 @@ export const products = {
     GET_STATE_DELETE_PRODUCT_ERROR: (state) => {
       return state.deleteProduct.ERROR;
     },
+    GET_DELETE_ALL_PRODUCTS: (state) => {
+      return state.deleteAllProducts;
+    },
     GET_STATE_getListProducts: (state) => {
       return state.getListProducts;
     },
@@ -142,6 +146,12 @@ export const products = {
       for (let i = 0; i < state.deleteProduct.length; i++) {
         state.deleteProduct[i] = false;
       }
+    },
+    SET_DELETE_ALL_PRODUCTS_START: function (state) {
+      state.deleteAllProducts = true;
+    },
+    SET_DELETE_ALL_PRODUCTS_COMPLETE: function (state) {
+      state.deleteAllProducts = false;
     },
     SET_LIST_PRODUCT_UPDATE_RUN: function (state) {
       state.listProductsUpdate = true;

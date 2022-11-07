@@ -16,10 +16,13 @@
 }
 
 .admin-form {
-  display: grid;
-  grid-template-columns: 25rem;
+  width: 84vw;
+  // display: grid;
+  // grid-template-columns: 25rem;
+
+  // justify-content: center;
   color: $color-purple;
-  justify-content: center;
+  background-color: $color-white !important;
 }
 
 .admin-btn-form {
@@ -83,14 +86,6 @@
   }
 }
 
-.admin-form {
-  background-color: $color-white !important;
-}
-// .edit-user-text {
-//   background-color: $color-white !important;
-//   color: black !important;
-//   z-index: 0 !important;
-// }
 .delete-icon {
   color: $color-red !important;
 }

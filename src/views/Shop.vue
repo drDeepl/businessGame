@@ -2,11 +2,24 @@
   <div class="shop-container">
     <Load v-if="$store.getters['shopState/GET_STATE_CREATED']" />
 
-    <v-tabs color="#6C63FF" v-else>
-      <v-tab>Предложения поставщика</v-tab>
-      <v-tab>Предложения клиента</v-tab>
+    <v-tabs
+      class="panel-tabs"
+      center-active
+      centered
+      fixed-tabs
+      color="#6C63FF"
+      v-else
+    >
+      <div class="panel-tabs container">
+        <v-tab class="panel-tabs tabs">
+          <span class="panel-tabs text">Предложения поставщика</span>
+        </v-tab>
 
-      <!-- <v-tab @click="onClickTabTransaction">Все транзакции</v-tab> -->
+        <v-tab class="panel-tabs tabs">
+          <span class="panel-tabs text">Предложения клиента</span>
+        </v-tab>
+      </div>
+
       <!-- INFO: Вкладка с предложениями о покупке продуктового набора у поставщика -->
       <v-tab-item>
         <v-btn
@@ -435,6 +448,7 @@ export default {
         this.$store.$db().model('offersPurchase').delete(offer.id);
         console.error('OFFER ACQUIRE RESPONSE\n', response);
         await this.updateTeamBalance();
+        await this.onClickUpdatePurchaseOffers();
       } catch (e) {
         console.warn(Object.keys(e));
         if (e.response.data.includes('TeamHaveNot')) {

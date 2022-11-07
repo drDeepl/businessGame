@@ -16,10 +16,28 @@
 
 .products-cards {
   display: grid;
-  grid-template-columns: 15rem 15rem;
+  grid-template-columns: 15em 15em;
   justify-content: center !important;
   column-gap: 2%;
   padding: 0;
+}
+
+.product-card-content {
+  width: 84vw;
+}
+
+@media (max-width: 480px) {
+  .products-cards {
+    display: flex;
+    flex-direction: column;
+    align-items: space-around;
+  }
+
+  .cards-container {
+    display: flex !important;
+    flex-direction: column;
+    align-items: space-around;
+  }
 }
 
 .offer-card {

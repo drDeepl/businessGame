@@ -1,11 +1,22 @@
 <template>
   <div class="productKit-store-page">
-    <v-tabs color="#6C63FF">
-      <v-tab>продуктовые наборы</v-tab>
-      <v-tab>продукты</v-tab>
+    <v-tabs
+      class="panel-tabs"
+      center-active
+      centered
+      fixed-tabs
+      color="#6C63FF"
+    >
+      <div class="panel-tabs container">
+        <v-tab class="panel-tabs tabs">
+          <span class="panel-tabs text">продуктовые наборы</span>
+        </v-tab>
+        <v-tab class="panel-tabs tabs">
+          <span class="panel-tabs text">продукты</span>
+        </v-tab>
+      </div>
 
       <v-tab-item>
-        <!-- NOTE: данные пользователя {{ currentUserData }} -->
         <Load v-if="isGetProductKits" />
         <div v-else-if="productKits.length == 0"></div>
 
@@ -165,12 +176,9 @@ export default {
         .first();
     },
     productKits() {
-      // TODO: show arryas through variable
-
       return this.arrays.productKits;
     },
     products() {
-      // TODO: show arryas through variable
       return this.arrays.products;
     },
     progressBar: {
@@ -201,6 +209,7 @@ export default {
           'storageTeam/getTeamProducts',
           teamId
         );
+        this.arrays.products = products;
         console.error(products);
       }
     },

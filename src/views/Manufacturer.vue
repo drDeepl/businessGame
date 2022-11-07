@@ -51,14 +51,25 @@
     >
     </Form>
     <div>
-      <v-tabs color="#6c63ff" class="manufacturer-layout mt-2">
-        <!-- <v-tab color="#6c63ff" v-for="tab in tabs.tabsView" :key="tab.view">
-          {{ tab.label }}
-        </v-tab> -->
-        <v-tab>продукты</v-tab>
-        <v-tab @click="onClickTabProductKits">продуктовые наборы</v-tab>
+      <v-tabs
+        center-active
+        centered
+        fixed-tabs
+        color="#6c63ff"
+        class="manufacturer-layout mt-2 panel-tabs"
+      >
+        <div class="panel-tabs container">
+          <v-tab class="panel-tabs tabs"
+            ><span class="panel-tabs text">продукты</span></v-tab
+          >
+
+          <v-tab class="panel-tabs tabs" @click="onClickTabProductKits">
+            <span class="panel-tabs text">продуктовые наборы</span>
+          </v-tab>
+        </div>
+
         <!-- INFO: список готовых продуктов -->
-        <v-tab-item class="mt-2">
+        <v-tab-item class="mt-2 panel-tabs">
           <Load v-if="getListProducts" />
           <p v-else-if="products.length == 0">нет готовых продуктов</p>
           <div v-else class="products-cards">
@@ -223,7 +234,6 @@ import ModelProductKit from '@/models/model.productKit';
 import CreateProduct from '@/models/model.create.product';
 import CreateProductKit from '@/models/model.productKit.create';
 import CreateSellOffer from '@/models/model.productKit.sell';
-
 
 import Form from '@/UI/Form.vue';
 import ProductCard from '@/UI/ProductCard.vue';

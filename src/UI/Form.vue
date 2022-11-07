@@ -1,7 +1,9 @@
 <template>
-  <v-dialog v-model="activate" persistent>
-    <v-form ref="form" class="admin-form pt-2 pb-2">
-      <div class="form-title">{{ title }}</div>
+  <v-dialog v-model="activate" persistent class="panel-tabs">
+    <v-form ref="form" class="admin-form panel-tabs pa-2">
+      <div class="form-title panel-tabs">
+        <span>{{ title }}</span>
+      </div>
       <!-- v-for="textField in Object.keys(model.props).filter(
           (key) => !model.hideShow[key]
         )" -->
@@ -25,7 +27,7 @@
           <v-text-field
             v-if="!disableFields.hasOwnProperty(textField)"
             color="#6c63ff"
-            class="pr-2 pl-2 ma-1 admin-field"
+            class="pr-2 pl-2 ma-1"
             v-model="createdModel[textField]"
             :label="model.props[textField]"
             :rules="form.rules[model.ruleValidate[textField]]"

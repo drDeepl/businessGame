@@ -2,19 +2,17 @@
   <div class="admin-wrapper">
     <div class="tab-wrapper">
       <div class="admin-card-wrapper">
-        <v-tabs
-          color="#6C63FF"
-          next-icon="mdi-arrow-right-bold-box-outline"
-          prev-icon="mdi-arrow-left-bold-box-outline"
-          show-arrows
-        >
-          <v-tab
-            v-for="objectTab in titles.titleTabs"
-            :key="objectTab.form"
-            @click.prevent="onClickAdminTab(objectTab.form, objectTab.title)"
-          >
-            {{ objectTab.title }}
-          </v-tab>
+        <v-tabs color="#6C63FF" class="panel-tabs">
+          <div class="panel-tabs container">
+            <v-tab
+              v-for="objectTab in titles.titleTabs"
+              :key="objectTab.form"
+              @click.prevent="onClickAdminTab(objectTab.form, objectTab.title)"
+            >
+              <span class="panel-tabs text">{{ objectTab.title }}</span>
+            </v-tab>
+          </div>
+
           <!-- // INFO: Форма создания пользователя -->
           <v-tab-item>
             <Form
@@ -199,30 +197,47 @@
               <span>Список продуктов</span>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
-              <div
-                class="admin-panel-products-layout"
-                v-if="products.length > 0"
-              >
-                <ProductCard
-                  v-for="product in products"
-                  :key="product.id"
-                  :title="{name: product.name}"
-                  :item="product"
-                  :modelItem="models.modelProduct"
+              <div v-if="products.length > 0">
+                <v-btn
+                  color="red darken-1"
+                  text
+                  :loading="isAllProductsDeleted"
+                  @click="onClickDeleteProductAll"
                 >
-                  <v-card-actions>
-                    <v-btn
-                      color="red darken-1"
-                      icon
-                      @click="onClickDeleteProduct(product)"
-                    >
-                      <v-spacer><delete-icon /></v-spacer>
-                    </v-btn>
-                  </v-card-actions>
-                </ProductCard>
+                  <span>удалить все продукты</span>
+                </v-btn>
+                // FIX Перенести в отдельный компонент CardExpansionContent
+                <v-container>
+                  <v-row
+                    class="pa-0"
+                    v-for="product in products"
+                    :key="product.id"
+                  >
+                    <v-col class="pa-1">{{ product.name }}</v-col>
+                    <v-spacer></v-spacer>
+                    <v-col class="pa-1"
+                      ><v-btn
+                        color="red darken-1"
+                        icon
+                        @click="onClickDeleteProduct(product)"
+                      >
+                        <v-spacer><delete-icon /></v-spacer> </v-btn
+                    ></v-col>
+                  </v-row>
+                </v-container>
               </div>
-              <div><v-card-text>Нет созданных продуктов</v-card-text></div>
-              <Load v-if="getProducts || isDeleteProductRun" />
+              <Load v-else-if="getProducts || isDeleteProductRun" />
+              <div v-else>
+                <v-card-text>Нет созданных продуктов</v-card-text>
+              </div>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel>
+            <v-expansion-panel-header>
+              <span>Список команд</span>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <p>IN DEVELOP</p>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
@@ -249,7 +264,7 @@ import Team from '@/store/models/Team';
 
 import Form from '@/UI/Form.vue';
 import Load from '@/UI/Load.vue';
-import ProductCard from '@/UI/ProductCard.vue';
+// import ProductCard from '@/UI/ProductCard.vue';
 
 export default {
   data() {
@@ -348,6 +363,7 @@ export default {
     ...mapGetters({
       getProducts: 'products/GET_STATE_getListProducts',
       isDeleteProductRun: 'products/GET_STATE_DELETE_PRODUCT_RUN',
+      isAllProductsDeleted: 'products/GET_DELETE_ALL_PRODUCTS',
     }),
     teamNames() {
       console.warn('ADMIN.VUE: teamNames');
@@ -507,12 +523,21 @@ export default {
       await this.$store.dispatch('products/deleteProduct', product.id);
       await this.updateListProduct();
     },
+    async onClickDeleteProductAll() {
+      console.warn('onClickDeleteProductAll');
+      this.$store.commit('products/SET_DELETE_ALL_PRODUCTS_START');
+      while (this.arrays.products.length != 0) {
+        const product = this.arrays.products.pop();
+        console.log(product);
+        await this.$store.dispatch('products/deleteProduct', product.id);
+      }
+      this.$store.commit('products/SET_DELETE_ALL_PRODUCTS_COMPLETE');
+    },
   },
 
   components: {
     Form,
     Load,
-    ProductCard,
   },
 };
 </script>
