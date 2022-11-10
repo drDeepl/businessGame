@@ -16,12 +16,15 @@
   flex-direction: column !important;
   justify-content: center !important;
   align-items: center !important;
-  width: 84vw;
 }
 
 .panel-tabs.container {
   display: flex !important;
   justify-content: center !important;
+}
+
+.panel-tabs {
+  width: 30em !important;
 }
 
 @media (max-width: 480px) {

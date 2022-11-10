@@ -1,6 +1,7 @@
 <template>
   <div class="admin-wrapper">
-    <div class="tab-wrapper">
+    <Load v-if="isRenderPage" />
+    <div v-else class="tab-wrapper">
       <div class="admin-card-wrapper">
         <v-tabs color="#6C63FF" class="panel-tabs">
           <div class="panel-tabs container">
@@ -122,7 +123,6 @@
                 v-if="arrays.users == null || arrays.users == undefined"
               ></v-progress-circular>
               <div v-else class="admin-list-users-wrapper">
-                <!-- TODO: переделать через независимый компонент -->
                 <v-card class="ma-1 pa-1 admin-row-user-card list-users-header">
                   <span
                     class="admin-users-text"
@@ -206,25 +206,25 @@
                 >
                   <span>удалить все продукты</span>
                 </v-btn>
-                // FIX Перенести в отдельный компонент CardExpansionContent
-                <v-container>
-                  <v-row
-                    class="pa-0"
-                    v-for="product in products"
-                    :key="product.id"
-                  >
-                    <v-col class="pa-1">{{ product.name }}</v-col>
-                    <v-spacer></v-spacer>
-                    <v-col class="pa-1"
-                      ><v-btn
-                        color="red darken-1"
-                        icon
-                        @click="onClickDeleteProduct(product)"
-                      >
-                        <v-spacer><delete-icon /></v-spacer> </v-btn
-                    ></v-col>
-                  </v-row>
-                </v-container>
+                <v-list>
+                  <div v-for="product in products" :key="product.id">
+                    <v-list-item>
+                      <v-list-item-icon>
+                        <v-btn
+                          color="red darken-1"
+                          icon
+                          @click="onClickDeleteProduct(product)"
+                        >
+                          <delete-icon />
+                        </v-btn>
+                      </v-list-item-icon>
+                      <v-list-item-content>
+                        {{ product.name }}
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-divider class="mt-0"></v-divider>
+                  </div>
+                </v-list>
               </div>
               <Load v-else-if="getProducts || isDeleteProductRun" />
               <div v-else>
@@ -237,7 +237,37 @@
               <span>Список команд</span>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
-              <p>IN DEVELOP</p>
+              <v-card-text v-if="teams.length == 0">
+                Список команд ещё пуст
+              </v-card-text>
+              <v-list v-else dense>
+                <v-btn
+                  text
+                  color="red"
+                  @click="onClickDeleteTeamAll"
+                  :loading="isTeamDelete"
+                >
+                  <span>удалить все команды</span>
+                </v-btn>
+                <div v-for="team in teams" :key="team.id">
+                  <v-list-item>
+                    <v-list-item-icon>
+                      <v-btn
+                        icon
+                        color="red"
+                        :loading="isTeamDelete"
+                        @click="onClickDeleteTeam(team.id)"
+                      >
+                        <delete-icon></delete-icon>
+                      </v-btn>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                      {{ team.name }}
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-divider class="pa-0 mt-0"></v-divider>
+                </div>
+              </v-list>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
@@ -269,6 +299,7 @@ import Load from '@/UI/Load.vue';
 export default {
   data() {
     return {
+      loadingData: true,
       dialog: false,
       titleCurrentForm: '',
       currentForm: '',
@@ -340,6 +371,7 @@ export default {
   },
   async created() {
     console.warn('ADMIN.VUE: created');
+    this.$store.commit('admin/SET_RENDER_PAGE_START');
     const currentUser = this.$store.state.auth.user;
     const username = currentUser.username;
     console.error(username);
@@ -357,6 +389,7 @@ export default {
       console.warn(listTeams.response.data);
       this.arrays.users = listUsers.response.data;
       this.arrays.teams = listTeams.response.data;
+      this.$store.commit('admin/SET_RENDER_PAGE_COMPLETE');
     }
   },
   computed: {
@@ -364,6 +397,8 @@ export default {
       getProducts: 'products/GET_STATE_getListProducts',
       isDeleteProductRun: 'products/GET_STATE_DELETE_PRODUCT_RUN',
       isAllProductsDeleted: 'products/GET_DELETE_ALL_PRODUCTS',
+      isTeamDelete: 'team/GET_DELETE_TEAM',
+      isRenderPage: 'admin/GET_RENDER_PAGE',
     }),
     teamNames() {
       console.warn('ADMIN.VUE: teamNames');
@@ -376,6 +411,9 @@ export default {
     },
     products() {
       return this.arrays.products;
+    },
+    teams() {
+      return this.arrays.teams;
     },
   },
   methods: {
@@ -446,7 +484,6 @@ export default {
       console.error(modelCreateTeam);
       const createdTeam = await Team.api().createTeam(modelCreateTeam);
       console.error(createdTeam);
-      // await User.api().getListUsers();
     },
 
     onClickUpdateUser(user) {
@@ -532,6 +569,20 @@ export default {
         await this.$store.dispatch('products/deleteProduct', product.id);
       }
       this.$store.commit('products/SET_DELETE_ALL_PRODUCTS_COMPLETE');
+    },
+
+    async onClickDeleteTeam(teamId) {
+      console.warn('onClickDeleteTeam');
+      this.$store.commit('team/SET_DELETE_TEAM_START');
+      await this.$store.dispatch('team/deleteTeam', teamId);
+    },
+    async onClickDeleteTeamAll() {
+      console.warn('onCLickDeleteTeamAll');
+      while (this.arrays.teams.length != 0) {
+        const team = this.arrays.teams.pop();
+        console.log(team);
+        await this.$store.dispatch('team/deleteTeam', team.id);
+      }
     },
   },
 

@@ -9,6 +9,7 @@ export const team = {
       getNames: false,
       listNamesTeams: [],
     },
+    deleteTeam: false,
     getBalance: {
       running: false,
       value: 0,
@@ -41,10 +42,14 @@ export const team = {
     async deleteTeam(context, teamId) {
       console.warn('TEAM.MODULE: deleteTeam');
       console.log(context);
+      context.commit('SET_DELETE_TEAM_COMPLETE');
       return TeamService.deleteTeam(teamId);
     },
   },
   getters: {
+    GET_DELETE_TEAM: (state) => {
+      return state.deleteTeam;
+    },
     GET_TEAM_STATE: (state) => {
       return state.getTeam;
     },
@@ -71,6 +76,12 @@ export const team = {
     },
   },
   mutations: {
+    SET_DELETE_TEAM_START: function (state) {
+      state.deleteTeam = true;
+    },
+    SET_DELETE_TEAM_COMPLETE: function (state) {
+      state.deleteTeam = false;
+    },
     SET_BALANCE: function (state, balance) {
       state.getBalance.value = balance;
     },

@@ -69,9 +69,10 @@
         </div>
 
         <!-- INFO: список готовых продуктов -->
+
         <v-tab-item class="mt-2 panel-tabs">
           <Load v-if="getListProducts" />
-          <p v-else-if="products.length == 0">нет готовых продуктов</p>
+          <span v-else-if="products.length == 0">нет готовых продуктов</span>
           <div v-else class="products-cards">
             <ProductCard
               v-for="product in products"
@@ -101,61 +102,6 @@
                   <span class="product-btn-action-text">cоздать комплект</span>
                 </v-btn>
               </v-card-actions>
-              <DialogError
-                :active="isDeleteProductRun"
-                :title="'Вы уверены, что хотите удалить продукт?'"
-              >
-                <p
-                  class="text-md-center"
-                  v-if="deleteState.data.hasOwnProperty('name')"
-                >
-                  "{{ deleteState.data.name }}"
-                </p>
-                <v-card-text class="text-md-left pl-4 mb-0 pb-0">
-                  После удаления продукта так же удалится у всех пользователей
-                  следующая информация:
-                </v-card-text>
-                <v-card-text class="text-md-left pl-4 mt-0 pt-0">
-                  <ul class="dialog-errors-container">
-                    <li class="dialog-error-li mt-2 pa-1">
-                      <span class="dialog-error-text"
-                        >продуктовые комплекты</span
-                      >
-                    </li>
-                    <li class="dialog-error-li mt-2 pa-1">
-                      <span class="dialog-error-text"
-                        >предложения в магазине</span
-                      >
-                    </li>
-                  </ul></v-card-text
-                >
-                <v-card-actions>
-                  <v-btn
-                    color="grey"
-                    rounded
-                    outlined
-                    @click="onClickCancelDeleteProduct"
-                  >
-                    <span>Отмена</span>
-                  </v-btn>
-                  <v-btn
-                    color="red"
-                    rounded
-                    outlined
-                    @click="onClicApplykDeleteProduct"
-                  >
-                    <span>Да, удалить продукт</span>
-                  </v-btn>
-                </v-card-actions>
-              </DialogError>
-              <DialogError
-                :active="isDeleteProductError"
-                :title="'При удалении продукта возникли ошибки:'"
-              >
-                <p v-for="i in Object.keys(deleteState.errors)" :key="i">
-                  {{ deleteState.errors[i] }}
-                </p>
-              </DialogError>
             </ProductCard>
           </div>
         </v-tab-item>
@@ -172,16 +118,6 @@
               :showLabel="true"
             >
               <v-card-actions class="manufacturer-card-action pa-2">
-                <!-- <v-btn
-                  v-if="dataCurrentUser.is_superuser"
-                  class="mb-1"
-                  outlined
-                  rounded
-                  color="#ee5544"
-                  @click.prevent="onClickDeleteProductKit(productKit)"
-                >
-                  <span>удалить</span>
-                </v-btn> -->
                 <slot></slot>
                 <v-btn
                   class="mr-1 btn-put-to-sell"
@@ -206,17 +142,6 @@
               :load="$store.getters['offer/GET_offerSale']"
             >
             </Form>
-            <!-- <DialogError
-              :active="isErrorDeleteProductKit"
-              title="при удалении комплекта произошла ошибка"
-            >
-              <v-btn
-                color="deep-orange"
-                text
-                @click="onClickCloseDeleteProductKitError"
-                >закрыть</v-btn
-              >
-            </DialogError> -->
           </div>
         </v-tab-item>
       </v-tabs>
@@ -225,10 +150,6 @@
 </template>
 
 <script>
-// TODO: [13.07.22]: продажу продуктовых наборов
-// TODO: [15.07.2022] Упростить подмену product_id на product_name
-// TODO: [18.07.2022] научиться в общем виде делать подмену данных формы через watch
-// TODO: [26.07.2022] Синхронизировать данные между компонентами
 import ModelProduct from '@/models/model.product';
 import ModelProductKit from '@/models/model.productKit';
 import CreateProduct from '@/models/model.create.product';
@@ -237,14 +158,14 @@ import CreateSellOffer from '@/models/model.productKit.sell';
 
 import Form from '@/UI/Form.vue';
 import ProductCard from '@/UI/ProductCard.vue';
-import DialogError from '@/UI/DialogError.vue';
+// import DialogError from '@/UI/DialogError.vue';
 import Load from '@/UI/Load.vue';
 import {mapGetters} from 'vuex';
 
 export default {
   components: {
     Load,
-    DialogError,
+
     Form,
     ProductCard,
   },

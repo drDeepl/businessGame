@@ -25,8 +25,8 @@ export default {
       }
 
       return false;
-    }
+    },
   },
-  methods: {}
+  methods: {},
 };
 </script>
