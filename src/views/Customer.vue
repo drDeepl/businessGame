@@ -52,7 +52,7 @@
       <DialogError
         v-if="forms.offerPlace.errors.length > 0"
         :active="forms.offerPlace.errors.length > 0"
-        :title="forms.errorMessage.title"
+        :title="forms.errorMessage.errorTitle"
       >
         <v-card-text>Решение: {{ forms.errorMessage.reloadPage }}</v-card-text>
       </DialogError>
@@ -71,7 +71,7 @@ import Form from '@/UI/Form.vue';
 import ModelProduct from '@/models/model.product';
 import OfferPurchasePlace from '@/models/model.offer.purchase.place';
 
-import ErrorMessage from '@/errors/messages';
+import Message from '@/helpers/messages';
 export default {
   data() {
     return {
@@ -84,7 +84,7 @@ export default {
         offerPlace: new OfferPurchasePlace(),
       },
       forms: {
-        errorMessage: new ErrorMessage(),
+        errorMessage: new Message(),
         offerPlace: {
           active: false,
           choicedProduct: '',
@@ -145,7 +145,7 @@ export default {
           modelOfferPurchase
         );
       } catch {
-        const reloadPage = new ErrorMessage().reloadPage;
+        const reloadPage = new Message().reloadPage;
         this.forms.offerPlace.errors.push(reloadPage);
       }
     },

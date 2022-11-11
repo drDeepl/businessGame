@@ -168,7 +168,7 @@
       </v-tab-item>
       <DialogError
         v-if="offerStateError"
-        :title="errors.messages.title"
+        :title="errors.messages.errorTitle"
         :active="offerStateError"
       >
         <v-card-text v-for="message in errors.offerPurchase" :key="message">
@@ -193,7 +193,7 @@ import ModelProductKit from '@/models/model.productKit';
 import Transaction from '@/store/models/Transaction';
 import Team from '@/store/models/Team';
 
-import ErrorMessage from '@/errors/messages';
+import Message from '@/helpers/messages';
 import {mapGetters} from 'vuex';
 
 // TODO: Синхронизировать данные между сервером через web socket или SSE
@@ -231,7 +231,7 @@ export default {
         offers: {sale: [], purchase: []},
       },
       errors: {
-        messages: new ErrorMessage(),
+        messages: new Message(),
         offerPurchase: [],
       },
     };

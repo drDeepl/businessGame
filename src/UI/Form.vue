@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="activate" persistent width="25em">
+  <v-dialog
+    v-model="activate"
+    persistent
+    width="25em"
+    content-class="panel-tabs"
+  >
     <v-form ref="form" class="admin-form pa-2">
       <div class="form-title">
         <span>{{ title }}</span>

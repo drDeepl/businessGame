@@ -116,80 +116,94 @@
               <span>Список пользователей</span>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
-              <v-progress-circular
-                class="manufacturer-layout"
-                indeterminate
-                size="64"
-                v-if="arrays.users == null || arrays.users == undefined"
-              ></v-progress-circular>
-              <div v-else class="admin-list-users-wrapper">
-                <v-card class="ma-1 pa-1 admin-row-user-card list-users-header">
-                  <span
-                    class="admin-users-text"
-                    v-for="title in Object.keys(listUsersHeaders)"
-                    :key="title"
-                  >
-                    {{ models.user.titleProps[title] }}</span
-                  >
-                </v-card>
-                <v-card
-                  class="admin-row-user-card ma-2 pa-3 admin-users-text"
-                  v-for="user in users"
-                  :key="user.username"
+              <v-btn
+                text
+                color="red lighten-1"
+                @click.prevent="dialogsActivate.deleteAllUsers = true"
+              >
+                <span>удалить всех пользователей</span>
+              </v-btn>
+              <DataTable
+                :items="users"
+                :modelItem="models.user"
+                :onClickDeleteItem="onClickDeleteUser"
+              />
+              <v-expand-transition :hide-on-leave="true" mode="out-in">
+                <DialogError
+                  v-if="isDeleteUserError"
+                  :active="isDeleteUserError"
+                  :title="messages.errorTitle"
                 >
-                  <span
-                    class="admin-users-text"
-                    v-for="titleProperty in Object.keys(listUsersHeaders)"
-                    :key="titleProperty"
-                    >{{ user[titleProperty] }}
-                  </span>
+                  <v-card-text class="text-display-1 text-center">
+                    {{ messages.reloadPage }}
+                  </v-card-text>
 
-                  <v-btn
-                    class="admin-row-user-btn mr-2"
-                    outlined
-                    color="#31c48d"
-                    rounded
-                    @click="onClickUpdateUser(user)"
-                    >Редактировать</v-btn
-                  >
-
-                  <v-btn
-                    outlined
-                    color="red"
-                    rounded
-                    @click="onClickDeleteUser(user)"
-                  >
-                    <delete-icon />
-                  </v-btn>
-                </v-card>
-
-                <Form
-                  :activate="forms.formUpdateUser.active"
-                  :title="titleCurrentForm"
-                  :model="forms.formUpdateUser.model"
-                  :select="{role: arrays.role, team_id: teamNames}"
-                  :parentFunction="onClickApplyUpdateUser"
-                  :values="forms.formUpdateUser.values"
-                  :cancelForm="onClickCancelForm"
-                  :load="$store.getters['user/GET_USER_UPDATING']"
+                  <v-flex align-self-center>
+                    <v-card-actions>
+                      <v-btn
+                        color="red lighten-1"
+                        text
+                        :loading="deleteUserInProgress"
+                        @click.prevent="onClickCancelDeleteUser"
+                      >
+                        закрыть
+                      </v-btn>
+                    </v-card-actions>
+                  </v-flex>
+                </DialogError>
+                <DialogError
+                  v-else
+                  :title="messages.deleteUserTitle + '?'"
+                  :active="isDeleteUser"
                 >
-                  <v-alert
-                    border="right"
-                    colored-border
-                    type="error"
-                    elevation="2"
-                    v-if="forms.formUpdateUser.errors.length > 0"
-                    class="form-error-container"
-                    >Ошибки в следующий полях:
-                    <small
-                      class="form-error-text"
-                      v-for="message in forms.formUpdateUser.errors"
-                      :key="message"
-                      >{{ forms.formUpdateUser.model.props[message] }}</small
-                    >
-                  </v-alert>
-                </Form>
-              </div>
+                  <v-card-text v-if="!!dataUserToDelete" class="text-body-2">
+                    Будет удалён пользователь с именем
+                    <span class="font-weight-bold">
+                      {{ dataUserToDelete.username }}
+                    </span>
+                  </v-card-text>
+                  <v-flex align-self-center>
+                    <v-card-actions>
+                      <v-btn
+                        color="green lighten-1"
+                        text
+                        :loading="deleteUserInProgress"
+                        @click.prevent="onClickApplyDeleteUser"
+                      >
+                        Да
+                      </v-btn>
+                      <v-btn
+                        color="red lighten-1"
+                        text
+                        @click.prevent="onClickCancelDeleteUser"
+                      >
+                        Нет
+                      </v-btn>
+                    </v-card-actions>
+                  </v-flex>
+                </DialogError>
+              </v-expand-transition>
+              <DialogError
+                :active="dialogsActivate.deleteAllUsers"
+                :title="messages.deleteAllUsersTitle"
+              >
+                <v-flex align-self-center>
+                  <v-card-actions>
+                    <v-btn
+                      @click.prevent="onClickApplyDeleteAllUsers"
+                      :loading="isDeleteAllUsers"
+                      text
+                      color="red lighten-1"
+                      >Да, удалить
+                    </v-btn>
+                    <v-btn
+                      text
+                      @click.prevent="dialogsActivate.deleteAllUsers = false"
+                      >Отмена
+                    </v-btn>
+                  </v-card-actions>
+                </v-flex>
+              </DialogError>
             </v-expansion-panel-content>
           </v-expansion-panel>
           <v-expansion-panel @click="onClickListProducts">
@@ -281,6 +295,7 @@ import {mapGetters} from 'vuex';
 
 import {codeErrorResponse} from '@/helpers/helper.error';
 import {createRandomUser} from '@/helpers/helper.fake';
+import Message from '@/helpers/messages';
 
 import ModelProduct from '@/models/model.product';
 import ModelUserCreate from '@/models/model.user.create';
@@ -294,13 +309,24 @@ import Team from '@/store/models/Team';
 
 import Form from '@/UI/Form.vue';
 import Load from '@/UI/Load.vue';
+import DataTable from '@/UI/DataTable.vue';
+import DialogError from '@/UI/DialogError.vue';
 // import ProductCard from '@/UI/ProductCard.vue';
 
 export default {
+  components: {
+    Form,
+    Load,
+    DataTable,
+    DialogError,
+  },
   data() {
     return {
+      messages: new Message(),
       loadingData: true,
-      dialog: false,
+      dialogsActivate: {
+        deleteAllUsers: false,
+      },
       titleCurrentForm: '',
       currentForm: '',
       loading: {
@@ -395,10 +421,16 @@ export default {
   computed: {
     ...mapGetters({
       getProducts: 'products/GET_STATE_getListProducts',
+      dataUserToDelete: 'admin/GET_DELETE_USER_dataUser',
       isDeleteProductRun: 'products/GET_STATE_DELETE_PRODUCT_RUN',
       isAllProductsDeleted: 'products/GET_DELETE_ALL_PRODUCTS',
       isTeamDelete: 'team/GET_DELETE_TEAM',
       isRenderPage: 'admin/GET_RENDER_PAGE',
+      isDeleteUser: 'admin/GET_DELETE_USER',
+      deleteUserInProgress: 'admin/GET_DELETE_USER_inProgress',
+      isDeleteUserError: 'admin/GET_DELETE_USER_error',
+      isDeleteAllUsers: 'admin/GET_DELETE_ALL_USERS',
+      isDeleteAllUsersError: 'admin/GET_DELETE_ALL_USERS_ERROR',
     }),
     teamNames() {
       console.warn('ADMIN.VUE: teamNames');
@@ -498,7 +530,7 @@ export default {
     async onClickApplyUpdateUser(modelUpdateUser) {
       this.forms.formCreateUser.erros = [];
       this.$store.commit('user/SET_USER_UPDATING');
-      // [07.07.2022] TODO: Сделать функцию обновления даных пользователя
+
       console.warn('ADMIN.vue: onClickUpdateUser');
       console.error(modelUpdateUser);
       const team = this.$store
@@ -518,13 +550,49 @@ export default {
       this.$store.commit('user/SET_USER_UPDATED');
     },
 
+    async onClickApplyDeleteUser() {
+      console.warn('ADMIN: onClicApplykDeleteUser');
+      this.$store.commit('admin/SET_DELETE_USER_inProgress', true);
+      const user = this.dataUserToDelete;
+      console.log(user);
+      const userId = user.id;
+      try {
+        await User.api().deleteUser(userId);
+        const users = this.$store.$db().model('users').query().all();
+        this.onClickCancelDeleteUser();
+        this.arrays.users = users;
+      } catch (e) {
+        console.error(e);
+        this.$store.commit('admin/SET_DELETE_USER_error', true);
+      } finally {
+        this.$store.commit('admin/SET_DELETE_USER_inProgress', false);
+      }
+    },
+    onClickCancelDeleteUser() {
+      this.$store.commit('admin/SET_DELETE_USER_ACTIVE', false);
+      this.$store.commit('admin/SET_DELETE_USER_DATA', null);
+      this.$store.commit('admin/SET_DELETE_USER_inProgress', false);
+      this.$store.commit('admin/SET_DELETE_USER_error', false);
+    },
     async onClickDeleteUser(user) {
-      console.warn('ADMIN: onClickDeleteUser');
-      this.$store.commit('user.SET_USER_DELETE');
-      console.error(user);
-      await User.api().deleteUser(user.id);
-      const users = this.$store.$db().model('users').query().all();
-      this.arrays.users = users;
+      console.warn('onClickDeleteUser');
+      this.$store.commit('admin/SET_DELETE_USER_ACTIVE', true);
+      this.$store.commit('admin/SET_DELETE_USER_DATA', user);
+    },
+    async onClickApplyDeleteAllUsers() {
+      // FIX deleteAllUsers
+      this.$store.commit('admin/SET_DELETE_ALL_USERS', true);
+      const users = this.arrays.users.filter((user) => !user.is_superuser);
+      for (let i = 0; i < users.length; i++) {
+        try {
+          // await this.$store.dispatch('user/deleteUser', users[i].id);
+          conosle.log(users[i].id);
+        } catch (e) {
+          this.$store.commit('admin/SET_DELETE_USER_error', true);
+        } finally {
+          this.$store.commit('admin/SET_DELETE_ALL_USERS', false);
+        }
+      }
     },
     onClickAutoCreateUser() {
       const newModel = createRandomUser(this.models.modelCreateUser);
@@ -584,11 +652,6 @@ export default {
         await this.$store.dispatch('team/deleteTeam', team.id);
       }
     },
-  },
-
-  components: {
-    Form,
-    Load,
   },
 };
 </script>

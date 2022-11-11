@@ -14,7 +14,7 @@ export default class ModelCreateTeam {
     };
     this.data = {
       name: '',
-      balance: 0,
+      balance: null,
     };
   }
 }

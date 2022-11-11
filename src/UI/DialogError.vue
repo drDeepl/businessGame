@@ -8,10 +8,13 @@
     >
       <v-card class="dialog-error" elevation="0">
         <v-card-title
-          class="offer-card-text dialog-error-title text-subtitle-1"
+          class="offer-card-text dialog-error-title font-weight-medium"
         >
-          <span class="dialog-error-title-text">{{ title }}</span>
+          <span class="dialog-error-title-text">
+            {{ title }}
+          </span>
         </v-card-title>
+        <v-divider class="mt-1"></v-divider>
 
         <slot></slot>
       </v-card>
@@ -30,13 +33,6 @@ export default {
       },
     },
     active: {type: Boolean, required: true},
-    error: {
-      type: Boolean,
-      required: false,
-      default() {
-        return true;
-      },
-    },
   },
 };
 </script>
