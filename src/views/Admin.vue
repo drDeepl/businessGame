@@ -218,7 +218,7 @@
                   :loading="isAllProductsDeleted"
                   @click="onClickDeleteProductAll"
                 >
-                  <span>удалить все продукты</span>
+                  <span>Очистить список продуктов</span>
                 </v-btn>
                 <v-list>
                   <div v-for="product in products" :key="product.id">
@@ -244,6 +244,17 @@
               <div v-else>
                 <v-card-text>Нет созданных продуктов</v-card-text>
               </div>
+              <DialogError
+                :active="isAllProductsDeleteError"
+                :title="messages.errorTtile"
+              >
+                <v-btn
+                  text
+                  color="red lighten-1"
+                  @click.prevent="onClickCloseErrorProducts"
+                  >закрыть</v-btn
+                >
+              </DialogError>
             </v-expansion-panel-content>
           </v-expansion-panel>
           <v-expansion-panel>
@@ -261,7 +272,7 @@
                   @click="onClickDeleteTeamAll"
                   :loading="isTeamDelete"
                 >
-                  <span>удалить все команды</span>
+                  <span>Очистить список команд</span>
                 </v-btn>
                 <div v-for="team in teams" :key="team.id">
                   <v-list-item>
@@ -424,6 +435,7 @@ export default {
       dataUserToDelete: 'admin/GET_DELETE_USER_dataUser',
       isDeleteProductRun: 'products/GET_STATE_DELETE_PRODUCT_RUN',
       isAllProductsDeleted: 'products/GET_DELETE_ALL_PRODUCTS',
+      isAllProductsDeleteError: 'products/GET_DELETE_ALL_PRODUCTS_ERROR',
       isTeamDelete: 'team/GET_DELETE_TEAM',
       isRenderPage: 'admin/GET_RENDER_PAGE',
       isDeleteUser: 'admin/GET_DELETE_USER',
@@ -586,7 +598,7 @@ export default {
       for (let i = 0; i < users.length; i++) {
         try {
           // await this.$store.dispatch('user/deleteUser', users[i].id);
-          conosle.log(users[i].id);
+          console.log(users[i].id);
         } catch (e) {
           this.$store.commit('admin/SET_DELETE_USER_error', true);
         } finally {
@@ -631,12 +643,18 @@ export default {
     async onClickDeleteProductAll() {
       console.warn('onClickDeleteProductAll');
       this.$store.commit('products/SET_DELETE_ALL_PRODUCTS_START');
-      while (this.arrays.products.length != 0) {
-        const product = this.arrays.products.pop();
-        console.log(product);
-        await this.$store.dispatch('products/deleteProduct', product.id);
+      try {
+        await this.$store.dispatch('products/deleteProducts', 1);
+
+        await this.updateListProduct();
+      } catch {
+        this.$store.commit('products/SET_DELETE_ALL_PRODUCTS_COMPLETE');
+        this.$store.commit('products/SET_DELETE_ALL_PRODUCTS_ERROR', true);
       }
-      this.$store.commit('products/SET_DELETE_ALL_PRODUCTS_COMPLETE');
+    },
+
+    onClickCloseErrorProducts() {
+      this.$store.commit('products/SET_DELETE_ALL_PRODUCTS_ERROR', false);
     },
 
     async onClickDeleteTeam(teamId) {

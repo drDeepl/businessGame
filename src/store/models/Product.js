@@ -30,6 +30,9 @@ export default class Product extends Model {
 
         return this.delete('products/' + id, {delete: id});
       },
+      async deleteProducts(flag) {
+        return this.delete('products/all/' + flag);
+      },
     },
   };
 }

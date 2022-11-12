@@ -14,12 +14,12 @@ export const products = {
       COMPLETE: false,
       ERROR: false,
     },
-    deleteAllProducts: false,
+    deleteAllProducts: {
+      active: false,
+      error: false,
+    },
     arrays: {
-      tabsAction: [
-        {form: 'formAddProduct', label: 'Добавить продукт'},
-        // {form: 'formSellProduct', label: 'Продать продукт'},
-      ],
+      tabsAction: [{form: 'formAddProduct', label: 'Добавить продукт'}],
       tabsView: [
         {view: 'product', label: 'Продукты'},
         {view: 'productKit', label: 'Продуктовые наборы'},
@@ -63,6 +63,13 @@ export const products = {
       context.commit('SET_DELETE_PRODUCT_COMPLETE');
       return responseWrap.response;
     },
+    async deleteProducts(context, flag) {
+      console.warn('deleteProducts');
+
+      const responseWrap = await Product.api().deleteProducts(flag);
+      context.commit('SET_DELETE_ALL_PRODUCTS_COMPLETE');
+      return responseWrap.response.data;
+    },
     async productCreate(context, createdProduct) {
       console.warn('MODULE.PRODUCTS: createProduct');
       const product = await ProductService.createProduct(createdProduct);
@@ -81,7 +88,10 @@ export const products = {
       return state.deleteProduct.ERROR;
     },
     GET_DELETE_ALL_PRODUCTS: (state) => {
-      return state.deleteAllProducts;
+      return state.deleteAllProducts.active;
+    },
+    GET_DELETE_ALL_PRODUCTS_ERROR: (state) => {
+      return state.deleteAllProducts.error;
     },
     GET_STATE_getListProducts: (state) => {
       return state.getListProducts;
@@ -101,10 +111,6 @@ export const products = {
     GET_LIST_TABS_VIEW: (state) => {
       console.warn('MODULE.PRODUCTS: GET_LIST_TABS');
       return state.arrays.tabsView;
-    },
-    GET_PRODUCT_BY_NAME: () => (productName) => {
-      console.warn('MODULE.product');
-      return Product.query().where('name', productName.toLowerCase()).get();
     },
   },
   mutations: {
@@ -148,10 +154,13 @@ export const products = {
       }
     },
     SET_DELETE_ALL_PRODUCTS_START: function (state) {
-      state.deleteAllProducts = true;
+      state.deleteAllProducts.active = true;
     },
     SET_DELETE_ALL_PRODUCTS_COMPLETE: function (state) {
-      state.deleteAllProducts = false;
+      state.deleteAllProducts.active = false;
+    },
+    SET_DELETE_ALL_PRODUCTS_ERROR: function (state, flag) {
+      state.deleteAllProducts.error = flag;
     },
     SET_LIST_PRODUCT_UPDATE_RUN: function (state) {
       state.listProductsUpdate = true;
