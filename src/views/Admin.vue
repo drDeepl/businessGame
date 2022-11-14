@@ -116,18 +116,29 @@
               <span>Список пользователей</span>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
-              <v-btn
-                text
-                color="red lighten-1"
-                @click.prevent="dialogsActivate.deleteAllUsers = true"
-              >
-                <span>удалить всех пользователей</span>
-              </v-btn>
-              <DataTable
-                :items="users"
-                :modelItem="models.user"
-                :onClickDeleteItem="onClickDeleteUser"
-              />
+              <Load v-if="panels.users.render" />
+              <div v-else>
+                <v-btn
+                  text
+                  icon
+                  color="green lighten-1"
+                  @click.prevent="updateListUsers"
+                  ><restore-icon
+                /></v-btn>
+                <v-btn
+                  text
+                  color="red lighten-1"
+                  @click.prevent="dialogDeleteActive.users = true"
+                >
+                  <span>удалить всех пользователей</span>
+                </v-btn>
+                <DataTable
+                  :items="users"
+                  :modelItem="models.user"
+                  :onClickDeleteItem="onClickDeleteUser"
+                />
+              </div>
+
               <v-expand-transition :hide-on-leave="true" mode="out-in">
                 <DialogError
                   v-if="isDeleteUserError"
@@ -184,7 +195,7 @@
                 </DialogError>
               </v-expand-transition>
               <DialogError
-                :active="dialogsActivate.deleteAllUsers"
+                :active="dialogDeleteActive.users"
                 :title="messages.deleteAllUsersTitle"
               >
                 <v-flex align-self-center>
@@ -198,7 +209,7 @@
                     </v-btn>
                     <v-btn
                       text
-                      @click.prevent="dialogsActivate.deleteAllUsers = false"
+                      @click.prevent="dialogDeleteActivator('users', false)"
                       >Отмена
                     </v-btn>
                   </v-card-actions>
@@ -272,7 +283,7 @@
                   @click="onClickDeleteTeamAll"
                   :loading="isTeamDelete"
                 >
-                  <span>Очистить список команд</span>
+                  <span>Очистить список команд(TO FIXED)</span>
                 </v-btn>
                 <div v-for="team in teams" :key="team.id">
                   <v-list-item>
@@ -333,10 +344,21 @@ export default {
   },
   data() {
     return {
+      panels: {
+        users: {
+          render: false,
+        },
+        products: {
+          render: false,
+        },
+        teams: {
+          render: false,
+        },
+      },
       messages: new Message(),
       loadingData: true,
-      dialogsActivate: {
-        deleteAllUsers: false,
+      dialogDeleteActive: {
+        users: false,
       },
       titleCurrentForm: '',
       currentForm: '',
@@ -443,6 +465,7 @@ export default {
       isDeleteUserError: 'admin/GET_DELETE_USER_error',
       isDeleteAllUsers: 'admin/GET_DELETE_ALL_USERS',
       isDeleteAllUsersError: 'admin/GET_DELETE_ALL_USERS_ERROR',
+      isGetUsers: 'user/GET_STATE_getUser',
     }),
     teamNames() {
       console.warn('ADMIN.VUE: teamNames');
@@ -461,6 +484,13 @@ export default {
     },
   },
   methods: {
+    checkRenderPanels(name, flag) {
+      this.panels[name].render = flag;
+    },
+    dialogDeleteActivator(name, flag) {
+      this.dialogDeleteActive[name] = flag;
+    },
+
     onClickAdminTab(formTitle, titleTab) {
       console.warn('ADMIN.VUE: onClickAdminTab');
       console.error(formTitle, titleTab);
@@ -529,7 +559,25 @@ export default {
       const createdTeam = await Team.api().createTeam(modelCreateTeam);
       console.error(createdTeam);
     },
+    async updateListProduct() {
+      console.warn('updateListProduct');
 
+      const products = await this.$store.dispatch('products/getProducts');
+      this.arrays.products = products;
+    },
+    async updateListUsers() {
+      this.checkRenderPanels('users', true);
+      this.$store
+        .$db()
+        .model('users')
+        .delete((user) => {
+          return !user.is_superuser;
+        });
+      const users = await this.$store.dispatch('user/getUsers');
+      this.arrays.users = users;
+      this.checkRenderPanels('users', false);
+      this.dialogDeleteActivator('users', false);
+    },
     onClickUpdateUser(user) {
       console.warn('Admin.vue: onClickUpdateUser');
       console.error('USER FROM ROW:\n', user);
@@ -592,19 +640,10 @@ export default {
       this.$store.commit('admin/SET_DELETE_USER_DATA', user);
     },
     async onClickApplyDeleteAllUsers() {
-      // FIX deleteAllUsers
       this.$store.commit('admin/SET_DELETE_ALL_USERS', true);
-      const users = this.arrays.users.filter((user) => !user.is_superuser);
-      for (let i = 0; i < users.length; i++) {
-        try {
-          // await this.$store.dispatch('user/deleteUser', users[i].id);
-          console.log(users[i].id);
-        } catch (e) {
-          this.$store.commit('admin/SET_DELETE_USER_error', true);
-        } finally {
-          this.$store.commit('admin/SET_DELETE_ALL_USERS', false);
-        }
-      }
+      await this.$store.dispatch('user/deleteUsers', 1);
+      await this.updateListUsers();
+      this.$store.commit('admin/SET_DELETE_ALL_USERS', false);
     },
     onClickAutoCreateUser() {
       const newModel = createRandomUser(this.models.modelCreateUser);
@@ -616,11 +655,7 @@ export default {
       const new_model = createRandomUser(model);
       this.forms.formCreateUser.model.data = new_model;
     },
-    async updateListProduct() {
-      console.warn('updateListProduct');
-      const products = await this.$store.dispatch('products/getProducts');
-      this.arrays.products = products;
-    },
+
     async onClickListProducts() {
       console.warn('onClickListProducts');
       this.$store.commit('products/SET_GET_LIST_PRODUCTS_RUN');
@@ -663,6 +698,7 @@ export default {
       await this.$store.dispatch('team/deleteTeam', teamId);
     },
     async onClickDeleteTeamAll() {
+      // FIX Переписать через backend
       console.warn('onCLickDeleteTeamAll');
       while (this.arrays.teams.length != 0) {
         const team = this.arrays.teams.pop();

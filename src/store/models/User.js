@@ -28,7 +28,6 @@ export default class User extends Model {
         return this.get('users');
       },
       async createUser(modelCreateUser) {
-        // FIX возврат функции
         console.warn('MODEL.USER: createUser');
         return await this.post('users', modelCreateUser);
       },
@@ -46,6 +45,10 @@ export default class User extends Model {
       },
       async deleteUser(userId) {
         return this.delete('users/' + userId, {delete: userId});
+      },
+
+      async deleteUsers(flag) {
+        return this.delete('users/delete/' + flag);
       },
       async getRoles() {
         console.warn('MODEL.USER: getRules');

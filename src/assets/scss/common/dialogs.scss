@@ -1,4 +1,6 @@
-.v-dialog {
-  position: absolute !important;
-  top: 15em !important;
+@media (max-width: 480px) {
+  .v-dialog {
+    position: absolute !important;
+    top: 15em !important;
+  }
 }

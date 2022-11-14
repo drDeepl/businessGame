@@ -25,10 +25,6 @@ export const user = {
       customer: customerSidebarLinks,
       SUPERUSER: adminSidebarLinks,
     },
-    arrays: {
-      // INFO: [JSON User]
-      usersById: {}, // INFO: idUsers: dataUsers
-    },
   },
   actions: {
     async getUserDataByUsername(context, username) {
@@ -52,10 +48,8 @@ export const user = {
       console.log(context);
       return roles;
     },
-    async getUsers(context) {
+    async getUsers() {
       const users = await UserService.getUsersList();
-      context.commit('SET_USERS_LIST', users);
-
       return users;
     },
     async createUser(context, modelCreateUser) {
@@ -75,6 +69,13 @@ export const user = {
     async deleteUser(context, userId) {
       console.warn('MODULE.USER: deleteUser');
       const responseWrap = await User.api().deleteUser(userId);
+      context.commit('SET_USER_DELETED');
+      return responseWrap.response;
+    },
+
+    async deleteUsers(context, flag) {
+      console.warn('MODULE.USER: deleteUsers');
+      const responseWrap = await User.api().deleteUsers(flag);
       context.commit('SET_USER_DELETED');
       return responseWrap.response;
     },
@@ -131,10 +132,6 @@ export const user = {
     SET_USER_INFO: function (state, userData) {
       console.warn('MODULE.USER: SET_USER_INFO');
       state.userInfo[userData.username] = userData;
-    },
-    SET_USERS_LIST: function (state, users) {
-      console.warn('MODULE.USER: SET_USERS_LIST');
-      state.arrays.users = users;
     },
 
     SET_USER_UPDATED: function (state) {

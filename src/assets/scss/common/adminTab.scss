@@ -16,14 +16,18 @@
 }
 
 .admin-form {
-  width: 84vw;
-
   // display: grid;
   // grid-template-columns: 25rem;
 
   // justify-content: center;
   color: $color-purple;
   background-color: $color-white !important;
+}
+
+@media (max-width: 480px) {
+  .admin-form {
+    width: 84vw;
+  }
 }
 
 .admin-btn-form {
