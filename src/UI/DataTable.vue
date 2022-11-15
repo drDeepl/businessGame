@@ -45,10 +45,16 @@ export default {
   },
   created() {
     this.render = true;
-    const headers = this.modelItem.props.filter(
-      (item) => !this.modelItem.hideShow[item]
-    );
-    this.headers = headers;
+
+    try {
+      const headers = this.modelItem.props.filter(
+        (item) => !this.modelItem.hideShow[item]
+      );
+      this.headers = headers;
+    } catch {
+      this.headers = Object.keys(this.modelItem.props);
+    }
+
     this.render = false;
   },
 

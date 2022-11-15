@@ -231,7 +231,12 @@
                 >
                   <span>Очистить список продуктов</span>
                 </v-btn>
-                <v-list>
+                <DataTable
+                  :items="products"
+                  :modelItem="models.modelProduct"
+                  :onClickDeleteItem="onClickDeleteProduct"
+                />
+                <!-- <v-list>
                   <div v-for="product in products" :key="product.id">
                     <v-list-item>
                       <v-list-item-icon>
@@ -249,9 +254,9 @@
                     </v-list-item>
                     <v-divider class="mt-0"></v-divider>
                   </div>
-                </v-list>
+                </v-list> -->
               </div>
-              <Load v-else-if="getProducts || isDeleteProductRun" />
+              <Load v-else-if="panels.products" />
               <div v-else>
                 <v-card-text>Нет созданных продуктов</v-card-text>
               </div>
@@ -677,6 +682,7 @@ export default {
     },
     async onClickDeleteProductAll() {
       console.warn('onClickDeleteProductAll');
+
       this.$store.commit('products/SET_DELETE_ALL_PRODUCTS_START');
       try {
         await this.$store.dispatch('products/deleteProducts', 1);

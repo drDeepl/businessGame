@@ -4,6 +4,10 @@ export default class ModelProduct {
       id: 'id',
       name: 'продукт',
     };
+    this.titleProps = {
+      id: 'id',
+      name: 'продукт',
+    };
     this.types = {
       id: 'number',
       name: 'string',
