@@ -5,7 +5,7 @@
       <template v-slot:default>
         <thead>
           <tr>
-            <th>
+            <th v-if="haveDeleteFunc">
               <span>Действие</span>
             </th>
             <th v-for="title in headers" :key="title">
@@ -17,7 +17,7 @@
         </thead>
         <tbody>
           <tr v-for="item in items" :key="item.id">
-            <td>
+            <td v-if="haveDeleteFunc">
               <v-btn
                 color="red lighten-1"
                 icon
@@ -52,7 +52,9 @@ export default {
       );
       this.headers = headers;
     } catch {
-      this.headers = Object.keys(this.modelItem.props);
+      this.headers = this.modelItem.props.filter(
+        (item) => item.toLowerCase() != 'id'
+      );
     }
 
     this.render = false;
@@ -61,6 +63,13 @@ export default {
   props: {
     items: {type: Array, required: true},
     modelItem: {type: Object, required: true},
+    haveDeleteFunc: {
+      type: Boolean,
+      required: false,
+      default() {
+        return false;
+      },
+    },
     onClickDeleteItem: {type: Function, required: false},
   },
   data() {

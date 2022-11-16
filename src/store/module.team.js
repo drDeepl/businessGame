@@ -1,4 +1,3 @@
-import TeamService from '@/services/team.service';
 import Team from './models/Team';
 export const team = {
   namespaced: true,
@@ -35,15 +34,22 @@ export const team = {
     async createTeam(context, dataForCreate) {
       console.warn('MODULE.TEAM: createTeam');
       console.error(dataForCreate);
-      const dataTeam = await TeamService.createTeam(dataForCreate);
-      context.commit('SET_TEAM_DATA', dataTeam);
-      context.commit('SET_TEAM_DATA_BY_NAME', [dataTeam]);
+      const responseWrap = await Team.api().createTeam(dataForCreate);
+      return responseWrap.response.data;
     },
     async deleteTeam(context, teamId) {
       console.warn('TEAM.MODULE: deleteTeam');
       console.log(context);
       context.commit('SET_DELETE_TEAM_COMPLETE');
-      return TeamService.deleteTeam(teamId);
+      const responseWrap = await Team.api().removeTeam(teamId);
+      return responseWrap.response.data;
+    },
+    async deleteTeams(context) {
+      console.warn('TEAM.MODULE: deleteTeam');
+      console.log(context);
+      context.commit('SET_DELETE_TEAM_COMPLETE');
+      const responseWrap = await Team.api().deleteTeams();
+      return responseWrap.response.data;
     },
   },
   getters: {

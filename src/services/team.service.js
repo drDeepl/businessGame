@@ -1,5 +1,5 @@
 import teamAPI from '@/api/team.api';
-import Team from '@/models/model.team';
+import ModelTeam from '@/models/model.team';
 import {createModelFromResponseData} from '@/helpers/helper.model';
 import teamApi from '../api/team.api';
 
@@ -14,7 +14,7 @@ class teamService {
     console.warn('TEAM.SERVICE: getDataTeam');
     const response = await teamAPI.getTeamInfo(teamId);
     if (response.status == 200) {
-      let model = new Team();
+      let model = new ModelTeam();
       const dataTeam = createModelFromResponseData(model, response.data);
       return dataTeam;
     } else {

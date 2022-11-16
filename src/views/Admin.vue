@@ -135,6 +135,7 @@
                 <DataTable
                   :items="users"
                   :modelItem="models.user"
+                  :haveDeleteFunc="true"
                   :onClickDeleteItem="onClickDeleteUser"
                 />
               </div>
@@ -234,29 +235,11 @@
                 <DataTable
                   :items="products"
                   :modelItem="models.modelProduct"
+                  :haveDeleteFunc="true"
                   :onClickDeleteItem="onClickDeleteProduct"
                 />
-                <!-- <v-list>
-                  <div v-for="product in products" :key="product.id">
-                    <v-list-item>
-                      <v-list-item-icon>
-                        <v-btn
-                          color="red darken-1"
-                          icon
-                          @click="onClickDeleteProduct(product)"
-                        >
-                          <delete-icon />
-                        </v-btn>
-                      </v-list-item-icon>
-                      <v-list-item-content>
-                        {{ product.name }}
-                      </v-list-item-content>
-                    </v-list-item>
-                    <v-divider class="mt-0"></v-divider>
-                  </div>
-                </v-list> -->
               </div>
-              <Load v-else-if="panels.products" />
+              <Load v-else-if="panels.products.render" />
               <div v-else>
                 <v-card-text>Нет созданных продуктов</v-card-text>
               </div>
@@ -285,29 +268,28 @@
                 <v-btn
                   text
                   color="red"
-                  @click="onClickDeleteTeamAll"
-                  :loading="isTeamDelete"
+                  @click="dialogDeleteActivator('teamAll', true)"
                 >
                   <span>Очистить список команд(TO FIXED)</span>
                 </v-btn>
-                <div v-for="team in teams" :key="team.id">
-                  <v-list-item>
-                    <v-list-item-icon>
-                      <v-btn
-                        icon
-                        color="red"
-                        :loading="isTeamDelete"
-                        @click="onClickDeleteTeam(team.id)"
-                      >
-                        <delete-icon></delete-icon>
-                      </v-btn>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                      {{ team.name }}
-                    </v-list-item-content>
-                  </v-list-item>
-                  <v-divider class="pa-0 mt-0"></v-divider>
-                </div>
+
+                <DataTable :items="teams" :modelItem="models.modelTeam" />
+                <DialogError
+                  :title="messages.deleteTeam"
+                  :active="dialogDeleteActive.teamAll"
+                >
+                  <v-card-text>
+                    {{ messages.deleteTeamDescription }}
+                  </v-card-text>
+                  <v-btn
+                    text
+                    color="red lighten-1"
+                    :loading="isTeamDelete"
+                    @click.prevent="onClickDeleteTeamAll"
+                  >
+                    Да, удалить
+                  </v-btn>
+                </DialogError>
               </v-list>
             </v-expansion-panel-content>
           </v-expansion-panel>
@@ -328,6 +310,7 @@ import ModelProduct from '@/models/model.product';
 import ModelUserCreate from '@/models/model.user.create';
 import ModelUpdateUser from '@/models/model.user.update';
 import ModelCreateTeam from '@/models/model.team.create';
+import ModelTeam from '@/models/model.team';
 import ModelUser from '@/models/model.user';
 import UserService from '@/services/user.service';
 
@@ -364,6 +347,8 @@ export default {
       loadingData: true,
       dialogDeleteActive: {
         users: false,
+        team: false,
+        teamAll: false,
       },
       titleCurrentForm: '',
       currentForm: '',
@@ -382,6 +367,7 @@ export default {
         modelCreateUser: new ModelUserCreate(),
         modelUpdateUser: new ModelUpdateUser(),
         modelProduct: new ModelProduct(),
+        modelTeam: new ModelTeam(),
       },
       arrays: {
         role: null,
@@ -561,8 +547,12 @@ export default {
     async onClickCreateTeam(modelCreateTeam) {
       console.warn('ADMIN.VUE: onClickCreateTeam');
       console.error(modelCreateTeam);
-      const createdTeam = await Team.api().createTeam(modelCreateTeam);
-      console.error(createdTeam);
+      // const createdTeam = await Team.api().createTeam(modelCreateTeam);
+      const team = await this.$store.dispatch(
+        'team/createTeam',
+        modelCreateTeam
+      );
+      this.arrays.teams.push(team);
     },
     async updateListProduct() {
       console.warn('updateListProduct');
@@ -664,11 +654,12 @@ export default {
     async onClickListProducts() {
       console.warn('onClickListProducts');
       this.$store.commit('products/SET_GET_LIST_PRODUCTS_RUN');
-      this.expansionPanels.listProducts.open =
-        !this.expansionPanels.listProducts.open;
-      if (this.expansionPanels.listProducts.open) {
+      this.checkRenderPanels('products', true);
+      if (this.panels.products) {
         console.log('open panel with products');
+
         await this.updateListProduct();
+        this.checkRenderPanels('products', false);
       }
     },
 
@@ -698,19 +689,22 @@ export default {
       this.$store.commit('products/SET_DELETE_ALL_PRODUCTS_ERROR', false);
     },
 
-    async onClickDeleteTeam(teamId) {
+    async onClickDeleteTeam(team) {
       console.warn('onClickDeleteTeam');
       this.$store.commit('team/SET_DELETE_TEAM_START');
+      const teamId = team.id;
+      console.log(teamId);
       await this.$store.dispatch('team/deleteTeam', teamId);
+      const teams = this.$store.$db().model('teams').all();
+      this.arrays.teams = teams;
+      this.$store.commit('team/SET_DELETE_TEAM_COMPLETE');
     },
     async onClickDeleteTeamAll() {
-      // FIX Переписать через backend
       console.warn('onCLickDeleteTeamAll');
-      while (this.arrays.teams.length != 0) {
-        const team = this.arrays.teams.pop();
-        console.log(team);
-        await this.$store.dispatch('team/deleteTeam', team.id);
-      }
+      this.$store.commit('team/SET_DELETE_TEAM_START');
+      await this.$store.dispatch('team/deleteTeams');
+      this.arrays.teams = [];
+      this.dialogDeleteActivator('teamAll', false);
     },
   },
 };

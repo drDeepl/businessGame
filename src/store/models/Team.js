@@ -29,22 +29,27 @@ export default class Team extends Model {
         console.warn('MODEL.TEAM: getTeam');
         return this.get('teams/' + teamId);
       },
-    },
-    async getParticipantsTeams(teamId) {
-      console.warn('MODEL.TEAM: getParticipantsTeams');
-      return this.get('team/' + teamId + '/participants');
-    },
-    async movePlayer(modelMovePlayer) {
-      console.warn('MODEL.TEAM: movePlayer');
-      return this.put('teams/', modelMovePlayer);
-    },
-    async renameTeam(teamId, nameTeam) {
-      console.warn('MODEL.TEAM: renameTeam');
-      return this.put('team/' + teamId + '/' + nameTeam);
-    },
-    async removeTeam(teamId) {
-      console.warn('MODEL.TEAM: removeTeam');
-      return this.delete('teams/' + teamId);
+      async getParticipantsTeams(teamId) {
+        console.warn('MODEL.TEAM: getParticipantsTeams');
+        return this.get('teams/' + teamId + '/participants');
+      },
+      async movePlayer(modelMovePlayer) {
+        console.warn('MODEL.TEAM: movePlayer');
+        return this.put('teams/', modelMovePlayer);
+      },
+      async renameTeam(teamId, nameTeam) {
+        console.warn('MODEL.TEAM: renameTeam');
+        return this.put('teams/' + teamId + '/' + nameTeam);
+      },
+
+      async removeTeam(teamId) {
+        console.warn('MODEL.TEAM: removeTeam');
+        return this.delete('teams/' + teamId, {delete: teamId});
+      },
+
+      async deleteTeams() {
+        return this.delete('teams-delete/' + 1);
+      },
     },
   };
 }
