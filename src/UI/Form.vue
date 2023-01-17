@@ -5,7 +5,11 @@
     width="25em"
     content-class="panel-tabs"
   >
-    <v-form ref="form" class="admin-form pa-2">
+    <v-form
+      ref="form"
+      class="admin-form pa-2"
+      @submit.prevent="onClickApplyForm"
+    >
       <div class="form-title">
         <span>{{ title }}</span>
       </div>

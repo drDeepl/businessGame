@@ -126,7 +126,7 @@
                   color="#ee5544"
                   @click.prevent="onClickSellProductKit(productKit)"
                 >
-                  <span class="btn-put-to-sell-text">выставить на продажу</span>
+                  <span class="btn-put-to-sell-text">Продать</span>
                 </v-btn>
               </v-card-actions>
             </ProductCard>
@@ -141,6 +141,14 @@
               :cancelForm="onClickCancelForm"
               :load="$store.getters['offer/GET_offerSale']"
             >
+              <v-select
+                class="form-slot"
+                :items="arrays.teams"
+                color="#6c63ff"
+                item-color="#6c63ff"
+                label="Какой команде продаём?"
+              >
+              </v-select>
             </Form>
           </div>
         </v-tab-item>
@@ -174,6 +182,7 @@ export default {
       arrays: {
         products: [],
         productKits: [],
+        teams: [],
       },
       deleteState: {
         errors: [],
@@ -229,6 +238,11 @@ export default {
   async created() {
     console.warn('MANUFACTURER.VUE: CREATED');
     const products = await this.$store.dispatch('products/getProducts');
+    const teams = await this.$store.dispatch('team/getTeams');
+    const teamNames = teams.map((item) => {
+      return item.name;
+    });
+    this.arrays.teams = teamNames;
 
     this.arrays.products = products;
   },
@@ -407,10 +421,13 @@ export default {
       this.forms.activeForm = 'formSellProductKit';
       this.forms.titleForm = 'выставить на продажу';
       this.forms.formSellProductKit.disableFields['product_kit_id'] = true;
+      this.forms.formSellProductKit.disableFields['toTeam'] = true;
+
       this.forms.formSellProductKit.model.data['product_kit_id'] =
         productKit.id;
-
       this.forms.formSellProductKit.active = true;
+
+      console.warn(this.arrays.teams);
     },
     async onClickApplySellProductKit(saleOfferProductKit) {
       console.warn('MANUFACTURER: onClickApplySellProductKit');
