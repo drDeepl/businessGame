@@ -141,14 +141,15 @@
               :cancelForm="onClickCancelForm"
               :load="$store.getters['offer/GET_offerSale']"
             >
-              <v-select
+              <!-- <v-select
                 class="form-slot"
                 :items="arrays.teams"
                 color="#6c63ff"
                 item-color="#6c63ff"
                 label="Какой команде продаём?"
+                :v-model="forms.formSellProductKit.model.data.toTeam"
               >
-              </v-select>
+              </v-select> -->
             </Form>
           </div>
         </v-tab-item>
@@ -421,7 +422,8 @@ export default {
       this.forms.activeForm = 'formSellProductKit';
       this.forms.titleForm = 'выставить на продажу';
       this.forms.formSellProductKit.disableFields['product_kit_id'] = true;
-      this.forms.formSellProductKit.disableFields['toTeam'] = true;
+      this.forms.formSellProductKit.select['toTeam'] = this.arrays.teams;
+      // this.forms.formSellProductKit.disableFields['toTeam'] = true;
 
       this.forms.formSellProductKit.model.data['product_kit_id'] =
         productKit.id;
@@ -431,17 +433,41 @@ export default {
     },
     async onClickApplySellProductKit(saleOfferProductKit) {
       console.warn('MANUFACTURER: onClickApplySellProductKit');
+      console.log(saleOfferProductKit);
+      const nameTeam = saleOfferProductKit.toTeam;
+      const team = this.$store
+        .$db()
+        .model('teams')
+        .query()
+        .where('name', nameTeam)
+        .first();
+      console.log(team);
+      const accountTeam = team.account;
+      console.log(`id's account of team: ${accountTeam}`);
+      // NOTE: Протестить
+      // NOTE: const offerSalePlace = await this.$store.dispatch(
+      // NOTE:   'offer/offerSalePlace',
+      // NOTE:   {
+      // NOTE:     price: saleOfferProductKit.price,
+      // NOTE:     product_kit_id: saleOfferProductKit.product_kit_id,
+      // NOTE:   }
+      // NOTE: );
+      // NOTE: const offerId = offerSalePlace.id;
+      // NOTE: const offerSaleAcquire = await this.$store.dispatch(
+      // NOTE:   'offer/offerSaleAcquire',
+      // NOTE:   offerId
+      // NOTE: );
+      // NOTE: console.log(offerSaleAcquire);
+      // NOTE: this.$store.commit('offer/SET_offerSale');
+      // NOTE: console.warn(saleOfferProductKit);
+      // NOTE: saleOfferProductKit.price = Number.parseInt(saleOfferProductKit.price);
+      // NOTE: console.error(saleOfferProductKit);
 
-      this.$store.commit('offer/SET_offerSale');
-      console.warn(saleOfferProductKit);
-      saleOfferProductKit.price = Number.parseInt(saleOfferProductKit.price);
-      console.error(saleOfferProductKit);
-
-      const offer = await this.$store.dispatch(
-        'offer/offerSalePlace',
-        saleOfferProductKit
-      );
-      console.error(offer);
+      // const offer = await this.$store.dispatch(
+      //   'offer/offerSalePlace',
+      //   saleOfferProductKit
+      // );
+      // console.error(offer);
     },
     onClickCancelForm() {
       console.warn('MANUFACTURER.VUE: onClickCancelForm');
