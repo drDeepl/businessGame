@@ -5,10 +5,6 @@ class TokenAPI {
     return instance.post(subdomain + '/verify', {token: token});
   }
 
-  pair(user) {
-    return instance.post(subdomain + '/pair', user);
-  }
-
   refresh(refresh) {
     return instance.post(subdomain + '/refresh', refresh);
   }

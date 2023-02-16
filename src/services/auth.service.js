@@ -18,6 +18,7 @@ class AuthService {
     console.log('Obtain.Token');
     createModelFromResponseData(obtainToken, data);
     TokenService.setUser(obtainToken);
+    console.log(response);
     return response.response;
   }
 

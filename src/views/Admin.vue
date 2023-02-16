@@ -20,7 +20,7 @@
               :activate="forms.formCreateUser.active"
               :title="titleCurrentForm"
               :model="forms.formCreateUser.model"
-              :select="{role: arrays.role, team_id: teamNames}"
+              :select="{role: arrays.role, team_id: arrays.namesTeam}"
               :disableFields="{team_id: true}"
               :cancelForm="onClickCancelForm"
               :parentFunction="onClickCreateUser"
@@ -35,11 +35,11 @@
                 >
                   <v-select
                     attach
-                    v-if="teamNames.length > 0"
+                    v-if="arrays.teamNames.length > 0"
                     color="#6c63ff"
                     class="pr-2 pl-2 ma-1 admin-form-create-user-select-team"
                     v-model="forms.formCreateUser.model.data.team_id"
-                    :items="teamNames"
+                    :items="arrays.teamNames"
                     :label="forms.formCreateUser.model.props.team_id"
                     :rules="[(v) => !!v || 'Поле не может быть пустым']"
                   >
@@ -133,7 +133,7 @@
                   <span>удалить всех пользователей</span>
                 </v-btn>
                 <DataTable
-                  :items="users"
+                  :items="arrays.users"
                   :modelItem="models.user"
                   :haveDeleteFunc="true"
                   :onClickDeleteItem="onClickDeleteUser"
@@ -261,7 +261,7 @@
               <span>Список команд</span>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
-              <v-card-text v-if="teams.length == 0">
+              <v-card-text v-if="arrays.teams.length == 0">
                 Список команд ещё пуст
               </v-card-text>
               <v-list v-else dense>
@@ -273,7 +273,10 @@
                   <span>Очистить список команд(TO FIXED)</span>
                 </v-btn>
 
-                <DataTable :items="teams" :modelItem="models.modelTeam" />
+                <DataTable
+                  :items="arrays.teams"
+                  :modelItem="models.modelTeam"
+                />
                 <DialogError
                   :title="messages.deleteTeam"
                   :active="dialogDeleteActive.teamAll"
@@ -374,6 +377,7 @@ export default {
         teams: null, // INFO: {nameTeam: data team}
         users: null,
         products: [],
+        namesTeam: [],
       },
 
       forms: {
@@ -433,12 +437,15 @@ export default {
     } else {
       this.arrays.role = await UserService.getRoles();
 
-      const listTeams = await Team.api().getListTeams();
+      const listTeams = (await Team.api().getListTeams()).response.data.items;
+      // const teamNames = listTeams.response.data.map((team) => team.name);
+      console.log(listTeams);
+      let listUsers = (await User.api().getListUsers()).response.data.items;
 
-      let listUsers = await User.api().getListUsers();
-      console.warn(listTeams.response.data);
-      this.arrays.users = listUsers.response.data;
-      this.arrays.teams = listTeams.response.data;
+      this.arrays.users = listUsers;
+      this.arrays.teams = listTeams;
+      this.arrays.teamNames = listTeams.map((team) => team.name);
+      console.log(listTeams);
       this.$store.commit('admin/SET_RENDER_PAGE_COMPLETE');
     }
   },
@@ -458,21 +465,21 @@ export default {
       isDeleteAllUsersError: 'admin/GET_DELETE_ALL_USERS_ERROR',
       isGetUsers: 'user/GET_STATE_getUser',
     }),
-    teamNames() {
-      console.warn('ADMIN.VUE: teamNames');
-      const listTeams = this.$store.$db().model('teams').query().all();
-      let namesTeam = listTeams.map((team) => team.name);
-      return namesTeam;
-    },
+    // teamNames() {
+    //   console.warn('ADMIN.VUE: teamNames');
+    //   let listTeams = this.$store.$db().model('teams').query().all();
+    //   let namesTeam = listTeams.map((team) => team.name);
+    //   return namesTeam;
+    // },
     users() {
       return this.$store.$db().model('users').query().all();
     },
     products() {
       return this.arrays.products;
     },
-    teams() {
-      return this.arrays.teams;
-    },
+    // teams() {
+    //   return this.arrays.teams;
+    // },
   },
   methods: {
     checkRenderPanels(name, flag) {
@@ -531,9 +538,10 @@ export default {
           'user/createUser',
           modelCreateUser
         );
+        const user = responseWrap.response.data;
         console.error('CREATED USER\n', responseWrap.response.data);
-        const listUsers = this.$store.$db().model('users').query().all();
-        this.arrays.users = listUsers;
+
+        this.arrays.users.push(user);
       } catch (e) {
         console.warn(e);
         const errorCode = codeErrorResponse(e);
@@ -547,7 +555,7 @@ export default {
     async onClickCreateTeam(modelCreateTeam) {
       console.warn('ADMIN.VUE: onClickCreateTeam');
       console.error(modelCreateTeam);
-      // const createdTeam = await Team.api().createTeam(modelCreateTeam);
+
       const team = await this.$store.dispatch(
         'team/createTeam',
         modelCreateTeam
@@ -613,9 +621,12 @@ export default {
       const userId = user.id;
       try {
         await User.api().deleteUser(userId);
-        const users = this.$store.$db().model('users').query().all();
+
+        let newUsersArray = this.arrays.users.filter(
+          (element) => element.id != userId
+        );
+        this.arrays.users = newUsersArray;
         this.onClickCancelDeleteUser();
-        this.arrays.users = users;
       } catch (e) {
         console.error(e);
         this.$store.commit('admin/SET_DELETE_USER_error', true);

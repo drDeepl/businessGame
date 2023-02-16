@@ -14,7 +14,7 @@
         ><span class="manufacturer-action-text">{{ tab.label }}</span>
       </v-btn>
     </div>
-    <!-- INFO: Форма создания продукта  -->
+    <!-- // INFO: Форма создания продукта  -->
     <Form
       :activate="forms.formAddProduct.active"
       :title="forms.titleForm"
@@ -38,7 +38,7 @@
         </ul>
       </v-alert>
     </Form>
-    <!-- INFO: Форма создания продуктового набора-->
+    <!-- // INFO: Форма создания продуктового набора-->
     <Form
       :activate="forms.formAddProductKit.active"
       :title="forms.titleForm"
@@ -72,10 +72,14 @@
 
         <v-tab-item class="mt-2 panel-tabs">
           <Load v-if="getListProducts" />
-          <span v-else-if="products.length == 0">нет готовых продуктов</span>
+          <span v-else-if="arrays.products.length == 0">
+            нет готовых продуктов
+            {{ arrays.products }}
+          </span>
+
           <div v-else class="products-cards">
             <ProductCard
-              v-for="product in products"
+              v-for="product in arrays.products"
               :key="product.id"
               :item="product"
               :title="{name: product.name}"
@@ -105,15 +109,20 @@
             </ProductCard>
           </div>
         </v-tab-item>
-        <!-- INFO: список готовых продуктовых наборов -->
-        <!-- FIX  v-tab-item v-if="isGetProductKits" -->
+        <!-- // INFO: список готовых продуктовых наборов -->
+
         <v-tab-item class="mt-2">
-          <div class="products-cards">
+          <Load v-if="render.content" />
+          <div class="products-cards" v-if="arrays.products.length > 0">
             <ProductCard
-              v-for="productKit in productKits"
+              v-for="productKit in productKits.items"
               :key="productKit.id"
               :item="productKit"
-              :title="{product: getProduct(productKit.product).name}"
+              :title="{
+                title: arrays.products.find(
+                  (item) => item.id == productKit.product
+                ).name,
+              }"
               :modelItem="modelsCard.productKit"
               :showLabel="true"
             >
@@ -141,16 +150,19 @@
               :cancelForm="onClickCancelForm"
               :load="$store.getters['offer/GET_offerSale']"
             >
-              <!-- <v-select
+              <v-select
                 class="form-slot"
-                :items="arrays.teams"
+                :items="arrays.namesTeam"
                 color="#6c63ff"
                 item-color="#6c63ff"
-                label="Какой команде продаём?"
+                label="Продажа продукта команде:"
                 :v-model="forms.formSellProductKit.model.data.toTeam"
               >
-              </v-select> -->
+              </v-select>
             </Form>
+          </div>
+          <div v-else>
+            <p>Заготовленные продуктовые наборы отсутствуют</p>
           </div>
         </v-tab-item>
       </v-tabs>
@@ -167,7 +179,7 @@ import CreateSellOffer from '@/models/model.productKit.sell';
 
 import Form from '@/UI/Form.vue';
 import ProductCard from '@/UI/ProductCard.vue';
-// import DialogError from '@/UI/DialogError.vue';
+// FIX: import DialogError from '@/UI/DialogError.vue';
 import Load from '@/UI/Load.vue';
 import {mapGetters} from 'vuex';
 
@@ -180,10 +192,13 @@ export default {
   },
   data() {
     return {
+      render: {
+        content: false,
+      },
       arrays: {
         products: [],
         productKits: [],
-        teams: [],
+        namesTeam: [],
       },
       deleteState: {
         errors: [],
@@ -238,14 +253,19 @@ export default {
   },
   async created() {
     console.warn('MANUFACTURER.VUE: CREATED');
-    const products = await this.$store.dispatch('products/getProducts');
-    const teams = await this.$store.dispatch('team/getTeams');
-    const teamNames = teams.map((item) => {
-      return item.name;
-    });
-    this.arrays.teams = teamNames;
 
-    this.arrays.products = products;
+    const products = await this.$store.dispatch('products/getProducts');
+    const productKits = await this.$store.dispatch('productKit/getProductKits');
+
+    const teams = await this.$store.dispatch('team/getTeams');
+    const namesTeam = teams.items.map((team) => team.name);
+    // const teamNames = teams.map((item) => {
+    //   return item.name;
+    // });
+
+    this.arrays.namesTeam = namesTeam;
+    this.arrays.productKits = productKits.items;
+    this.arrays.products = products.items;
   },
   computed: {
     ...mapGetters({
@@ -272,10 +292,10 @@ export default {
     currentUser() {
       return this.$store.state.auth.user;
     },
-    products() {
-      console.warn('MANUFACTURER.VUE: products');
-      return this.$store.$db().model('products').query().get();
-    },
+    // products() {
+    //   console.warn('MANUFACTURER.VUE: products');
+    //   return this.$store.$db().model('products').query().get();
+    // },
     productKits() {
       console.warn('MANUFACTURER.VUE: productKits');
       return this.arrays.productKits;
@@ -300,6 +320,16 @@ export default {
     },
   },
   methods: {
+    // getProduct(productId) {
+    //   let product = this.$store
+    //     .$db()
+    //     .model('products')
+    //     .query()
+    //     .where('id', productId)
+    //     .first();
+    //   return product;
+    // },
+
     async onClickTabProductKits() {
       console.warn('MANUFACTURER.VUE: onClickTabProductKits');
       const listProductsKits = await this.$store.dispatch(
@@ -422,52 +452,50 @@ export default {
       this.forms.activeForm = 'formSellProductKit';
       this.forms.titleForm = 'выставить на продажу';
       this.forms.formSellProductKit.disableFields['product_kit_id'] = true;
-      this.forms.formSellProductKit.select['toTeam'] = this.arrays.teams;
-      // this.forms.formSellProductKit.disableFields['toTeam'] = true;
-
       this.forms.formSellProductKit.model.data['product_kit_id'] =
         productKit.id;
       this.forms.formSellProductKit.active = true;
-
-      console.warn(this.arrays.teams);
     },
     async onClickApplySellProductKit(saleOfferProductKit) {
       console.warn('MANUFACTURER: onClickApplySellProductKit');
-      console.log(saleOfferProductKit);
-      const nameTeam = saleOfferProductKit.toTeam;
-      const team = this.$store
-        .$db()
-        .model('teams')
-        .query()
-        .where('name', nameTeam)
-        .first();
-      console.log(team);
-      const accountTeam = team.account;
-      console.log(`id's account of team: ${accountTeam}`);
-      // NOTE: Протестить
-      // NOTE: const offerSalePlace = await this.$store.dispatch(
-      // NOTE:   'offer/offerSalePlace',
-      // NOTE:   {
-      // NOTE:     price: saleOfferProductKit.price,
-      // NOTE:     product_kit_id: saleOfferProductKit.product_kit_id,
-      // NOTE:   }
-      // NOTE: );
-      // NOTE: const offerId = offerSalePlace.id;
-      // NOTE: const offerSaleAcquire = await this.$store.dispatch(
-      // NOTE:   'offer/offerSaleAcquire',
-      // NOTE:   offerId
-      // NOTE: );
-      // NOTE: console.log(offerSaleAcquire);
-      // NOTE: this.$store.commit('offer/SET_offerSale');
-      // NOTE: console.warn(saleOfferProductKit);
-      // NOTE: saleOfferProductKit.price = Number.parseInt(saleOfferProductKit.price);
-      // NOTE: console.error(saleOfferProductKit);
+      console.log(this.forms.formSellProductKit.model.data);
+      // console.log(saleOfferProductKit);
+      // const nameTeam = saleOfferProductKit.toTeam;
+      // const team = this.$store
+      //   .$db()
+      //   .model('teams')
+      //   .query()
+      //   .where('name', nameTeam)
+      //   .first();
+      // console.log(team);
+      // const accountTeam = team.account;
+      // console.log(`id's account of team: ${accountTeam}`);
 
-      // const offer = await this.$store.dispatch(
+      // const offerSalePlace = await this.$store.dispatch(
       //   'offer/offerSalePlace',
-      //   saleOfferProductKit
+      //   {
+      //     price: saleOfferProductKit.price,
+      //     product_kit_id: saleOfferProductKit.product_kit_id,
+      //   }
       // );
-      // console.error(offer);
+      // console.log(offerSalePlace);
+      // const offerId = offerSalePlace.id;
+      // const offerSaleAcquire = await this.$store.dispatch(
+      //   'offer/offerSaleAcquire',
+      //   offerId
+      // );
+      // console.log(offerSaleAcquire);
+
+      this.$store.commit('offer/SET_offerSale');
+      console.warn(saleOfferProductKit);
+      saleOfferProductKit.price = Number.parseInt(saleOfferProductKit.price);
+      console.error(saleOfferProductKit);
+
+      const offer = await this.$store.dispatch(
+        'offer/offerSalePlace',
+        saleOfferProductKit
+      );
+      console.error(offer);
     },
     onClickCancelForm() {
       console.warn('MANUFACTURER.VUE: onClickCancelForm');

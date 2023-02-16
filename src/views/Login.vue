@@ -111,9 +111,10 @@ export default {
           console.log(this.$store.state.auth.status);
         } catch (e) {
           this.load = false;
-          console.log('Login.vue: Error');
-          console.error(e);
-          this.errorMessages.push('Неправильный логин или пароль!');
+          // console.log('Login.vue: Error');
+          // console.error(e);
+          console.log(e);
+          this.errorMessages.push(e.message);
         }
       }
     },

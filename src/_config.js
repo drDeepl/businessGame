@@ -7,8 +7,8 @@ export const adminSidebarLinks = [
     title: 'Панель администратора',
     url: '/admin',
     titleTabs: [
-      {title: 'Создание пользователя', form: 'formCreateUser'},
-      {title: 'создать команду', form: 'formCreateTeam'},
+      {title: 'Создать пользователя', form: 'formCreateUser'},
+      {title: 'Создать команду', form: 'formCreateTeam'},
     ],
   },
 ];
@@ -17,8 +17,9 @@ export const card = {
   color: '#6c63ff',
 };
 export const playerSidebarLinks = [
+  {title: 'Мой профиль', url: '/player'},
   {title: 'Склад', url: '/storage'},
-  {title: 'Магазин', url: '/shop'},
+  {title: 'Предложения', url: '/offers'},
 ];
 
 export const manufacturerSidebarLinks = [
