@@ -55,15 +55,6 @@ database.register(OfferPurchase);
 database.register(Transaction);
 
 export default new Vuex.Store({
-  state: {
-    connect: false,
-    message: null,
-  },
-  mutations: {
-    SOCKET_CONNECT: (state) => {
-      state.connect = true;
-    },
-  },
   modules: {
     auth,
     user,

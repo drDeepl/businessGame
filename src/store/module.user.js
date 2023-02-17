@@ -54,9 +54,21 @@ export const user = {
     },
     async createUser(context, modelCreateUser) {
       console.warn('MODULE.USER: createUser');
-      const responseWrap = await User.api().createUser(modelCreateUser);
-      context.commit('SET_CREATED_USER');
-      return responseWrap;
+      let response = {success: true, data: null, status: 200};
+      try {
+        const responseWrap = await User.api().createUser(modelCreateUser);
+        response.success = true;
+        response.data = responseWrap;
+      } catch (e) {
+        console.error('MODULE.USER: CREATE USER');
+        console.warn(e);
+        response.success = false;
+        response.status = e.response.status;
+      } finally {
+        context.commit('SET_CREATED_USER');
+      }
+
+      return response;
     },
     async updateUser(context, dataForUpdateUser) {
       console.warn('MODULE.USER: updateUser');

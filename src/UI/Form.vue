@@ -10,11 +10,15 @@
       class="admin-form pa-2"
       @submit.prevent="onClickApplyForm"
     >
+      <v-dialog v-model="messageSuccess" persistent width="100%">
+        <v-card-text>Готово!</v-card-text>
+        <v-btn text @click.prevent="messageSuccess = false">окей</v-btn>
+      </v-dialog>
       <div class="form-title">
         <span>{{ title }}</span>
       </div>
 
-      <!-- INFO: Проверка на показ элементов -->
+      <!-- // INFO: Проверка на показ элементов -->
       <div v-for="textField in Object.keys(model.props)" :key="textField">
         <!-- // NOTE: Если свойство модели совпадает со свойством select -->
         <!-- // NOTE: То текстовое поле не отображается -->
@@ -103,7 +107,7 @@ export default {
         return {};
       },
     },
-    applySucces: Boolean,
+    applySuccess: Boolean,
     select: {
       // NOTE: {textField: {label: string, value: string}}
       types: Object,
@@ -136,6 +140,7 @@ export default {
   data() {
     return {
       createdModel: Object.create(this.$props.model.data),
+      messageSuccess: false,
       form: {
         rules: {
           field: [(v) => !!v || 'Поле не может быть пустым'],
@@ -155,10 +160,10 @@ export default {
     };
   },
   watch: {
-    applySucces(value) {
+    applySuccess: function (value) {
       console.warn('FORM.VUE: watch succes validate');
       if (value) {
-        this.$refs.form.reset();
+        this.messageSuccess = true;
       }
     },
   },
@@ -175,6 +180,7 @@ export default {
         if (this.$refs.form.validate()) {
           const preparedData = prepareTypes(createdModel, typesModel, passed);
           console.warn(preparedData);
+
           await this.parentFunction(preparedData);
           this.$refs.form.reset();
           this.$refs.form.resetValidation();

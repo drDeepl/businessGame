@@ -1,6 +1,7 @@
 <template>
   <div>
     <Load v-if="render" />
+
     <v-simple-table v-else>
       <template v-slot:default>
         <thead>
@@ -8,7 +9,10 @@
             <th v-if="haveDeleteFunc">
               <span>Действие</span>
             </th>
-            <th v-for="title in headers" :key="title">
+            <th
+              v-for="title in headers.filter((title) => !hideColumns[title])"
+              :key="title"
+            >
               <span>
                 {{ modelItem.titleProps[title] }}
               </span>
@@ -70,6 +74,7 @@ export default {
         return false;
       },
     },
+    hideColumns: {type: Object, required: false},
     onClickDeleteItem: {type: Function, required: false},
   },
   data() {

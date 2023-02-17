@@ -25,6 +25,7 @@
               :cancelForm="onClickCancelForm"
               :parentFunction="onClickCreateUser"
               :load="$store.getters['user/GET_CREATE_USER']"
+              :applySuccess="forms.formCreateUser.applySuccess"
             >
               <div v-if="forms.formCreateUser.model.data.role">
                 <div
@@ -76,7 +77,7 @@
                   class="form-error-text"
                   v-for="message in forms.formCreateUser.errors"
                   :key="message"
-                  >{{ forms.formCreateUser.model.props[message] }}</small
+                  >{{ message }}</small
                 >
               </v-alert>
             </Form>
@@ -137,6 +138,7 @@
                   :modelItem="models.user"
                   :haveDeleteFunc="true"
                   :onClickDeleteItem="onClickDeleteUser"
+                  :hideColumns="{account: true}"
                 />
               </div>
 
@@ -305,7 +307,7 @@
 <script>
 import {mapGetters} from 'vuex';
 
-import {codeErrorResponse} from '@/helpers/helper.error';
+// FIX: import {codeErrorResponse} from '@/helpers/helper.error';
 import {createRandomUser} from '@/helpers/helper.fake';
 import Message from '@/helpers/messages';
 
@@ -346,6 +348,7 @@ export default {
           render: false,
         },
       },
+
       messages: new Message(),
       loadingData: true,
       dialogDeleteActive: {
@@ -379,7 +382,9 @@ export default {
         products: [],
         namesTeam: [],
       },
-
+      dicts: {
+        teams: {}, // INFO: {TeamName: TeamId}
+      },
       forms: {
         formActive: '', // INFO: titleTab из onClickAdminTab
         formCreateUser: {
@@ -390,6 +395,7 @@ export default {
             role: [],
             team_id: this.$store.getters['team/GET_LIST_NAMES_TEAMS'],
           },
+          applySuccess: false,
           errors: [],
         },
         formUpdateUser: {
@@ -438,14 +444,19 @@ export default {
       this.arrays.role = await UserService.getRoles();
 
       const listTeams = (await Team.api().getListTeams()).response.data.items;
-      // const teamNames = listTeams.response.data.map((team) => team.name);
+      let dictTeams = {};
+      listTeams.forEach((team) => {
+        dictTeams[team.name] = team.id;
+      });
       console.log(listTeams);
       let listUsers = (await User.api().getListUsers()).response.data.items;
 
-      this.arrays.users = listUsers;
+      this.arrays.users = listUsers.filter((user) => !user.is_superuser);
       this.arrays.teams = listTeams;
       this.arrays.teamNames = listTeams.map((team) => team.name);
+      this.dicts.teams = dictTeams;
       console.log(listTeams);
+      console.log(dictTeams);
       this.$store.commit('admin/SET_RENDER_PAGE_COMPLETE');
     }
   },
@@ -515,39 +526,36 @@ export default {
       // INFO: А после показывает ошибки либо отправляет данные на сервер
       console.warn(modelCreateUser);
       if (modelCreateUser.role.toLowerCase() == 'player') {
-        const team = this.$store
-          .$db()
-          .model('teams')
-          .query()
-          .where('name', modelCreateUser['team_id'])
-          .first();
-        console.warn('TEAM\n', team);
-        if (team) {
-          const team_id = team.id;
+        const team_id = this.dicts.teams[modelCreateUser['team_id']];
+
+        if (team_id) {
           modelCreateUser['team_id'] = team_id;
         } else {
           this.forms.formCreateUser.errors.push('Такая команда не найдена');
         }
       } else {
-        modelCreateUser['team_id'] = 0;
+        modelCreateUser['team_id'] = this.arrays.teams[0].id;
       }
 
       console.log('NEW USER\n', modelCreateUser);
-      try {
-        const responseWrap = await this.$store.dispatch(
-          'user/createUser',
-          modelCreateUser
-        );
-        const user = responseWrap.response.data;
-        console.error('CREATED USER\n', responseWrap.response.data);
 
+      const response = await this.$store.dispatch(
+        'user/createUser',
+        modelCreateUser
+      );
+      if (response.success) {
+        const user = response.data;
+        console.error('CREATED USER\n', user);
+        this.forms.formCreateUser.applySuccess = true;
         this.arrays.users.push(user);
-      } catch (e) {
-        console.warn(e);
-        const errorCode = codeErrorResponse(e);
-        if (errorCode == 422) {
+      } else {
+        if (response.status == 422) {
           this.forms.formCreateUser.errors.push(
-            'Имя пользователя уже существует'
+            'Имя пользователя "' + modelCreateUser.username + '" уже существует'
+          );
+        } else {
+          this.forms.formCreateUser.errors.push(
+            'Что-то пошло не так...\nПопробуйте перезагрузить страницу'
           );
         }
       }
@@ -570,14 +578,8 @@ export default {
     },
     async updateListUsers() {
       this.checkRenderPanels('users', true);
-      this.$store
-        .$db()
-        .model('users')
-        .delete((user) => {
-          return !user.is_superuser;
-        });
       const users = await this.$store.dispatch('user/getUsers');
-      this.arrays.users = users;
+      this.arrays.users = users.items;
       this.checkRenderPanels('users', false);
       this.dialogDeleteActivator('users', false);
     },

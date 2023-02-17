@@ -71,7 +71,7 @@
         <!-- INFO: список готовых продуктов -->
 
         <v-tab-item class="mt-2 panel-tabs">
-          <Load v-if="getListProducts" />
+          <Load v-if="getListProducts || render.content" />
           <span v-else-if="arrays.products.length == 0">
             нет готовых продуктов
             {{ arrays.products }}
@@ -253,7 +253,7 @@ export default {
   },
   async created() {
     console.warn('MANUFACTURER.VUE: CREATED');
-
+    this.render.content = true;
     const products = await this.$store.dispatch('products/getProducts');
     const productKits = await this.$store.dispatch('productKit/getProductKits');
 
@@ -266,6 +266,7 @@ export default {
     this.arrays.namesTeam = namesTeam;
     this.arrays.productKits = productKits.items;
     this.arrays.products = products.items;
+    this.render.content = false;
   },
   computed: {
     ...mapGetters({

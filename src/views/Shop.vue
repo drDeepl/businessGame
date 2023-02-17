@@ -196,10 +196,6 @@ import Team from '@/store/models/Team';
 import Message from '@/helpers/messages';
 import {mapGetters} from 'vuex';
 
-// TODO: Синхронизировать данные между сервером через web socket или SSE
-// TODO: расшифровку для карточки
-// TODO: показ кнопки купить в зависимости от роли
-
 export default {
   data: function () {
     return {
