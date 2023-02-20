@@ -1,3 +1,6 @@
+.border-top-card {
+  border-top: $border-top-width solid $color-purple !important;
+}
 .cards-container {
   display: grid !important;
   grid-template-columns: 16em 16em;

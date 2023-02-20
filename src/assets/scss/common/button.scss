@@ -1,0 +1,30 @@
+.btn-green {
+  background-color: $color-green !important;
+}
+.btn-apply {
+  background-color: $color-green !important; // NOTE: $color-green: #43d681
+  border-radius: $card-radius !important;
+  text-transform: lowercase !important;
+  color: $color-white !important;
+  font-size: 0.9em !important;
+}
+
+.btn-apply:hover {
+  color: $color-green !important;
+  background-color: $color-white !important;
+  border: 1.8px solid $color-green !important;
+}
+
+.btn-cancel {
+  background-color: $color-red !important; // NOTE: $color-green: #43d681
+  border-radius: $card-radius !important;
+  text-transform: lowercase !important;
+  color: $color-white !important;
+  font-size: 0.9em !important;
+}
+
+.btn-cancel:hover {
+  color: $color-red !important;
+  background-color: $color-white !important;
+  border: 1.8px solid $color-red !important;
+}

@@ -17,6 +17,8 @@
 @import 'common/storage';
 @import 'common/layout';
 @import 'common/dialogs';
+@import 'common/alert';
+@import 'common/button';
 body,
 #app {
   font-family: Montserrat;
@@ -28,15 +30,15 @@ body,
 }
 
 *::-webkit-scrollbar {
-  width: 4px;
+  width: 4px !important;
 }
 
 *::-webkit-scrollbar-track {
-  background-color: $bodyBackground;
-  border-radius: 6px;
+  background-color: $bodyBackground !important;
+  border-radius: 6px !important;
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: $color-purple;
-  border-radius: 6px;
+  background-color: $color-purple !important;
+  border-radius: 6px !important;
 }

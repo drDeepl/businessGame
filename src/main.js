@@ -2,8 +2,8 @@ import Vue from 'vue';
 import App from './App.vue';
 import {router} from './router';
 import store from './store';
-import 'bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import './assets/scss/main.scss';
 import VeeValidate from 'vee-validate';
 import Vuex from 'vuex';
@@ -13,16 +13,16 @@ import Delete from 'vue-material-design-icons/Delete.vue';
 import BackupRestore from 'vue-material-design-icons/BackupRestore.vue';
 import ChevronDown from 'vue-material-design-icons/ChevronDown';
 import DeleteCircleOutline from 'vue-material-design-icons/DeleteCircleOutline';
+import CheckCircleOutline from 'vue-material-design-icons/CheckCircleOutline';
 import MainLayout from './layouts/MainLayout.vue';
 import setupInterceptors from './services/setupInterceptors';
-import VueSSE from 'vue-sse';
 
 Vue.config.productionTip = false;
 
-Vue.use(VueSSE);
 Vue.use(VeeValidate);
 
 // Vue.component('font-awesome-icon', FontAwesomeIcon);
+Vue.component('success-icon', CheckCircleOutline);
 Vue.component('arrow-icon', ChevronDown);
 Vue.component('close-icon', Close);
 Vue.component('delete-icon', Delete);

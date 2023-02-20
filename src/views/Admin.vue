@@ -126,6 +126,7 @@
                   @click.prevent="updateListUsers"
                   ><restore-icon
                 /></v-btn>
+
                 <v-btn
                   text
                   color="red lighten-1"
@@ -520,6 +521,7 @@ export default {
       console.warn('ADMIN.VUE: onClickCreateUser');
       console.warn(modelCreateUser);
       this.$store.commit('user/SET_CREATING_USER');
+      this.forms.formCreateUser.applySuccess = false;
       this.forms.formCreateUser.errors = [];
       // INFO: modelCreateUser содержит данные из формы
       // INFO: Функция выполняет валидацию данных, полученных из формы

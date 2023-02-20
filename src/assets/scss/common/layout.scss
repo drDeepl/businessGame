@@ -5,6 +5,13 @@
   align-items: center;
 }
 
+.flex-centered {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center;
+}
+
 .layout-showcase {
   display: flex !important;
   justify-content: center;

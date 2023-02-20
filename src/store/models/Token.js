@@ -24,19 +24,19 @@ export default class Token extends Model {
             if (error.response) {
               console.log(error.response.status);
               let status = error.response.status;
-              console.log(status);
+              console.log(`TOKEN.PAIR.Response\n ${status}`);
               errorState['in'] = 'response';
               errorState['status'] = status;
               errorState['message'] = exceptionMessage[status];
             } else if (error.request) {
-              console.log(error.request);
+              console.log(`Bad request: ${error.request}`);
               errorState['in'] = 'request';
               errorState['data'] = error.request;
-              errorState['message'] = exceptionMessage[0];
+              errorState['message'] = 'Что-то пошло не так';
             } else {
               errorState['in'] = null;
               errorState['data'] = error.message;
-              errorState['message'] = exceptionMessage[0];
+              errorState['message'] = 'Что-то пошло не так';
             }
             return errorState;
           }

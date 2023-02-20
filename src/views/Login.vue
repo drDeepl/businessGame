@@ -8,13 +8,13 @@
             :loading="load"
             :readonly="load"
             v-model.trim="form.username"
-            :rules="rules"
             label="Имя пользователя"
             :error-messages="errorMessages"
             :succes-messages="succesMessages"
             successr-messages
             :color="styles.form.color"
             required
+            :rules="rules"
           ></v-text-field>
         </v-row>
         <v-row class="login-row">
@@ -46,13 +46,13 @@
 </template>
 
 <script>
-import {validationMixin} from 'vuelidate';
-import {required} from 'vuelidate/lib/validators';
+// import {validationMixin} from 'vuelidate';
+// import {required} from 'vuelidate/lib/validators';
 import LoginForm from '@/models/model.login.form';
 import {card} from '@/_config';
 import User from '@/store/models/User';
 export default {
-  mixins: [validationMixin],
+  // mixins: [validationMixin],
   data() {
     return {
       load: false,
@@ -71,51 +71,50 @@ export default {
       },
     };
   },
-  validations: {
-    form: {
-      username: {required},
-      password: {required},
-    },
-  },
+  // validations: {
+  //   form: {
+  //     username: {required},
+  //     password: {required},
+  //   },
+  // },
   methods: {
     async onLogIn() {
       console.warn('Login.vue: onLogin');
-      this.$v.form.$touch();
-      if (this.$v.form.$error) {
-        console.log('Login.vue: error validate');
-      } else {
-        this.load = true;
-        console.log('Is Errors? ' + this.$v.form.$error);
-        try {
-          const user = new LoginForm(this.form);
-          console.log(this.$store.state.auth.user);
-          console.log('onLogin:' + this.$store.state.auth.status.loggedIn);
-          const userToken = await this.$store.dispatch('auth/login', user);
-          const username = userToken.username;
-          console.error(username);
+      this.load = true;
+      // this.$v.form.$touch();
+      // if (this.$v.form.$error) {
+      //   console.log('Login.vue: error validate');
+      // }
+      console.log('Is Errors? ');
+      try {
+        const user = new LoginForm(this.form);
+        console.log(this.$store.state.auth.user);
+        console.log('onLogin:' + this.$store.state.auth.status.loggedIn);
+        const userToken = await this.$store.dispatch('auth/login', user);
+        const username = userToken.username;
+        console.error(username);
 
-          const access = this.$store.getters['auth/initState'].user.access;
-          console.warn(access);
+        const access = this.$store.getters['auth/initState'].user.access;
+        console.warn(access);
 
-          const response = await User.api().getUserByUsername(username);
-          const userData = response.response.data;
-          const role = userData.role.toLowerCase();
-          if (userData.is_superuser) {
-            this.$router.push('/admin');
-          } else {
-            this.$store.commit('mainLayout/SET_CURRENT_TAB', role);
-            this.$router.push('/' + role);
-          }
-
-          console.log('After Login');
-          console.log(this.$store.state.auth.status);
-        } catch (e) {
-          this.load = false;
-          // console.log('Login.vue: Error');
-          // console.error(e);
-          console.log(e);
-          this.errorMessages.push(e.message);
+        const response = await User.api().getUserByUsername(username);
+        const userData = response.response.data;
+        const role = userData.role.toLowerCase();
+        if (userData.is_superuser) {
+          this.$router.push('/admin');
+        } else {
+          this.$store.commit('mainLayout/SET_CURRENT_TAB', role);
+          this.$router.push('/' + role);
         }
+
+        console.log('After Login');
+        console.log(this.$store.state.auth.status);
+      } catch (e) {
+        this.load = false;
+        // console.log('Login.vue: Error');
+        // console.error(e);
+        console.log(e);
+        this.errorMessages.push(e.message);
       }
     },
   },
