@@ -29,6 +29,11 @@ body,
   margin: 0;
 }
 
+* {
+  scrollbar-color: $color-purple !important;
+  scrollbar-width: 6px;
+}
+
 *::-webkit-scrollbar {
   width: 4px !important;
 }

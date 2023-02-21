@@ -150,7 +150,9 @@
               :cancelForm="onClickCancelForm"
               :load="$store.getters['offer/GET_offerSale']"
             >
-              <v-select
+              <!-- // FIX :select="forms.formSellProductKit.select" -->
+              {{ currentOfferModel.props }}
+              <!-- <v-select
                 class="form-slot"
                 :items="arrays.namesTeam"
                 color="#6c63ff"
@@ -158,7 +160,7 @@
                 label="Продажа продукта команде:"
                 :v-model="forms.formSellProductKit.model.data.toTeam"
               >
-              </v-select>
+              </v-select> -->
             </Form>
           </div>
           <div v-else>
@@ -195,10 +197,14 @@ export default {
       render: {
         content: false,
       },
+      currentOfferModel: new CreateSellOffer(),
       arrays: {
         products: [],
         productKits: [],
         namesTeam: [],
+      },
+      dict: {
+        namesTeam: {},
       },
       deleteState: {
         errors: [],
@@ -258,14 +264,23 @@ export default {
     const productKits = await this.$store.dispatch('productKit/getProductKits');
 
     const teams = await this.$store.dispatch('team/getTeams');
-    const namesTeam = teams.items.map((team) => team.name);
+    // const namesTeam = teams.items.map((team) => team.name);
+    let arrayNamesTeam = [];
+    let dictNamesTeam = {};
+    teams.items.forEach(function (team) {
+      const teamName = team.name;
+      arrayNamesTeam.push(teamName);
+      dictNamesTeam[teamName] = team.id;
+    });
+
     // const teamNames = teams.map((item) => {
     //   return item.name;
     // });
 
-    this.arrays.namesTeam = namesTeam;
+    this.arrays.namesTeam = arrayNamesTeam;
     this.arrays.productKits = productKits.items;
     this.arrays.products = products.items;
+    this.dict.namesTeam = dictNamesTeam;
     this.render.content = false;
   },
   computed: {
@@ -455,48 +470,43 @@ export default {
       this.forms.formSellProductKit.disableFields['product_kit_id'] = true;
       this.forms.formSellProductKit.model.data['product_kit_id'] =
         productKit.id;
+      this.forms.formSellProductKit.select['team_id'] = this.arrays.namesTeam;
       this.forms.formSellProductKit.active = true;
     },
     async onClickApplySellProductKit(saleOfferProductKit) {
       console.warn('MANUFACTURER: onClickApplySellProductKit');
-      console.log(this.forms.formSellProductKit.model.data);
-      // console.log(saleOfferProductKit);
-      // const nameTeam = saleOfferProductKit.toTeam;
-      // const team = this.$store
-      //   .$db()
-      //   .model('teams')
-      //   .query()
-      //   .where('name', nameTeam)
-      //   .first();
-      // console.log(team);
-      // const accountTeam = team.account;
-      // console.log(`id's account of team: ${accountTeam}`);
-
-      // const offerSalePlace = await this.$store.dispatch(
-      //   'offer/offerSalePlace',
-      //   {
-      //     price: saleOfferProductKit.price,
-      //     product_kit_id: saleOfferProductKit.product_kit_id,
-      //   }
-      // );
-      // console.log(offerSalePlace);
-      // const offerId = offerSalePlace.id;
-      // const offerSaleAcquire = await this.$store.dispatch(
-      //   'offer/offerSaleAcquire',
-      //   offerId
-      // );
-      // console.log(offerSaleAcquire);
+      // console.log(this.forms.formSellProductKit.model.data);
+      console.log(saleOfferProductKit);
+      const teamId = this.dict.namesTeam[saleOfferProductKit['team_id']];
+      saleOfferProductKit['team_id'] = teamId;
+      console.log(saleOfferProductKit);
+      // INFO: Протестить, когда "AttributeError: 'NoneType' object jas no attribute 'group_send' "
+      // FIX: const offerSalePlace = await this.$store.dispatch(
+      // FIX:   'offer/offerSalePlace',
+      // FIX:   {
+      // FIX:     price: saleOfferProductKit.price,
+      // FIX:     product_kit_id: saleOfferProductKit.product_kit_id,
+      // FIX:   }
+      // FIX: );
+      // FIX: console.log(offerSalePlace);
+      // FIX: const offerId = offerSalePlace.id;
+      // FIX: const offerSaleAcquire = await this.$store.dispatch(
+      // FIX:   'offer/offerSaleAcquire',
+      // FIX:   offerId,
+      // FIX:   teamId
+      // FIX: );
+      // FIX: console.log(offerSaleAcquire);
 
       this.$store.commit('offer/SET_offerSale');
-      console.warn(saleOfferProductKit);
-      saleOfferProductKit.price = Number.parseInt(saleOfferProductKit.price);
-      console.error(saleOfferProductKit);
+      // console.warn(saleOfferProductKit);
+      // saleOfferProductKit.price = Number.parseInt(saleOfferProductKit.price);
+      // console.error(saleOfferProductKit);
 
-      const offer = await this.$store.dispatch(
-        'offer/offerSalePlace',
-        saleOfferProductKit
-      );
-      console.error(offer);
+      // const offer = await this.$store.dispatch(
+      //   'offer/offerSalePlace',
+      //   saleOfferProductKit
+      // );
+      // console.error(offer);
     },
     onClickCancelForm() {
       console.warn('MANUFACTURER.VUE: onClickCancelForm');
