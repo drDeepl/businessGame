@@ -294,6 +294,7 @@ export default {
     console.log(listOffersSale);
     await Team.api().getListTeams();
     this.$store.commit('shopState/SET_STATE_CREATED_COMPLETE');
+    
   },
   mounted() {
     this.$store.commit('shopState/SET_STATE_COMPLETE_mainLayout');

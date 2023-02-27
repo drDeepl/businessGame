@@ -74,7 +74,13 @@ export default {
         return false;
       },
     },
-    hideColumns: {type: Object, required: false},
+    hideColumns: {
+      type: Object,
+      required: false,
+      default() {
+        return {};
+      },
+    },
     onClickDeleteItem: {type: Function, required: false},
   },
   data() {

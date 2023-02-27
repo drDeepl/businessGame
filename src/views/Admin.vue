@@ -91,21 +91,28 @@
               :types="forms.formCreateTeam.model.types"
               :cancelForm="onClickCancelForm"
               :parentFunction="onClickCreateTeam"
+              :applySuccess="forms.formCreateTeam.applySuccess"
             >
               <v-alert
-                border="right"
+                border="left"
                 colored-border
                 type="error"
                 elevation="2"
                 v-if="forms.formCreateTeam.errors.length > 0"
                 class="form-error-container"
-                >Ошибки в следующий полях:
-                <small
-                  class="form-error-text"
+              >
+                <div
                   v-for="message in forms.formCreateTeam.errors"
                   :key="message"
-                  >{{ forms.formCreateTeam.model.props[message] }}</small
                 >
+                  <div v-if="typeof message == 'string'">{{ message }}</div>
+                  <div v-else>
+                    <span>Ошибки в поле:</span>
+                    <small class="form-error-text">{{
+                      forms.formCreateTeam.model.props[message]
+                    }}</small>
+                  </div>
+                </div>
               </v-alert>
             </Form>
           </v-tab-item>
@@ -267,20 +274,51 @@
               <v-card-text v-if="arrays.teams.length == 0">
                 Список команд ещё пуст
               </v-card-text>
-              <v-list v-else dense>
-                <v-btn
-                  text
-                  color="red"
-                  @click="dialogDeleteActivator('teamAll', true)"
-                >
-                  <span>Очистить список команд(TO FIXED)</span>
-                </v-btn>
 
+              <v-list v-else dense>
+                <v-card-actions
+                  class="flex-sm-column justify-start align-start"
+                >
+                  <v-btn
+                    class="mb-1"
+                    text
+                    color="red"
+                    @click="
+                      dialogDeleteActivator(
+                        'teamAll',
+                        true,
+                        messages.deleteTeamDescription
+                      )
+                    "
+                  >
+                    <span>Удалить все команды(TO FIXED)</span>
+                  </v-btn>
+                  <v-select
+                    class="mb-1 mt-1"
+                    v-model="values.teamToDelete"
+                    :items="arrays.teamNames"
+                    chips
+                    attach
+                    multiple
+                    :menu-props="{closeOnContentClick: true}"
+                    color="#6c63ff"
+                    item-color="success"
+                    label="Удалить команды"
+                  ></v-select>
+                  <v-btn
+                    v-if="values.teamToDelete.length > 0"
+                    class="btn-cancel"
+                    @click="onClickDeleteChoiceTeam"
+                  >
+                    Удалить выбранные
+                  </v-btn>
+                </v-card-actions>
                 <DataTable
                   :items="arrays.teams"
                   :modelItem="models.modelTeam"
                 />
                 <DialogError
+                  v-if="dialogDeleteActive.teamAll"
                   :title="messages.deleteTeam"
                   :active="dialogDeleteActive.teamAll"
                 >
@@ -294,6 +332,57 @@
                     @click.prevent="onClickDeleteTeamAll"
                   >
                     Да, удалить
+                  </v-btn>
+                  <v-btn
+                    text
+                    color="green lighten-1"
+                    :loading="isTeamDelete"
+                    @click.prevent="() => (dialogDeleteActive.teamAll = false)"
+                  >
+                    Отмена
+                  </v-btn>
+                </DialogError>
+                <DialogError
+                  title="Что-то пошло не так"
+                  :active="dialogDeleteActive.errors.length > 0"
+                >
+                  <v-card-text
+                    v-for="message in dialogDeleteActive.errors"
+                    :key="message"
+                  >
+                    {{ message }}
+                  </v-card-text>
+                  <v-btn
+                    text
+                    color="red lighten-1"
+                    :loading="isTeamDelete"
+                    @click.prevent="() => (dialogDeleteActive.errors = [])"
+                  >
+                    Ок
+                  </v-btn>
+                </DialogError>
+                <DialogError
+                  title="Удалить выбранные команды?"
+                  :active="dialogDeleteActive.choiceTeam"
+                >
+                  <v-card-text>
+                    {{ messages.deleteTeamDescription }}
+                  </v-card-text>
+                  <v-btn
+                    text
+                    color="red lighten-1"
+                    :loading="render.team.choiceDelete"
+                    @click.prevent="onClickApplyDeleteChoiceTeam"
+                  >
+                    Да
+                  </v-btn>
+                  <v-btn
+                    text
+                    color="green lighten-1"
+                    :loading="render.team.choiceDelete"
+                    @click.prevent="dialogDeleteActivator('choiceTeam', false)"
+                  >
+                    Закрыть
                   </v-btn>
                 </DialogError>
               </v-list>
@@ -349,13 +438,19 @@ export default {
           render: false,
         },
       },
-
+      render: {
+        team: {
+          choiceDelete: false,
+        },
+      },
       messages: new Message(),
       loadingData: true,
       dialogDeleteActive: {
         users: false,
         team: false,
         teamAll: false,
+        choiceTeam: false,
+        errors: [],
       },
       titleCurrentForm: '',
       currentForm: '',
@@ -366,6 +461,9 @@ export default {
         listProducts: {
           open: false,
         },
+      },
+      values: {
+        teamToDelete: [],
       },
       titles:
         this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE']('SUPERUSER')[0],
@@ -381,7 +479,7 @@ export default {
         teams: null, // INFO: {nameTeam: data team}
         users: null,
         products: [],
-        namesTeam: [],
+        teamNames: [],
       },
       dicts: {
         teams: {}, // INFO: {TeamName: TeamId}
@@ -413,6 +511,7 @@ export default {
           model: new ModelCreateTeam(),
           errors: [],
           modelToValidate: null,
+          applySuccess: false,
         },
         formCreateAccountTeam: {
           active: false,
@@ -444,13 +543,19 @@ export default {
     } else {
       this.arrays.role = await UserService.getRoles();
 
-      const listTeams = (await Team.api().getListTeams()).response.data.items;
+      const responseTeams = (await Team.api().getListTeams()).response;
+      console.log(responseTeams);
+      const listTeams = responseTeams.data ? responseTeams.data : [];
+
+      console.log(`LIST TEAMS ${listTeams}`);
       let dictTeams = {};
       listTeams.forEach((team) => {
         dictTeams[team.name] = team.id;
       });
       console.log(listTeams);
-      let listUsers = (await User.api().getListUsers()).response.data.items;
+
+      let responseUsers = (await User.api().getListUsers()).response;
+      const listUsers = responseUsers.data ? responseUsers.data : [];
 
       this.arrays.users = listUsers.filter((user) => !user.is_superuser);
       this.arrays.teams = listTeams;
@@ -562,15 +667,23 @@ export default {
         }
       }
     },
+    // NOTE: TEAM
     async onClickCreateTeam(modelCreateTeam) {
       console.warn('ADMIN.VUE: onClickCreateTeam');
-      console.error(modelCreateTeam);
-
+      this.forms.formCreateTeam.applySuccess = false;
+      this.forms.formCreateTeam.errors = [];
       const team = await this.$store.dispatch(
         'team/createTeam',
         modelCreateTeam
       );
-      this.arrays.teams.push(team);
+      console.log(team);
+      if (team.statusCode) {
+        this.forms.formCreateTeam.errors.push(team.message);
+      } else {
+        this.forms.formCreateTeam.applySuccess = true;
+        this.arrays.teams.push(team);
+        this.dicts.teams[team.name] = team.id;
+      }
     },
     async updateListProduct() {
       console.warn('updateListProduct');
@@ -578,6 +691,7 @@ export default {
       const products = await this.$store.dispatch('products/getProducts');
       this.arrays.products = products;
     },
+    // NOTE: USER
     async updateListUsers() {
       this.checkRenderPanels('users', true);
       const users = await this.$store.dispatch('user/getUsers');
@@ -704,21 +818,49 @@ export default {
       this.$store.commit('products/SET_DELETE_ALL_PRODUCTS_ERROR', false);
     },
 
-    async onClickDeleteTeam(team) {
+    async onClickDeleteTeam(teamName) {
       console.warn('onClickDeleteTeam');
-      this.$store.commit('team/SET_DELETE_TEAM_START');
-      const teamId = team.id;
-      console.log(teamId);
-      await this.$store.dispatch('team/deleteTeam', teamId);
-      const teams = this.$store.$db().model('teams').all();
-      this.arrays.teams = teams;
-      this.$store.commit('team/SET_DELETE_TEAM_COMPLETE');
+      this.render.team.choiceDelete = true;
+
+      try {
+        const teamId = this.dicts.teams[teamName];
+        console.log(teamId);
+
+        await this.$store.dispatch('team/deleteTeam', teamId);
+        // FIX: Удаление из массива удаленной команды
+        delete this.dicts.teams[teamName];
+        this.arrays.teams = Object.keys(this.dicts.teams);
+      } catch (e) {
+        console.error(e);
+        this.dialogDeleteActivator('choiceTeam', false);
+        this.dialogDeleteActive.errors.push(
+          'Что-то пошло не так <div>Попробуйте перезагрузить страницу</div>'
+        );
+      }
+      // const teams = this.$store.$db().model('teams').all();
+
+      this.render.team.choiceDelete = false;
+    },
+    onClickDeleteChoiceTeam() {
+      this.dialogDeleteActivator('choiceTeam', true);
+    },
+    async onClickApplyDeleteChoiceTeam() {
+      console.warn('ADMIN: onClickApplyDeleteChoiceTeam');
+      const teamsToDelete = this.values.teamToDelete;
+
+      for (let i = 0; i < teamsToDelete.length; i++) {
+        const teamName = teamsToDelete[i];
+
+        await this.onClickDeleteTeam(teamName);
+      }
+      this.dialogDeleteActivator('choiceTeam', false);
     },
     async onClickDeleteTeamAll() {
       console.warn('onCLickDeleteTeamAll');
       this.$store.commit('team/SET_DELETE_TEAM_START');
       await this.$store.dispatch('team/deleteTeams');
       this.arrays.teams = [];
+
       this.dialogDeleteActivator('teamAll', false);
     },
   },

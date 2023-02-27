@@ -34,7 +34,24 @@ export const team = {
     async createTeam(context, dataForCreate) {
       console.warn('MODULE.TEAM: createTeam');
       console.error(dataForCreate);
-      const responseWrap = await Team.api().createTeam(dataForCreate);
+
+      const responseWrap = await Team.api()
+        .createTeam(dataForCreate)
+        .catch((error) => {
+          const status = error.response.status;
+          let response = {statusCode: status, message: ''};
+          if (status === 400) {
+            response.message = 'Команда с таким названием уже существует';
+            return response;
+          } else {
+            response.message = 'Что-то пошло не так';
+          }
+        });
+      console.log(responseWrap);
+      if (responseWrap.statusCode) {
+        return responseWrap;
+      }
+
       return responseWrap.response.data;
     },
     async deleteTeam(context, teamId) {
