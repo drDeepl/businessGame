@@ -17,10 +17,11 @@
           <!-- // INFO: Форма создания пользователя -->
           <v-tab-item>
             <Form
+              v-if="forms.formCreateUser.active"
               :activate="forms.formCreateUser.active"
               :title="titleCurrentForm"
               :model="forms.formCreateUser.model"
-              :select="{role: arrays.role, team_id: arrays.namesTeam}"
+              :select="{role: arrays.role, team_id: arrays.teamNames}"
               :disableFields="{team_id: true}"
               :cancelForm="onClickCancelForm"
               :parentFunction="onClickCreateUser"
@@ -559,7 +560,8 @@ export default {
 
       this.arrays.users = listUsers.filter((user) => !user.is_superuser);
       this.arrays.teams = listTeams;
-      this.arrays.teamNames = listTeams.map((team) => team.name);
+      // this.arrays.teamNames = listTeams.map((team) => team.name);
+      this.arrays.teamNames = Object.keys(dictTeams);
       this.dicts.teams = dictTeams;
       console.log(listTeams);
       console.log(dictTeams);
@@ -682,6 +684,7 @@ export default {
       } else {
         this.forms.formCreateTeam.applySuccess = true;
         this.arrays.teams.push(team);
+        this.arrays.teamNames.push(team.name);
         this.dicts.teams[team.name] = team.id;
       }
     },
@@ -828,15 +831,22 @@ export default {
 
         await this.$store.dispatch('team/deleteTeam', teamId);
         // FIX: Удаление из массива удаленной команды
-        delete this.dicts.teams[teamName];
-        this.arrays.teams = Object.keys(this.dicts.teams);
+        const dictsTeams = this.dicts.teams;
+        const teams = this.$store.$db().model('teams').all();
+        this.arrays.teams = teams;
+
+        delete dictsTeams[teamName];
+        this.dicts.teams = dictsTeams;
+        this.arrays.teamNames = Object.keys(dictsTeams);
+        console.log(Object.keys(dictsTeams));
       } catch (e) {
         console.error(e);
         this.dialogDeleteActivator('choiceTeam', false);
         this.dialogDeleteActive.errors.push(
-          'Что-то пошло не так <div>Попробуйте перезагрузить страницу</div>'
+          'Что-то пошло не так. Попробуйте перезагрузить страницу'
         );
       }
+
       // const teams = this.$store.$db().model('teams').all();
 
       this.render.team.choiceDelete = false;
@@ -850,10 +860,10 @@ export default {
 
       for (let i = 0; i < teamsToDelete.length; i++) {
         const teamName = teamsToDelete[i];
-
         await this.onClickDeleteTeam(teamName);
       }
       this.dialogDeleteActivator('choiceTeam', false);
+      this.values.teamToDelete = [];
     },
     async onClickDeleteTeamAll() {
       console.warn('onCLickDeleteTeamAll');
