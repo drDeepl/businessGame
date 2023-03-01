@@ -30,8 +30,9 @@ export const products = {
     async createProduct(context, dataToCreate) {
       console.warn('MODULE.product: createProduct');
       context.commit('SET_PRODUCT_CREATE');
-      await Product.api().createProduct(dataToCreate);
+      const responseWrap = await Product.api().createProduct(dataToCreate);
       context.commit('SET_PRODUCT_CREATED');
+      return responseWrap.response.data;
     },
     async getListProductInStore(context, team_id) {
       console.warn('MODULE.PRODUCTS: getListProductInStore');

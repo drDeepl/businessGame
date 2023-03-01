@@ -22,6 +22,7 @@
       :parentFunction="onClickCreateProduct"
       :cancelForm="onClickCancelForm"
       :load="STATE_createProduct"
+      :applySuccess="forms.formAddProduct.applySuccess"
     >
       <v-alert v-if="forms.formAddProduct.errors.length > 0">
         <v-card-text class="ma-0 pa-0">Возникли следующие ошибки:</v-card-text>
@@ -48,6 +49,7 @@
       :cancelForm="onClickCancelForm"
       :load="STATE_createProductKit"
       :errorsMessage="forms.formAddProductKit.errors"
+      :applySuccess="forms.formAddProductKit.applySuccess"
     >
     </Form>
     <div>
@@ -68,7 +70,7 @@
           </v-tab>
         </div>
 
-        <!-- INFO: список готовых продуктов -->
+        <!-- // INFO: список готовых продуктов -->
 
         <v-tab-item class="mt-2 panel-tabs">
           <Load v-if="getListProducts || render.content" />
@@ -113,9 +115,9 @@
 
         <v-tab-item class="mt-2">
           <Load v-if="render.content" />
-          <div class="products-cards" v-if="arrays.products.length > 0">
+          <div class="products-cards" v-if="arrays.productKits.length > 0">
             <ProductCard
-              v-for="productKit in productKits.items"
+              v-for="productKit in arrays.productKits"
               :key="productKit.id"
               :item="productKit"
               :title="{
@@ -227,7 +229,7 @@ export default {
           active: false,
           model: new CreateProduct(),
           validate: false,
-          applySucces: false,
+          applySuccess: false,
           errors: [],
         },
         formAddProductKit: {
@@ -235,7 +237,7 @@ export default {
           model: new CreateProductKit(),
           select: {},
           values: {},
-          applySucces: false,
+          applySuccess: false,
           disableFields: {}, // NOTE: {disable textField: boolean}
           errors: [],
         },
@@ -267,7 +269,7 @@ export default {
     // const namesTeam = teams.items.map((team) => team.name);
     let arrayNamesTeam = [];
     let dictNamesTeam = {};
-    teams.items.forEach(function (team) {
+    teams.forEach(function (team) {
       const teamName = team.name;
       arrayNamesTeam.push(teamName);
       dictNamesTeam[teamName] = team.id;
@@ -276,10 +278,10 @@ export default {
     // const teamNames = teams.map((item) => {
     //   return item.name;
     // });
-
+    console.log(productKits);
     this.arrays.namesTeam = arrayNamesTeam;
-    this.arrays.productKits = productKits.items;
-    this.arrays.products = products.items;
+    this.arrays.productKits = productKits;
+    this.arrays.products = products;
     this.dict.namesTeam = dictNamesTeam;
     this.render.content = false;
   },
@@ -363,9 +365,18 @@ export default {
       console.warn('MANUFACTURER.VUE: onClickCardActions');
       console.error(product);
     },
+    onClickCreateProductKit(product) {
+      console.warn('MANUFACTURER.VUE: onClickCreateProductKit');
+      this.forms.activeForm = 'formAddProductKit';
+      this.forms.titleForm = 'Создать продуктовый набор';
+      this.forms.formAddProductKit.model.data['product_id'] = product.id;
+      this.forms.formAddProductKit.disableFields['product_id'] = true;
+      this.forms.formAddProductKit.active = true;
+    },
     async onClickCreateProduct(createdProduct) {
       console.warn('MANUFACTURER.VUE: onClickCreateProduct');
       this.$store.commit('products/SET_PRODUCT_CREATE');
+      this.forms.formAddProduct.applySuccess = false;
       this.forms.formAddProduct.errors = [];
       createdProduct.name = createdProduct.name.toLowerCase();
 
@@ -377,7 +388,12 @@ export default {
         .where('name', createdProduct.name)
         .get();
       if (productsWithCurrentName.length == 0) {
-        await this.$store.dispatch('products/createProduct', createdProduct);
+        const product = await this.$store.dispatch(
+          'products/createProduct',
+          createdProduct
+        );
+        console.log(product);
+        this.arrays.products.push(product);
       } else {
         // FIX:перенести в словарь с сообщениями
         const message =
@@ -386,18 +402,13 @@ export default {
       }
       this.$store.commit('products/SET_PRODUCT_CREATED');
       this.$store.commit('products/SET_LIST_PRODUCT_UPDATE_RUN');
+      this.forms.formAddProduct.applySuccess = true;
     },
-    onClickCreateProductKit(product) {
-      console.warn('MANUFACTURER.VUE: onClickCreateProductKit');
-      this.forms.activeForm = 'formAddProductKit';
-      this.forms.titleForm = 'Создать продуктовый набор';
-      this.forms.formAddProductKit.model.data['product_id'] = product.id;
-      this.forms.formAddProductKit.disableFields['product_id'] = true;
-      this.forms.formAddProductKit.active = true;
-    },
+
     async onClickApplyCreateProductKit(productKit) {
       console.warn('MANUFACTURER.vue: onClickApplyCreateProduct');
       this.forms.formAddProductKit.errors = [];
+      this.forms.formAddProductKit.applySuccess = false;
       console.error(productKit);
 
       const productKitIsExists = this.$store
@@ -414,6 +425,7 @@ export default {
         );
       } else {
         await this.$store.dispatch('productKit/createProductKit', productKit);
+        this.forms.formAddProductKit.applySuccess = true;
       }
       this.$store.commit('productKit/SET_CREATE_PRODUCT_KIT_COMPLETE');
     },
@@ -481,14 +493,15 @@ export default {
       saleOfferProductKit['team_id'] = teamId;
       console.log(saleOfferProductKit);
       // INFO: Протестить, когда "AttributeError: 'NoneType' object jas no attribute 'group_send' "
-      // FIX: const offerSalePlace = await this.$store.dispatch(
-      // FIX:   'offer/offerSalePlace',
-      // FIX:   {
-      // FIX:     price: saleOfferProductKit.price,
-      // FIX:     product_kit_id: saleOfferProductKit.product_kit_id,
-      // FIX:   }
-      // FIX: );
-      // FIX: console.log(offerSalePlace);
+      // FIX: To test websocket on offers
+      // const offerSalePlace = await this.$store.dispatch(
+      //   'offer/offerSalePlace',
+      //   {
+      //     price: saleOfferProductKit.price,
+      //     product_kit_id: saleOfferProductKit.product_kit_id,
+      //   }
+      // );
+      // console.log(offerSalePlace);
       // FIX: const offerId = offerSalePlace.id;
       // FIX: const offerSaleAcquire = await this.$store.dispatch(
       // FIX:   'offer/offerSaleAcquire',
