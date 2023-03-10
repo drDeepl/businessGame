@@ -29,7 +29,8 @@ export const team = {
       context.commit('SET_GET_TEAMS_COMPLETE');
       const listTeams = responseWrap.response.data;
       context.commit('SET_NAMES_TEAM', listTeams);
-      return responseWrap.response.data;
+      const data = listTeams.items ? listTeams.items : listTeams;
+      return data;
     },
     async createTeam(context, dataForCreate) {
       console.warn('MODULE.TEAM: createTeam');

@@ -397,6 +397,7 @@
 
 <script>
 import {mapGetters} from 'vuex';
+import {develop} from '@/_config';
 
 // FIX: import {codeErrorResponse} from '@/helpers/helper.error';
 import {createRandomUser} from '@/helpers/helper.fake';
@@ -411,7 +412,7 @@ import ModelUser from '@/models/model.user';
 import UserService from '@/services/user.service';
 
 import User from '@/store/models/User';
-import Team from '@/store/models/Team';
+//  FIX: import Team from '@/store/models/Team';
 
 import Form from '@/UI/Form.vue';
 import Load from '@/UI/Load.vue';
@@ -538,16 +539,15 @@ export default {
     console.error(username);
     const userData = await User.api().getUserByUsername(username);
 
-    userData.is_superuser = true;
+    if (develop) {
+      userData.is_superuser = true;
+    }
+
     if (!userData.is_superuser) {
       this.$router.push('/');
     } else {
       this.arrays.role = await UserService.getRoles();
-
-      const responseTeams = (await Team.api().getListTeams()).response;
-      console.log(responseTeams);
-      const listTeams = responseTeams.data ? responseTeams.data : [];
-
+      const listTeams = await this.$store.dispatch('team/getTeams');
       console.log(`LIST TEAMS ${listTeams}`);
       let dictTeams = {};
       listTeams.forEach((team) => {
@@ -555,8 +555,9 @@ export default {
       });
       console.log(listTeams);
 
-      let responseUsers = (await User.api().getListUsers()).response;
-      const listUsers = responseUsers.data ? responseUsers.data : [];
+      const listUsers = await this.$store.dispatch('user/getUsers');
+
+      // const listUsers = responseUsers.data ? responseUsers.data : [];
 
       this.arrays.users = listUsers.filter((user) => !user.is_superuser);
       this.arrays.teams = listTeams;

@@ -49,8 +49,11 @@ export const user = {
       return roles;
     },
     async getUsers() {
-      const users = await UserService.getUsersList();
-      return users;
+      console.log('MODULE.USER: getUsers');
+      const responseWrap = await User.api().getListUsers();
+      const response = responseWrap.response.data;
+      const data = response.items ? response.items : response;
+      return data;
     },
     async createUser(context, modelCreateUser) {
       console.warn('MODULE.USER: createUser');

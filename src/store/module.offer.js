@@ -30,6 +30,7 @@ export const offer = {
       );
       console.warn(responseWrap);
       context.commit('SET_offerSale_COMPLETE');
+
       return responseWrap.response.data;
     },
     async offerSaleAcquire(context, offerId) {

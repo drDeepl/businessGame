@@ -293,8 +293,20 @@ export default {
     this.arrays.offers.sale = listOffersSale;
     console.log(listOffersSale);
     await Team.api().getListTeams();
+    // FIX ========================================================
     this.$store.commit('shopState/SET_STATE_CREATED_COMPLETE');
-    
+    this.connection = new WebSocket('ws://localhost:8000/ws/');
+    this.connection.onmessage = () => {
+      this.$store.dispatch('offers/getOffersSale').then((response) => {
+        // this.myJson_s = response.data;
+        console.log('OFFERS: SALE ', response.data);
+      }),
+        this.$store.dispatch('offers/getOffersPurchase').then((response) => {
+          // this.myJson_p = response.data;
+          console.log('OFFERS: PURCHASE ', response.data);
+        });
+    };
+    // FIX ========================================================
   },
   mounted() {
     this.$store.commit('shopState/SET_STATE_COMPLETE_mainLayout');

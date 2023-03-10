@@ -492,7 +492,7 @@ export default {
       const teamId = this.dict.namesTeam[saleOfferProductKit['team_id']];
       saleOfferProductKit['team_id'] = teamId;
       console.log(saleOfferProductKit);
-      // INFO: Протестить, когда "AttributeError: 'NoneType' object jas no attribute 'group_send' "
+      // INFO: Протестить, когда "AttributeError: 'NoneType' object has no attribute 'group_send' "
       // FIX: To test websocket on offers
       // const offerSalePlace = await this.$store.dispatch(
       //   'offer/offerSalePlace',
