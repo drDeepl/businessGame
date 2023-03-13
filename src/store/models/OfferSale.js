@@ -30,11 +30,11 @@ export default class OfferSale extends Model {
 
         return this.post('offers/sale/place', modelPlaceOffer);
       },
-      async offerSaleAcquire(modelOfferSaleAcquire) {
+      async offerSaleAcquire(offerId, teamId) {
         console.warn('MODEL.OFFER: offerSaleAcquire');
         console.log(TokenService.getLocalAccessToken());
         return this.post(
-          'offers/sale/acquire?offer_id=' + modelOfferSaleAcquire
+          'offers/sale/acquire?offer_id=' + offerId + '&team_id=' + teamId
         );
       },
     },

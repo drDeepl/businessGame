@@ -14,44 +14,7 @@
         ><span class="manufacturer-action-text">{{ tab.label }}</span>
       </v-btn>
     </div>
-    <!-- // INFO: Форма создания продукта  -->
-    <Form
-      :activate="forms.formAddProduct.active"
-      :title="forms.titleForm"
-      :model="forms.formAddProduct.model"
-      :parentFunction="onClickCreateProduct"
-      :cancelForm="onClickCancelForm"
-      :load="STATE_createProduct"
-      :applySuccess="forms.formAddProduct.applySuccess"
-    >
-      <v-alert v-if="forms.formAddProduct.errors.length > 0">
-        <v-card-text class="ma-0 pa-0">Возникли следующие ошибки:</v-card-text>
-        <ul class="form-errors-container">
-          <li
-            class="form-error-message"
-            v-for="error in forms.formAddProduct.errors"
-            :key="error"
-          >
-            <v-card-text class="mt-1 pa-0 form-error-text">
-              {{ error }}
-            </v-card-text>
-          </li>
-        </ul>
-      </v-alert>
-    </Form>
-    <!-- // INFO: Форма создания продуктового набора-->
-    <Form
-      :activate="forms.formAddProductKit.active"
-      :title="forms.titleForm"
-      :model="forms.formAddProductKit.model"
-      :disableFields="forms.formAddProductKit.disableFields"
-      :parentFunction="onClickApplyCreateProductKit"
-      :cancelForm="onClickCancelForm"
-      :load="STATE_createProductKit"
-      :errorsMessage="forms.formAddProductKit.errors"
-      :applySuccess="forms.formAddProductKit.applySuccess"
-    >
-    </Form>
+
     <div>
       <v-tabs
         center-active
@@ -170,6 +133,46 @@
           </div>
         </v-tab-item>
       </v-tabs>
+      <!-- // INFO: Форма создания продукта  -->
+      <Form
+        :activate="forms.formAddProduct.active"
+        :title="forms.titleForm"
+        :model="forms.formAddProduct.model"
+        :parentFunction="onClickCreateProduct"
+        :cancelForm="onClickCancelForm"
+        :load="STATE_createProduct"
+        :applySuccess="forms.formAddProduct.applySuccess"
+      >
+        <v-alert v-if="forms.formAddProduct.errors.length > 0">
+          <v-card-text class="ma-0 pa-0"
+            >Возникли следующие ошибки:</v-card-text
+          >
+          <ul class="form-errors-container">
+            <li
+              class="form-error-message"
+              v-for="error in forms.formAddProduct.errors"
+              :key="error"
+            >
+              <v-card-text class="mt-1 pa-0 form-error-text">
+                {{ error }}
+              </v-card-text>
+            </li>
+          </ul>
+        </v-alert>
+      </Form>
+      <!-- // INFO: Форма создания продуктового набора-->
+      <Form
+        :activate="forms.formAddProductKit.active"
+        :title="forms.titleForm"
+        :model="forms.formAddProductKit.model"
+        :disableFields="forms.formAddProductKit.disableFields"
+        :parentFunction="onClickApplyCreateProductKit"
+        :cancelForm="onClickCancelForm"
+        :load="STATE_createProductKit"
+        :errorsMessage="forms.formAddProductKit.errors"
+        :applySuccess="forms.formAddProductKit.applySuccess"
+      >
+      </Form>
     </div>
   </div>
 </template>
@@ -410,7 +413,7 @@ export default {
       this.forms.formAddProductKit.errors = [];
       this.forms.formAddProductKit.applySuccess = false;
       console.error(productKit);
-
+      console.log(this.arrays.products);
       const productKitIsExists = this.$store
         .$db()
         .model('productKits')
@@ -485,6 +488,7 @@ export default {
       this.forms.formSellProductKit.select['team_id'] = this.arrays.namesTeam;
       this.forms.formSellProductKit.active = true;
     },
+    // TODO: =====================================================================================
     async onClickApplySellProductKit(saleOfferProductKit) {
       console.warn('MANUFACTURER: onClickApplySellProductKit');
       // console.log(this.forms.formSellProductKit.model.data);
@@ -494,21 +498,20 @@ export default {
       console.log(saleOfferProductKit);
       // INFO: Протестить, когда "AttributeError: 'NoneType' object has no attribute 'group_send' "
       // FIX: To test websocket on offers
-      // const offerSalePlace = await this.$store.dispatch(
-      //   'offer/offerSalePlace',
-      //   {
-      //     price: saleOfferProductKit.price,
-      //     product_kit_id: saleOfferProductKit.product_kit_id,
-      //   }
-      // );
-      // console.log(offerSalePlace);
-      // FIX: const offerId = offerSalePlace.id;
-      // FIX: const offerSaleAcquire = await this.$store.dispatch(
-      // FIX:   'offer/offerSaleAcquire',
-      // FIX:   offerId,
-      // FIX:   teamId
-      // FIX: );
-      // FIX: console.log(offerSaleAcquire);
+      const offerSalePlace = await this.$store.dispatch(
+        'offer/offerSalePlace',
+        {
+          price: saleOfferProductKit.price,
+          product_kit_id: saleOfferProductKit.product_kit_id,
+        }
+      );
+      console.log(offerSalePlace);
+      const offerId = offerSalePlace.id;
+      const offerSaleAcquire = await this.$store.dispatch(
+        'offer/offerSaleAcquire',
+        {offerId: offerId, teamId: teamId}
+      );
+      console.log(offerSaleAcquire);
 
       this.$store.commit('offer/SET_offerSale');
       // console.warn(saleOfferProductKit);
@@ -521,6 +524,7 @@ export default {
       // );
       // console.error(offer);
     },
+    // TODO: =====================================================================================
     onClickCancelForm() {
       console.warn('MANUFACTURER.VUE: onClickCancelForm');
       const activeForm = this.forms.activeForm;

@@ -292,7 +292,7 @@
                       )
                     "
                   >
-                    <span>Удалить все команды(TO FIXED)</span>
+                    <span>Удалить все команды</span>
                   </v-btn>
                   <v-select
                     class="mb-1 mt-1"
@@ -625,6 +625,15 @@ export default {
       this.forms[activeForm].active = false;
       this.forms[activeForm].errors = [];
     },
+
+    async updateListProduct() {
+      console.warn('updateListProduct');
+
+      const products = await this.$store.dispatch('products/getProducts');
+      this.arrays.products = products;
+    },
+    // NOTE: USER
+
     async onClickCreateUser(modelCreateUser) {
       console.warn('ADMIN.VUE: onClickCreateUser');
       console.warn(modelCreateUser);
@@ -670,36 +679,10 @@ export default {
         }
       }
     },
-    // NOTE: TEAM
-    async onClickCreateTeam(modelCreateTeam) {
-      console.warn('ADMIN.VUE: onClickCreateTeam');
-      this.forms.formCreateTeam.applySuccess = false;
-      this.forms.formCreateTeam.errors = [];
-      const team = await this.$store.dispatch(
-        'team/createTeam',
-        modelCreateTeam
-      );
-      console.log(team);
-      if (team.statusCode) {
-        this.forms.formCreateTeam.errors.push(team.message);
-      } else {
-        this.forms.formCreateTeam.applySuccess = true;
-        this.arrays.teams.push(team);
-        this.arrays.teamNames.push(team.name);
-        this.dicts.teams[team.name] = team.id;
-      }
-    },
-    async updateListProduct() {
-      console.warn('updateListProduct');
-
-      const products = await this.$store.dispatch('products/getProducts');
-      this.arrays.products = products;
-    },
-    // NOTE: USER
     async updateListUsers() {
       this.checkRenderPanels('users', true);
       const users = await this.$store.dispatch('user/getUsers');
-      this.arrays.users = users.items;
+      this.arrays.users = users;
       this.checkRenderPanels('users', false);
       this.dialogDeleteActivator('users', false);
     },
@@ -821,7 +804,25 @@ export default {
     onClickCloseErrorProducts() {
       this.$store.commit('products/SET_DELETE_ALL_PRODUCTS_ERROR', false);
     },
-
+    // NOTE: TEAM
+    async onClickCreateTeam(modelCreateTeam) {
+      console.warn('ADMIN.VUE: onClickCreateTeam');
+      this.forms.formCreateTeam.applySuccess = false;
+      this.forms.formCreateTeam.errors = [];
+      const team = await this.$store.dispatch(
+        'team/createTeam',
+        modelCreateTeam
+      );
+      console.log(team);
+      if (team.statusCode) {
+        this.forms.formCreateTeam.errors.push(team.message);
+      } else {
+        this.forms.formCreateTeam.applySuccess = true;
+        this.arrays.teams.push(team);
+        this.arrays.teamNames.push(team.name);
+        this.dicts.teams[team.name] = team.id;
+      }
+    },
     async onClickDeleteTeam(teamName) {
       console.warn('onClickDeleteTeam');
       this.render.team.choiceDelete = true;
@@ -829,14 +830,15 @@ export default {
       try {
         const teamId = this.dicts.teams[teamName];
         console.log(teamId);
-
+        const teams = this.arrays.teams;
+        const newTeams = teams.filter((team) => team.id != teamId);
+        this.arrays.teams = newTeams;
         await this.$store.dispatch('team/deleteTeam', teamId);
-        // FIX: Удаление из массива удаленной команды
         const dictsTeams = this.dicts.teams;
-        const teams = this.$store.$db().model('teams').all();
-        this.arrays.teams = teams;
-
         delete dictsTeams[teamName];
+        const users = this.arrays.users;
+        const newUsers = users.filter((user) => user.team_id != teamId);
+        this.arrays.users = newUsers;
         this.dicts.teams = dictsTeams;
         this.arrays.teamNames = Object.keys(dictsTeams);
         console.log(Object.keys(dictsTeams));
@@ -847,8 +849,6 @@ export default {
           'Что-то пошло не так. Попробуйте перезагрузить страницу'
         );
       }
-
-      // const teams = this.$store.$db().model('teams').all();
 
       this.render.team.choiceDelete = false;
     },
@@ -871,7 +871,9 @@ export default {
       this.$store.commit('team/SET_DELETE_TEAM_START');
       await this.$store.dispatch('team/deleteTeams');
       this.arrays.teams = [];
-
+      this.dicts.teams = {};
+      this.arrays.teamNames = [];
+      await this.updateListUsers();
       this.dialogDeleteActivator('teamAll', false);
     },
   },

@@ -16,7 +16,10 @@ export const productKit = {
       context.commit('SET_STATE_getProductKits');
       const responseWrap = await ProductKit.api().getListProductKits();
       context.commit('SET_getProductKits_COMPLETE');
-      return responseWrap.response.data;
+      const productKits = responseWrap.response.data.items
+        ? responseWrap.response.data.items
+        : responseWrap.response.data;
+      return productKits;
     },
     async createProductKit(context, productKit) {
       context.commit('SET_CREATE_PRODUCT_KIT');

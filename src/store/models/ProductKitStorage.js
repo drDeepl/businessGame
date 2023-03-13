@@ -13,14 +13,11 @@ export default class ProductKitStorage extends Model {
   static apiConfig = {
     headers: {'Content-Type': 'application/json'},
     actions: {
-      async getListProductKits(team_id) {
+      async getListProductKitsStore(team_id) {
         console.warn('MODEL.PRODUCT.STORAGE');
         return this.get('store/' + team_id + '/product-kits/list');
       },
-      async getListProducts(team_id) {
-        console.warn('MODEL.PRODUCT.STORAGE');
-        return this.get('store/' + team_id + '/products/list');
-      },
+
       async checkCreatedProductKits(team_id) {
         console.warn('MODEL.PRODUCT.STORAGE');
         return this.get('store/' + team_id + '/product-kits/check');

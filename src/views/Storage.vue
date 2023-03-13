@@ -18,12 +18,14 @@
 
       <v-tab-item>
         <Load v-if="isGetProductKits" />
-        <div v-else-if="productKits.length == 0"></div>
+        <div v-else-if="productKits.length == 0">
+          У Вашей команды ещё нет продуктовых наборов
+        </div>
 
         <div v-else>
           <div v-for="productKit in productKits" :key="productKit.id">
             <ProductKitCard
-              :nameProduct="getProductName(productKit.product_kit.product)"
+              :nameProduct="dicts.products[productKit.product_kit.product]"
               :countItems="productKit.count"
               :modelItem="cards.productKit.model"
               :item="productKit.product_kit"
@@ -39,6 +41,7 @@
                 </v-btn>
               </v-card-actions>
             </ProductKitCard>
+
             <v-overlay
               color="white"
               :opacity="0.85"
@@ -62,7 +65,7 @@
         </div>
       </v-tab-item>
       <v-tab-item>
-        <div v-if="products.length == 0">
+        <div v-if="teamProducts.length == 0">
           <p>У вашей команды ещё нет продуктов</p>
         </div>
         <div v-else v-for="product in products" :key="product['$id']">
@@ -75,7 +78,7 @@
           >
           </ProductCard>
 
-          <!-- FIX: Исправить или удалить -->
+          <!-- // FIX: Исправить или удалить -->
           <Form
             v-if="false"
             :activate="false"
@@ -125,7 +128,8 @@ export default {
         timer: 0,
         progress: 0,
       },
-      arrays: {productKits: [], products: []},
+      arrays: {productKits: [], teamProducts: []},
+      dicts: {products: {}}, // INFO: {productId:Name}
       cards: {
         productKit: {
           model: new ProductKit(),
@@ -143,16 +147,29 @@ export default {
     console.error(userData);
     const team_id = userData.team;
     console.error(team_id);
+    const products = await this.$store.dispatch('products/getProducts');
+    let dictsProducts = {};
+    products.forEach((product) => (dictsProducts[product.id] = product.name));
+    console.log('DICGTS_PRODUCTS:\n', dictsProducts);
+    console.log('PRODUCTS:\n', products);
     this.$store.commit('storageTeam/SET_GET_PRODUCTS_KIT_TEAM_RUN');
-    this.arrays.productKits = await this.$store.dispatch(
-      'storageTeam/getTeamProductKits',
-      team_id
-    );
-    this.arrays.products = await this.$store.dispatch(
+    const teamProducts = await this.$store.dispatch(
       'storageTeam/getTeamProducts',
       team_id
     );
+    this.dicts.products = dictsProducts;
+    this.arrays.teamProducts = teamProducts;
+    console.log('TEAM_PRODUCTS:\n', teamProducts);
 
+    const productKits = await this.$store.dispatch(
+      'storageTeam/getTeamProductKits',
+      team_id
+    );
+    this.arrays.productKits = productKits.filter(
+      (pk) => this.dicts.products[pk.product_kit.product]
+    );
+    console.log(productKits);
+    productKits.forEach((pk) => console.log(pk)); // pk.product_kit.product
     this.$store.commit('storageTeam/SET_GET_PRODUCTS_KIT_TEAM_RUN_COMPLETE');
   },
   computed: {
@@ -178,8 +195,8 @@ export default {
     productKits() {
       return this.arrays.productKits;
     },
-    products() {
-      return this.arrays.products;
+    teamProducts() {
+      return this.arrays.teamProducts;
     },
     progressBar: {
       get() {
@@ -193,6 +210,7 @@ export default {
   },
   watch: {
     async prepareProduct(value) {
+      // FIX: rewrite preapreProduct + checkCreated
       console.error('PREPARE PRODUCT: ' + value);
       if (!value) {
         let teamId = this.dataCurrentUser.team;
@@ -209,7 +227,7 @@ export default {
           'storageTeam/getTeamProducts',
           teamId
         );
-        this.arrays.products = products;
+        this.arrays.teamProducts = products;
         console.error(products);
       }
     },
@@ -235,7 +253,8 @@ export default {
         .query()
         .where('id', productId)
         .first();
-      return product.name;
+      const nameProduct = product.name ? product.name : '';
+      return nameProduct;
     },
   },
 

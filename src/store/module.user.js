@@ -61,7 +61,7 @@ export const user = {
       try {
         const responseWrap = await User.api().createUser(modelCreateUser);
         response.success = true;
-        response.data = responseWrap;
+        response.data = responseWrap.response.data;
       } catch (e) {
         console.error('MODULE.USER: CREATE USER');
         console.warn(e);

@@ -1,3 +1,4 @@
+import ProductStorage from '@/store/models/ProductStorage';
 import ProductKitStorage from '@/store/models/ProductKitStorage';
 export const storageTeam = {
   namespaced: true,
@@ -35,27 +36,31 @@ export const storageTeam = {
       }, time * 1000);
     },
     async getTeamProductKits(context, teamId) {
-      const responseWrap = await ProductKitStorage.api().getListProductKits(
-        teamId
-      );
-
-      if (responseWrap.response.status == 200) {
-        return responseWrap.response.data;
+      const responseWrap =
+        await ProductKitStorage.api().getListProductKitsStore(teamId);
+      const response = responseWrap.response;
+      if (response.status == 200) {
+        const productKits = response.data.items
+          ? response.data.items
+          : response.data;
+        return productKits;
       } else {
         context.commit('SET_GET_PRODUCTS_KIT_TEAM_ERROR');
         return [];
       }
     },
     async getTeamProducts(context, teamId) {
-      const responseWrap = await ProductKitStorage.api().getListProducts(
-        teamId
-      );
-
-      if (responseWrap.response.status == 200) {
-        return responseWrap.response.data;
+      const responseWrap = await ProductStorage.api().getListProducts(teamId);
+      const response = responseWrap.response;
+      if (response.status == 200) {
+        const products = response.data.items
+          ? response.data.items
+          : response.data;
+        return products;
       } else {
         // TODO: добавить состояние ошибки для списка продуктов
-        console.warn(context);
+        console.log(context);
+        console.error(response);
         // context.commit('SET_GET_PRODUCTS_KIT_TEAM_ERROR');
         return [];
       }

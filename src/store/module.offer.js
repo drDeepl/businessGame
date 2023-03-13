@@ -21,7 +21,10 @@ export const offer = {
       console.warn('MODULE.OFFER: getOffers');
       const responseWrap = await OfferSale.api().getListOffersSale();
       context.commit('SET_OFFERS_LIST_UPDATE_COMPLETE');
-      return responseWrap.response.data;
+      const offers = responseWrap.response.data.items
+        ? responseWrap.response.data.items
+        : responseWrap.response.data;
+      return offers;
     },
     async offerSalePlace(context, saleOfferProductKit) {
       console.warn('MODULE.OFFER: offerSalePlace');
@@ -33,9 +36,10 @@ export const offer = {
 
       return responseWrap.response.data;
     },
-    async offerSaleAcquire(context, offerId) {
+    async offerSaleAcquire(context, payload) {
       const responseAccountAcquire = await OfferSale.api().offerSaleAcquire(
-        offerId
+        payload.offerId,
+        payload.teamId
       );
       context.commit('SET_OFFER_ACQUIRE_COMPLETE');
       return responseAccountAcquire.response;
@@ -45,7 +49,10 @@ export const offer = {
       console.warn('MODULE.OFFER: getListOffersPurchase');
       const responseWrap = await OfferPurchase.api().getListOfferPurchase();
       context.commit('SET_GET_OFFERS_PURCHASE_COMPLETE');
-      return responseWrap.response.data;
+      const offersPurchase = responseWrap.response.data.items
+        ? responseWrap.response.data.items
+        : responseWrap.response.data;
+      return offersPurchase;
     },
     async createOfferPurchase(context, modelOfferPurchase) {
       console.warn('MODULE.OFFER: createOfferPurchase');

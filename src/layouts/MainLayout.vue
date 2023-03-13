@@ -169,16 +169,18 @@ export default {
     },
   },
   async created() {
-    // TODO [20.07.2022]: переделать страницу авторизации
-    // TODO [20.07.2022]: оформить покупку продуктового набора через состояния
-
-    // NOTE: 'Что должно происходить здесь
-    // NOTE: 0.Проверка на авторизацию
-    // NOTE: 1.Получение access токена
-    // NOTE: 2.Извлечение из него id пользователя
-    // NOTE: 3.Получение информации о пользователе для отображения её в сайдбаре
-    // NOTE: 4.Если админ, то показать панель админа
-    // NOTE: 5.Отобразить имя, команду, баланс пользователя'
+    this.connection = new WebSocket('ws://localhost:8000/ws/');
+    this.connection.onmessage = () => {
+      this.$store.dispatch('offer/getOffersSale').then((response) => {
+        // this.myJson_s = response.data;
+        console.log('OFFERS: SALE ', response);
+      }),
+        this.$store.dispatch('offer/getOffersPurchase').then((response) => {
+          // this.myJson_p = response.data;
+          console.log('OFFERS: PURCHASE ', response.data);
+        });
+      // FIX: Как узнать о продаже оффера?
+    };
     console.warn(User.api());
 
     if (this.isLoggedIn) {

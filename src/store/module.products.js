@@ -52,9 +52,11 @@ export const products = {
     },
     async getProducts(context) {
       const responseWrap = await Product.api().getListProducts();
-
+      const products = responseWrap.response.data.items
+        ? responseWrap.response.data.items
+        : responseWrap.response.data;
       context.commit('SET_GET_LIST_PRODUCTS_COMPLETE');
-      return responseWrap.response.data;
+      return products;
     },
     async deleteProduct(context, productId) {
       console.warn('MODULE.PRODUCTS: deleteProduct');
