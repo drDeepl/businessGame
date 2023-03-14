@@ -55,6 +55,19 @@ export const user = {
       const data = response.items ? response.items : response;
       return data;
     },
+
+    async getCustomerNames() {
+      console.log('MODULE.USER: getUsersName');
+      const responseWrap = await User.api().getListCustomerNames();
+      const response = responseWrap.response;
+      const status = response.status;
+      let answer = {status: status, data: null};
+      if (response.status === 200) {
+        const data = response.data.items ? response.data.items : response.data;
+        answer.data = data;
+      }
+      return answer;
+    },
     async createUser(context, modelCreateUser) {
       console.warn('MODULE.USER: createUser');
       let response = {success: true, data: null, status: 200};

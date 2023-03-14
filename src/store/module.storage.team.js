@@ -65,8 +65,13 @@ export const storageTeam = {
         return [];
       }
     },
-    async checkCreatedProductKits(context, teamId) {
-      await ProductKitStorage.api().checkCreatedProductKits(teamId);
+    async checkCreatedProductKits(context, payload) {
+      const teamId = payload.teamId;
+      const productKitId = payload.productKitId;
+      await ProductKitStorage.api().checkCreatedProductKits(
+        teamId,
+        productKitId
+      );
     },
   },
   getters: {

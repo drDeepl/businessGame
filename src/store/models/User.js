@@ -27,6 +27,10 @@ export default class User extends Model {
         console.warn('MODEL.USER: getListUsers');
         return this.get('users');
       },
+      async getListCustomerNames() {
+        console.warn('MODEL.USER: getListUsersName');
+        return this.get('users-names-customer');
+      },
       async createUser(modelCreateUser) {
         console.warn('MODEL.USER: createUser');
         return await this.post('users', modelCreateUser);

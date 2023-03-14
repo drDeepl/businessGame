@@ -19,12 +19,11 @@ export const card = {
 export const playerSidebarLinks = [
   {title: 'Мой профиль', url: '/player'},
   {title: 'Склад', url: '/storage'},
-  {title: 'Предложения', url: '/offers'},
 ];
 
 export const manufacturerSidebarLinks = [
   {title: 'Склад', url: '/manufacturer'},
-  {title: 'Магазин', url: '/shop'},
+  // {title: 'Магазин', url: '/shop'},
 ];
 
 export const customerSidebarLinks = [

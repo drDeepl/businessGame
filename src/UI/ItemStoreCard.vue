@@ -1,22 +1,19 @@
 <template>
   <div class="card-main-layout card-container pa-1">
     <v-card class="store-card-product-kit-wrapper" elevation="0">
-      <!-- <v-badge
-        :value="countItems"
-        :content="countItems"
-        color="red"
-        class="store-card-product-kit-subtitle mt-2"
-      > -->
       <v-card-title class="store-card-product-kit-title row-container pa-0">
         <small v-if="isProductKit">Комплект для продукта:</small>
-        <v-badge
-          :value="countItems"
-          :content="countItems"
-          color="red"
-          class="store-card-product-kit-subtitle mt-2"
-        >
-          <span>{{ nameProduct }}</span>
-        </v-badge>
+        <div class="justify-end">
+          <v-badge
+            :value="countItems"
+            :content="countItems + ' шт.'"
+            color="red"
+            class="store-card-product-kit-subtitle mt-2"
+          >
+          </v-badge>
+        </div>
+
+        <span class="">{{ nameProduct }}</span>
       </v-card-title>
 
       <v-card-text
@@ -34,7 +31,7 @@
         <span>{{ item[property] }}</span>
       </v-card-text>
     </v-card>
-    <v-card-actions><slot></slot></v-card-actions>
+    <v-card-actions class="d-flex justify-center"><slot></slot></v-card-actions>
   </div>
 </template>
 
