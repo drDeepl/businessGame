@@ -91,16 +91,45 @@
               :modelItem="modelsCard.productKit"
               :showLabel="true"
             >
-              <v-card-actions class="manufacturer-card-action pa-2">
-                <slot></slot>
+              <ErrorAlert
+                v-if="forms.message.active"
+                :errorsAr="[forms.message.text]"
+                :hasErrors="forms.message.active"
+              >
                 <v-btn
-                  class="mr-1 btn-put-to-sell"
+                  class="btn-cancel"
+                  @click="onClickApplyDeleteProductKit(productKit.product)"
+                  :loading="render.delete"
+                  >Удалить</v-btn
+                >
+                <v-btn
+                  :disabled="render.delete"
+                  class="btn-apply"
+                  @click="
+                    () => {
+                      forms.message.active = false;
+                    }
+                  "
+                  >Закрыть</v-btn
+                >
+              </ErrorAlert>
+              <v-card-actions class="d-flex flex-column justify-center">
+                <v-btn
+                  class="btn-put-to-sell"
                   outlined
                   rounded
                   color="#ee5544"
                   @click.prevent="onClickSellProductKit(productKit)"
                 >
                   <span class="btn-put-to-sell-text">Продать</span>
+                </v-btn>
+                <v-btn
+                  class="btn-put-to-sell"
+                  text
+                  color="red deep"
+                  @click="onClickDeleteProductKit(productKit.id)"
+                >
+                  Удалить
                 </v-btn>
               </v-card-actions>
             </ProductCard>
@@ -116,18 +145,6 @@
               :load="$store.getters['offer/GET_offerSale']"
               :applySuccess="forms.formSellProductKit.applySucces"
             >
-              <!-- // FIX :select="forms.formSellProductKit.select" -->
-              {{ currentOfferModel.props }}
-
-              <!-- <v-select
-                class="form-slot"
-                :items="arrays.namesTeam"
-                color="#6c63ff"
-                item-color="#6c63ff"
-                label="Продажа продукта команде:"
-                :v-model="forms.formSellProductKit.model.data.toTeam"
-              >
-              </v-select> -->
             </Form>
             <ErrorAlert
               v-if="forms.hasErrors"
@@ -200,6 +217,7 @@ import ProductCard from '@/UI/ProductCard.vue';
 // FIX: import DialogError from '@/UI/DialogError.vue';
 import Load from '@/UI/Load.vue';
 import ErrorAlert from '@/UI/ErrorAlert.vue';
+
 import {mapGetters} from 'vuex';
 
 export default {
@@ -213,6 +231,7 @@ export default {
     return {
       render: {
         content: false,
+        delete: false,
       },
       currentOfferModel: new CreateSellOffer(),
       arrays: {
@@ -243,6 +262,7 @@ export default {
         errors: [],
         activeForm: '',
         titleForm: '',
+        message: {text: '', active: false},
         formAddProduct: {
           active: false,
           model: new CreateProduct(),
@@ -386,6 +406,7 @@ export default {
       console.warn('MANUFACTURER.VUE: onClickCardActions');
       console.error(product);
     },
+    // NOTE: ProductKits
     onClickCreateProductKit(product) {
       console.warn('MANUFACTURER.VUE: onClickCreateProductKit');
       this.forms.activeForm = 'formAddProductKit';
@@ -450,6 +471,40 @@ export default {
       }
       this.$store.commit('productKit/SET_CREATE_PRODUCT_KIT_COMPLETE');
     },
+    async updateListProductKits() {
+      console.warn('updateListProductKits');
+      const productKits = await this.$store.dispatch(
+        'productKit/getProductKits'
+      );
+      this.arrays.productKits = productKits;
+    },
+    // FIX: ==========================================================
+    // TODO: обработка ошибки
+    async onClickApplyDeleteProductKit(productKitId) {
+      console.warn('MANUFACTURER: onClickApplyDeleteProductKit');
+      console.log('productKit', productKitId);
+      this.render.delete = true;
+      const response = await this.$store.dispatch(
+        'productKit/delProductKit',
+        productKitId
+      );
+      if (response.success) {
+        this.forms.message.text = 'Продуктовый набор удален!';
+        await this.updateListProductKits();
+      } else {
+        this.forms.message.text = response.message;
+      }
+      this.render.delete = false;
+    },
+    // FIX: ==========================================================
+    onClickDeleteProductKit(productKitId) {
+      console.warn('MANUFACTURER: onClickDeleteProductKit');
+      console.log('productKit for delete', productKitId);
+      this.forms.message.text = 'Удалить продуктовый набор?';
+      this.forms.message.active = true;
+    },
+
+    // NOTE: Products
     onClickDeleteProduct(product) {
       this.$store.commit('products/SET_DELETE_PRODUCT_RUN');
       this.deleteState.data = product;
@@ -480,21 +535,21 @@ export default {
         this.deleteState.errors.push(error);
       }
     },
-    async onClickDeleteProductKit(productKit) {
-      const productId = Number.parseInt(productKit.product);
-      this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_RUN');
-      try {
-        const response = await this.$store.dispatch(
-          'productKit/delProductKit',
-          productId
-        );
-        console.warn(response);
-      } catch (error) {
-        console.warn(error);
+    // async onClickDeleteProductKit(productKit) {
+    //   const productId = Number.parseInt(productKit.product);
+    //   this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_RUN');
+    //   try {
+    //     const response = await this.$store.dispatch(
+    //       'productKit/delProductKit',
+    //       productId
+    //     );
+    //     console.warn(response);
+    //   } catch (error) {
+    //     console.warn(error);
 
-        this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_ERROR');
-      }
-    },
+    //     this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_ERROR');
+    //   }
+    // },
     onClickSellProductKit(productKit) {
       console.warn('MANUFACTURER.VUE: onClickSellProductKit');
       console.warn(productKit);

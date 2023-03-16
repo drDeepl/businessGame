@@ -27,11 +27,22 @@ export const productKit = {
     },
     async delProductKit(context, productKitId) {
       console.warn('STORE.MODULE.PRODUCT_KIT: deleteProductKit');
-      const responseWrap = await ProductKit.api().deleteProductKit(
-        productKitId
-      );
-      context.commit('SET_PRODUCT_KIT_RUN_DELETE_COMPLETE');
-      return responseWrap.response.data;
+      // FIX: Как обработать ошибку?
+
+      const responseWrap = await ProductKit.api()
+        .deleteProductKit(productKitId)
+        .catch((response) => response.response);
+      const status = responseWrap.response
+        ? responseWrap.response.status
+        : responseWrap.status;
+      const isSuccess = status === 200;
+      const response = {success: isSuccess, data: null, message: null};
+      if (isSuccess) {
+        response.data = responseWrap.response.data;
+      } else {
+        response.message = 'При удалении произошла ошибка...';
+      }
+      return response;
     },
   },
   getters: {
