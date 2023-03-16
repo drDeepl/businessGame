@@ -128,7 +128,6 @@ export default {
       balanceTeam: 'team/GET_BALANCE_VALUE',
       activeTab: 'mainLayout/GET_CURRENT_TAB',
       isOffersUpdate: 'shopState/GET_OFFERS_UPDATE_RUNNING',
-      isProductsUpdate: 'producs/GET_LIST_PRODUCTS_UPDATE',
     }),
     currentUser() {
       return this.$store.state.auth.user;

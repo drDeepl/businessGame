@@ -114,9 +114,11 @@
               :parentFunction="onClickApplySellProductKit"
               :cancelForm="onClickCancelForm"
               :load="$store.getters['offer/GET_offerSale']"
+              :applySuccess="forms.formSellProductKit.applySucces"
             >
               <!-- // FIX :select="forms.formSellProductKit.select" -->
               {{ currentOfferModel.props }}
+
               <!-- <v-select
                 class="form-slot"
                 :items="arrays.namesTeam"
@@ -127,6 +129,15 @@
               >
               </v-select> -->
             </Form>
+            <ErrorAlert
+              v-if="forms.hasErrors"
+              :errorsAr="forms.errors"
+              :hasErrors="forms.hasErrors"
+            >
+              <v-btn class="btn-apply" @click="onClickAlertApply"
+                >Понятно</v-btn
+              >
+            </ErrorAlert>
           </div>
           <div v-else>
             <p>Заготовленные продуктовые наборы отсутствуют</p>
@@ -188,14 +199,15 @@ import Form from '@/UI/Form.vue';
 import ProductCard from '@/UI/ProductCard.vue';
 // FIX: import DialogError from '@/UI/DialogError.vue';
 import Load from '@/UI/Load.vue';
+import ErrorAlert from '@/UI/ErrorAlert.vue';
 import {mapGetters} from 'vuex';
 
 export default {
   components: {
     Load,
-
     Form,
     ProductCard,
+    ErrorAlert,
   },
   data() {
     return {
@@ -210,6 +222,7 @@ export default {
       },
       dict: {
         namesTeam: {},
+        teams: {},
       },
       deleteState: {
         errors: [],
@@ -226,6 +239,8 @@ export default {
       },
 
       forms: {
+        hasErrors: false,
+        errors: [],
         activeForm: '',
         titleForm: '',
         formAddProduct: {
@@ -272,10 +287,12 @@ export default {
     // const namesTeam = teams.items.map((team) => team.name);
     let arrayNamesTeam = [];
     let dictNamesTeam = {};
+    let dictTeams = {};
     teams.forEach(function (team) {
       const teamName = team.name;
       arrayNamesTeam.push(teamName);
       dictNamesTeam[teamName] = team.id;
+      dictTeams[Number(team.id)] = team;
     });
 
     // const teamNames = teams.map((item) => {
@@ -286,6 +303,7 @@ export default {
     this.arrays.productKits = productKits;
     this.arrays.products = products;
     this.dict.namesTeam = dictNamesTeam;
+    this.dict.teams = dictTeams;
     this.render.content = false;
   },
   computed: {
@@ -489,31 +507,48 @@ export default {
       this.forms.formSellProductKit.active = true;
     },
     // TODO: =====================================================================================
+
     async onClickApplySellProductKit(saleOfferProductKit) {
       console.warn('MANUFACTURER: onClickApplySellProductKit');
+      this.forms.formSellProductKit.applySucces = false;
       // console.log(this.forms.formSellProductKit.model.data);
       console.log(saleOfferProductKit);
       const teamId = this.dict.namesTeam[saleOfferProductKit['team_id']];
       saleOfferProductKit['team_id'] = teamId;
       console.log(saleOfferProductKit);
-      // INFO: Протестить, когда "AttributeError: 'NoneType' object has no attribute 'group_send' "
-      // FIX: To test websocket on offers
-      const offerSalePlace = await this.$store.dispatch(
-        'offer/offerSalePlace',
-        {
-          price: saleOfferProductKit.price,
-          product_kit_id: saleOfferProductKit.product_kit_id,
-        }
+      const teamAccount = this.dict.teams[Number(teamId)].account;
+      console.log('TEAM ACC', teamAccount);
+      // FIX: func of get team_balance
+      const account = await this.$store.dispatch(
+        'account/getAccountById',
+        teamAccount
       );
-      console.log(offerSalePlace);
-      const offerId = offerSalePlace.id;
-      const offerSaleAcquire = await this.$store.dispatch(
-        'offer/offerSaleAcquire',
-        {offerId: offerId, teamId: teamId}
-      );
-      console.log(offerSaleAcquire);
+      const teamBalance = account.balance;
 
-      this.$store.commit('offer/SET_offerSale');
+      if (saleOfferProductKit.price <= teamBalance) {
+        const offerSalePlace = await this.$store.dispatch(
+          'offer/offerSalePlace',
+          {
+            price: saleOfferProductKit.price,
+            product_kit_id: saleOfferProductKit.product_kit_id,
+          }
+        );
+        console.log(offerSalePlace);
+        const offerId = offerSalePlace.id;
+        const offerSaleAcquire = await this.$store.dispatch(
+          'offer/offerSaleAcquire',
+          {offerId: offerId, teamId: teamId}
+        );
+        console.log(offerSaleAcquire);
+
+        this.$store.commit('offer/SET_offerSale_COMPLETE');
+        this.forms.formSellProductKit.applySucces = true;
+      } else {
+        this.forms.hasErrors = true;
+        const msgError = 'У команды недостаточно средств для покупки';
+        this.forms.errors.push(msgError);
+      }
+
       // console.warn(saleOfferProductKit);
       // saleOfferProductKit.price = Number.parseInt(saleOfferProductKit.price);
       // console.error(saleOfferProductKit);
@@ -530,6 +565,11 @@ export default {
       const activeForm = this.forms.activeForm;
       console.error(activeForm);
       this.forms[activeForm].active = false;
+    },
+    onClickAlertApply() {
+      console.warn('MANUFACTURER: onClickAlertApply');
+      this.forms.hasErrors = false;
+      this.forms.errors = [];
     },
   },
 };

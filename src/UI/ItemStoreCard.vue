@@ -14,6 +14,7 @@
         </div>
 
         <span class="">{{ nameProduct }}</span>
+        <span>{{ item }}</span>
       </v-card-title>
 
       <v-card-text

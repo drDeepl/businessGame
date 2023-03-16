@@ -10,7 +10,10 @@ export const account = {
       context.commit('SET_GET_ACCOUNT');
       const responseWrap = await Account.api().getAccount(accountId);
       context.commit('SET_GET_ACCOUNT_COMPLETE');
-      return responseWrap.response.data;
+      const data = responseWrap.response.items
+        ? responseWrap.response.items.data
+        : responseWrap.response.data;
+      return data;
     },
   },
   getters: {

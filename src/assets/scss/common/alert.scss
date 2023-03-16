@@ -4,3 +4,8 @@
 .alert-success > * {
   fill: #43d681;
 }
+
+.alert-error-layer {
+  border-top: 5px solid $color-red !important;
+  border-radius: $card-radius;
+}
