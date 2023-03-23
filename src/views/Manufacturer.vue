@@ -52,16 +52,6 @@
             >
               <v-card-actions class="manufacturer-card-action">
                 <v-btn
-                  v-if="dataCurrentUser.is_superuser"
-                  class="mt-1 manufacturer-action-btn"
-                  outlined
-                  rounded
-                  color="#ee5544"
-                  @click.prevent="onClickDeleteProduct(product)"
-                >
-                  <span class="product-btn-action-text">удалить</span>
-                </v-btn>
-                <v-btn
                   class="mt-1 manufacturer-action-btn"
                   outlined
                   rounded
@@ -69,6 +59,16 @@
                   @click.prevent="onClickCreateProductKit(product)"
                 >
                   <span class="product-btn-action-text">cоздать комплект</span>
+                </v-btn>
+                <v-btn
+                  v-if="dataCurrentUser"
+                  class="mt-1 manufacturer-action-btn"
+                  outlined
+                  rounded
+                  color="#ee5544"
+                  @click.prevent="onClickDeleteProduct(product)"
+                >
+                  <span class="product-btn-action-text">удалить</span>
                 </v-btn>
               </v-card-actions>
             </ProductCard>
@@ -79,60 +79,66 @@
         <v-tab-item class="mt-2">
           <Load v-if="render.content" />
           <div class="products-cards" v-if="arrays.productKits.length > 0">
-            <ProductCard
-              v-for="productKit in arrays.productKits"
-              :key="productKit.id"
-              :item="productKit"
-              :title="{
-                title: arrays.products.find(
-                  (item) => item.id == productKit.product
-                ).name,
-              }"
-              :modelItem="modelsCard.productKit"
-              :showLabel="true"
-            >
-              <ErrorAlert
-                v-if="forms.message.active"
-                :errorsAr="[forms.message.text]"
-                :hasErrors="forms.message.active"
+            <div v-for="productKit in arrays.productKits" :key="productKit.id">
+              <ProductCard
+                :item="productKit"
+                :title="{
+                  title: arrays.products.find(
+                    (item) => item.id == productKit.product
+                  ).name,
+                }"
+                :modelItem="modelsCard.productKit"
+                :showLabel="true"
               >
-                <v-btn
-                  class="btn-cancel"
-                  @click="onClickApplyDeleteProductKit(productKit.product)"
-                  :loading="render.delete"
-                  >Удалить</v-btn
+                <ErrorAlert
+                  v-if="forms.message.active"
+                  :errorsAr="[forms.message.text]"
+                  :hasErrors="forms.message.active"
                 >
-                <v-btn
-                  :disabled="render.delete"
-                  class="btn-apply"
-                  @click="
-                    () => {
-                      forms.message.active = false;
-                    }
-                  "
-                  >Закрыть</v-btn
-                >
-              </ErrorAlert>
-              <v-card-actions class="d-flex flex-column justify-center">
-                <v-btn
-                  class="btn-put-to-sell"
-                  outlined
-                  rounded
-                  color="#ee5544"
-                  @click.prevent="onClickSellProductKit(productKit)"
-                >
-                  <span class="btn-put-to-sell-text">Продать</span>
-                </v-btn>
-                <v-btn
-                  class="btn-put-to-sell"
-                  text
-                  color="red deep"
-                  @click="onClickDeleteProductKit(productKit.id)"
-                >
-                  Удалить
-                </v-btn>
-              </v-card-actions>
-            </ProductCard>
+                  <v-btn
+                    class="btn-cancel"
+                    @click="onClickApplyDeleteProductKit(productKit.product)"
+                    :loading="render.delete"
+                    >Удалить</v-btn
+                  >
+                  <v-btn
+                    :disabled="render.delete"
+                    class="btn-apply"
+                    @click="
+                      () => {
+                        forms.message.active = false;
+                      }
+                    "
+                    >Закрыть</v-btn
+                  >
+                </ErrorAlert>
+                <v-card-actions class="d-flex flex-column justify-center">
+                  <v-btn
+                    text
+                    color="blue"
+                    @click="showInfoProductKit(productKit)"
+                    >?</v-btn
+                  >
+                  <v-btn
+                    class="btn-put-to-sell"
+                    outlined
+                    rounded
+                    color="#ee5544"
+                    @click.prevent="onClickSellProductKit(productKit)"
+                  >
+                    <span class="btn-put-to-sell-text">Продать</span>
+                  </v-btn>
+                  <v-btn
+                    class="btn-put-to-sell"
+                    text
+                    color="red deep"
+                    @click="onClickDeleteProductKit(productKit.id)"
+                  >
+                    Удалить
+                  </v-btn>
+                </v-card-actions>
+              </ProductCard>
+            </div>
             <!-- // INFO: Form of sell ProductKit -->
             <Form
               :activate="forms.formSellProductKit.active"
@@ -201,6 +207,24 @@
         :applySuccess="forms.formAddProductKit.applySuccess"
       >
       </Form>
+      <!-- // INFO: Всплывающее предупреждение  -->
+
+      <ErrorAlert
+        v-if="alert.warn.active"
+        :errorsAr="[alert.warn.message]"
+        :hasErrors="alert.warn.active"
+      >
+        <v-btn
+          class="btn-cancel"
+          v-if="!deleteState.product.isDelete"
+          :loading="render.delete"
+          @click="onClickApplyDeleteProduct"
+          >Удалить</v-btn
+        >
+        <v-btn class="btn-apply" @click="onClickCancelDeleteProduct"
+          >Закрыть</v-btn
+        >
+      </ErrorAlert>
     </div>
   </div>
 </template>
@@ -246,6 +270,7 @@ export default {
       deleteState: {
         errors: [],
         data: {},
+        product: {isDelete: false},
       },
       tabs: {
         tabsAction: this.$store.getters['products/GET_LIST_TABS_ACTION'],
@@ -256,7 +281,13 @@ export default {
         product: new ModelProduct(),
         productKit: new ModelProductKit(),
       },
-
+      currentItem: {data: null},
+      alert: {
+        warn: {
+          active: false,
+          message: '',
+        },
+      },
       forms: {
         hasErrors: false,
         errors: [],
@@ -379,15 +410,9 @@ export default {
     },
   },
   methods: {
-    // getProduct(productId) {
-    //   let product = this.$store
-    //     .$db()
-    //     .model('products')
-    //     .query()
-    //     .where('id', productId)
-    //     .first();
-    //   return product;
-    // },
+    showInfoProductKit(productKit) {
+      console.log('PRODUCT KIT\n', productKit);
+    },
 
     async onClickTabProductKits() {
       console.warn('MANUFACTURER.VUE: onClickTabProductKits');
@@ -506,29 +531,40 @@ export default {
 
     // NOTE: Products
     onClickDeleteProduct(product) {
-      this.$store.commit('products/SET_DELETE_PRODUCT_RUN');
-      this.deleteState.data = product;
+      this.alert.warn.active = true;
+      this.alert.warn.message = `Удалить продукт "${product.name}"?`;
+      this.currentItem.data = product;
     },
     onClickCancelDeleteProduct() {
-      this.deleteState.data = {};
+      this.alert.warn.active = false;
+      this.alert.warn.message = '';
+      this.deleteState.product.isDelete = false;
     },
-    async onClicApplykDeleteProduct() {
+    async onClickApplyDeleteProduct() {
       console.warn('MANUFACTURER.VUE: onClickDeleteProduct');
       this.$store.commit('products/SET_DELETE_PRODUCT');
-      const product = this.deleteState.data;
+      this.render.delete = true;
+      const product = this.currentItem.data;
       console.warn(product);
 
+      const products = this.arrays.products.filter((item) => {
+        return item.id != product.id;
+      });
+      const productKits = this.arrays.productKits.filter((item) => {
+        return item.product != product.id;
+      });
+      this.arrays.productKits = productKits;
+      this.arrays.products = products;
+
       try {
-        this.$store.$db().model('products').delete(product.id);
         const response = await this.$store.dispatch(
           'products/deleteProduct',
           product.id
         );
-        await this.onClickTabProductKits();
-        await this.$store.dispatch('products/getProducts');
-
+        this.alert.warn.message = 'Продукт был успешно удалён!✔️';
+        this.render.delete = false;
+        this.deleteState.product.isDelete = true;
         console.warn(response);
-        this.onClickCancelDeleteProduct();
       } catch (error) {
         console.warn(error);
         this.$store.commit('products/SET_DELETE_PRODUCT_ERROR');

@@ -29,10 +29,11 @@ export default class ProductKit extends Model {
         console.warn('STORE.MODEL.PRODUCT_KIT: getListProductKits');
         return this.get('product-kits');
       },
-      async deleteProductKit(productId) {
+      async deleteProductKit(productKitId) {
         console.warn('STORE.MODEL.PRODUCT_KIT: deleteProductKit');
-        const responseWrap = await this.delete('product-kits/' + productId);
-        return responseWrap;
+        return this.delete('product-kits/' + productKitId, {
+          delete: productKitId,
+        });
       },
     },
   };
