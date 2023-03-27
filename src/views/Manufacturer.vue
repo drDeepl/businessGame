@@ -28,7 +28,7 @@
             ><span class="panel-tabs text">продукты</span></v-tab
           >
 
-          <v-tab class="panel-tabs tabs" @click="onClickTabProductKits">
+          <v-tab class="panel-tabs tabs">
             <span class="panel-tabs text">продуктовые наборы</span>
           </v-tab>
         </div>
@@ -80,38 +80,17 @@
           <Load v-if="render.content" />
           <div class="products-cards" v-if="arrays.productKits.length > 0">
             <div v-for="productKit in arrays.productKits" :key="productKit.id">
+              <!-- default {title: arrays.products.find(
+                    (item) => item.id == productKit.product
+                  ).name,} -->
               <ProductCard
                 :item="productKit"
                 :title="{
-                  title: arrays.products.find(
-                    (item) => item.id == productKit.product
-                  ).name,
+                  title: dict.namesProduct[productKit.product],
                 }"
                 :modelItem="modelsCard.productKit"
                 :showLabel="true"
               >
-                <ErrorAlert
-                  v-if="forms.message.active"
-                  :errorsAr="[forms.message.text]"
-                  :hasErrors="forms.message.active"
-                >
-                  <v-btn
-                    class="btn-cancel"
-                    @click="onClickApplyDeleteProductKit(productKit.product)"
-                    :loading="render.delete"
-                    >Удалить</v-btn
-                  >
-                  <v-btn
-                    :disabled="render.delete"
-                    class="btn-apply"
-                    @click="
-                      () => {
-                        forms.message.active = false;
-                      }
-                    "
-                    >Закрыть</v-btn
-                  >
-                </ErrorAlert>
                 <v-card-actions class="d-flex flex-column justify-center">
                   <v-btn
                     text
@@ -132,7 +111,7 @@
                     class="btn-put-to-sell"
                     text
                     color="red deep"
-                    @click="onClickDeleteProductKit(productKit.id)"
+                    @click="onClickDeleteProductKit(productKit)"
                   >
                     Удалить
                   </v-btn>
@@ -225,6 +204,28 @@
           >Закрыть</v-btn
         >
       </ErrorAlert>
+      <ErrorAlert
+        v-if="forms.message.active"
+        :errorsAr="[forms.message.text]"
+        :hasErrors="forms.message.active"
+      >
+        <v-btn
+          class="btn-cancel"
+          @click="onClickApplyDeleteProductKit()"
+          :loading="render.delete"
+          >Удалить</v-btn
+        >
+        <v-btn
+          :disabled="render.delete"
+          class="btn-apply"
+          @click="
+            () => {
+              forms.message.active = false;
+            }
+          "
+          >Закрыть</v-btn
+        >
+      </ErrorAlert>
     </div>
   </div>
 </template>
@@ -266,6 +267,8 @@ export default {
       dict: {
         namesTeam: {},
         teams: {},
+        deletedProductKits: {}, // INFO: {id: true},
+        namesProduct: {},
       },
       deleteState: {
         errors: [],
@@ -333,12 +336,26 @@ export default {
     this.render.content = true;
     const products = await this.$store.dispatch('products/getProducts');
     const productKits = await this.$store.dispatch('productKit/getProductKits');
+    // TODO: TEST======================================================================
+    const deletedProductKits = localStorage.getItem('deletedProductKits')
+      ? JSON.parse(localStorage.getItem('deletedProductKits'))
+      : {};
 
+    this.dict.deletedProductKits = deletedProductKits;
+    const productKitWithoutDeleted = productKits.filter((productKit) => {
+      return !deletedProductKits[productKit.id];
+    });
+    console.log('PRODUCT KITS WITHOUT DELETED', productKitWithoutDeleted);
+    // TODO: TEST======================================================================
     const teams = await this.$store.dispatch('team/getTeams');
     // const namesTeam = teams.items.map((team) => team.name);
     let arrayNamesTeam = [];
     let dictNamesTeam = {};
     let dictTeams = {};
+    let dictNamesProduct = {};
+    products.forEach(function (product) {
+      dictNamesProduct[product.id] = product.name;
+    });
     teams.forEach(function (team) {
       const teamName = team.name;
       arrayNamesTeam.push(teamName);
@@ -351,10 +368,11 @@ export default {
     // });
     console.log(productKits);
     this.arrays.namesTeam = arrayNamesTeam;
-    this.arrays.productKits = productKits;
+    this.arrays.productKits = productKitWithoutDeleted;
     this.arrays.products = products;
     this.dict.namesTeam = dictNamesTeam;
     this.dict.teams = dictTeams;
+    this.dict.namesProduct = dictNamesProduct;
     this.render.content = false;
   },
   computed: {
@@ -410,18 +428,15 @@ export default {
     },
   },
   methods: {
+    // INFO: Utils
     showInfoProductKit(productKit) {
       console.log('PRODUCT KIT\n', productKit);
     },
-
-    async onClickTabProductKits() {
-      console.warn('MANUFACTURER.VUE: onClickTabProductKits');
-      const listProductsKits = await this.$store.dispatch(
-        'productKit/getProductKits'
-      );
-
-      this.arrays.productKits = listProductsKits;
+    clearCurrentItem() {
+      console.log('CLEAR CURRENT ITEM');
+      this.currentItem.data = null;
     },
+
     onClickActionTab(form, title) {
       this.forms.activeForm = form;
       this.forms.titleForm = title;
@@ -503,28 +518,51 @@ export default {
       );
       this.arrays.productKits = productKits;
     },
+    upgradeProductKits() {
+      console.warn('upgradeProductKits');
+      const currentProductKits = this.arrays.productKits;
+      const deletedProductKits = this.dict.deletedProductKits;
+      console.log(deletedProductKits);
+      const newProductKits = currentProductKits.filter((productKit) => {
+        return !deletedProductKits[productKit.id];
+      });
+      console.log('NEW PRODUCTKITS', newProductKits);
+      this.arrays.productKits = newProductKits;
+    },
     // FIX: ==========================================================
     // TODO: обработка ошибки
-    async onClickApplyDeleteProductKit(productKitId) {
+    async onClickApplyDeleteProductKit() {
       console.warn('MANUFACTURER: onClickApplyDeleteProductKit');
-      console.log('productKit', productKitId);
+      const productKit = this.currentItem.data;
+      console.log('productKit', productKit);
       this.render.delete = true;
-      const response = await this.$store.dispatch(
-        'productKit/delProductKit',
-        productKitId
+      this.dict.deletedProductKits[productKit.id] = true;
+      this.upgradeProductKits();
+      const deletedProductKits = this.dict.deletedProductKits;
+      localStorage.setItem(
+        'deletedProductKits',
+        JSON.stringify(deletedProductKits)
       );
-      if (response.success) {
-        this.forms.message.text = 'Продуктовый набор удален!';
-        await this.updateListProductKits();
-      } else {
-        this.forms.message.text = response.message;
-      }
+      this.forms.message.text = 'Продуктовый набор удалён!';
+      this.clearCurrentItem();
+
+      // const response = await this.$store.dispatch(
+      //   'productKit/delProductKit',
+      //   productKitId
+      // );
+      // if (response.success) {
+      //   this.forms.message.text = 'Продуктовый набор удален!';
+      //   await this.updateListProductKits();
+      // } else {
+      //   this.forms.message.text = response.message;
+      // }
       this.render.delete = false;
     },
     // FIX: ==========================================================
-    onClickDeleteProductKit(productKitId) {
+    onClickDeleteProductKit(productKit) {
       console.warn('MANUFACTURER: onClickDeleteProductKit');
-      console.log('productKit for delete', productKitId);
+      console.log('productKit for delete', productKit);
+      this.currentItem.data = productKit;
       this.forms.message.text = 'Удалить продуктовый набор?';
       this.forms.message.active = true;
     },
