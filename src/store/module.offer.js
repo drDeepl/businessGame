@@ -21,6 +21,7 @@ export const offer = {
       console.warn('MODULE.OFFER: getOffers');
       const responseWrap = await OfferSale.api().getListOffersSale();
       context.commit('SET_OFFERS_LIST_UPDATE_COMPLETE');
+      console.log(responseWrap.response);
       const offers = responseWrap.response.data.items
         ? responseWrap.response.data.items
         : responseWrap.response.data;

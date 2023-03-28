@@ -23,8 +23,14 @@ export const productKit = {
     },
     async createProductKit(context, productKit) {
       context.commit('SET_CREATE_PRODUCT_KIT');
-      await ProductKit.api().createProductKit(productKit);
+
+      const responseWrap = await ProductKit.api()
+        .createProductKit(productKit)
+        .catch((error) => console.log(error));
+      const data = responseWrap.response.data;
+      return data;
     },
+
     async delProductKit(context, productKitId) {
       console.warn('STORE.MODULE.PRODUCT_KIT: deleteProductKit');
       // FIX: Как обработать ошибку?

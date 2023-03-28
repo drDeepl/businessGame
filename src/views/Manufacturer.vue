@@ -80,9 +80,6 @@
           <Load v-if="render.content" />
           <div class="products-cards" v-if="arrays.productKits.length > 0">
             <div v-for="productKit in arrays.productKits" :key="productKit.id">
-              <!-- default {title: arrays.products.find(
-                    (item) => item.id == productKit.product
-                  ).name,} -->
               <ProductCard
                 :item="productKit"
                 :title="{
@@ -92,12 +89,6 @@
                 :showLabel="true"
               >
                 <v-card-actions class="d-flex flex-column justify-center">
-                  <v-btn
-                    text
-                    color="blue"
-                    @click="showInfoProductKit(productKit)"
-                    >?</v-btn
-                  >
                   <v-btn
                     class="btn-put-to-sell"
                     outlined
@@ -429,9 +420,7 @@ export default {
   },
   methods: {
     // INFO: Utils
-    showInfoProductKit(productKit) {
-      console.log('PRODUCT KIT\n', productKit);
-    },
+
     clearCurrentItem() {
       console.log('CLEAR CURRENT ITEM');
       this.currentItem.data = null;
@@ -506,8 +495,13 @@ export default {
           'Такой продуктовый набор уже существует'
         );
       } else {
-        await this.$store.dispatch('productKit/createProductKit', productKit);
+        const createdProductKit = await this.$store.dispatch(
+          'productKit/createProductKit',
+          productKit
+        );
+        console.log('CREATED PRODUCT KIT:', createdProductKit);
         this.forms.formAddProductKit.applySuccess = true;
+        this.arrays.productKits.push(createdProductKit);
       }
       this.$store.commit('productKit/SET_CREATE_PRODUCT_KIT_COMPLETE');
     },

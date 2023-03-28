@@ -176,7 +176,7 @@ export default {
       }),
         this.$store.dispatch('offer/getOffersPurchase').then((response) => {
           // this.myJson_p = response.data;
-          console.log('OFFERS: PURCHASE ', response.data);
+          console.log('OFFERS: PURCHASE ', response);
         });
       // FIX: Как узнать о продаже оффера?
     };
