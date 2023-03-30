@@ -37,10 +37,11 @@
 
         <v-tab-item class="mt-2 panel-tabs">
           <Load v-if="getListProducts || render.content" />
-          <span v-else-if="arrays.products.length == 0">
-            нет готовых продуктов
-            {{ arrays.products }}
-          </span>
+
+          <Empty
+            v-else-if="arrays.products.length == 0"
+            title="Склад с продуктами пуст"
+          />
 
           <div v-else class="products-cards">
             <ProductCard
@@ -132,9 +133,7 @@
               >
             </ErrorAlert>
           </div>
-          <div v-else>
-            <p>Заготовленные продуктовые наборы отсутствуют</p>
-          </div>
+          <Empty v-else title="Склад с продуктовыми наборами пуст" />
         </v-tab-item>
       </v-tabs>
       <!-- // INFO: Форма создания продукта  -->
@@ -230,6 +229,7 @@ import CreateSellOffer from '@/models/model.productKit.sell';
 
 import Form from '@/UI/Form.vue';
 import ProductCard from '@/UI/ProductCard.vue';
+import Empty from '@/UI/Empty.vue';
 // FIX: import DialogError from '@/UI/DialogError.vue';
 import Load from '@/UI/Load.vue';
 import ErrorAlert from '@/UI/ErrorAlert.vue';
@@ -242,6 +242,7 @@ export default {
     Form,
     ProductCard,
     ErrorAlert,
+    Empty,
   },
   data() {
     return {
@@ -463,10 +464,10 @@ export default {
           'products/createProduct',
           createdProduct
         );
-        console.log(product);
+        console.log(`CREATED PRODUCT: ${product}`);
+        this.dict.namesProduct[product.id] = product.name;
         this.arrays.products.push(product);
       } else {
-        // FIX:перенести в словарь с сообщениями
         const message =
           'Продукт с названием "' + createdProduct.name + '" уже существует';
         this.forms.formAddProduct.errors.push(message);
@@ -523,8 +524,7 @@ export default {
       console.log('NEW PRODUCTKITS', newProductKits);
       this.arrays.productKits = newProductKits;
     },
-    // FIX: ==========================================================
-    // TODO: обработка ошибки
+
     async onClickApplyDeleteProductKit() {
       console.warn('MANUFACTURER: onClickApplyDeleteProductKit');
       const productKit = this.currentItem.data;
@@ -539,26 +539,68 @@ export default {
       );
       this.forms.message.text = 'Продуктовый набор удалён!';
       this.clearCurrentItem();
-
-      // const response = await this.$store.dispatch(
-      //   'productKit/delProductKit',
-      //   productKitId
-      // );
-      // if (response.success) {
-      //   this.forms.message.text = 'Продуктовый набор удален!';
-      //   await this.updateListProductKits();
-      // } else {
-      //   this.forms.message.text = response.message;
-      // }
       this.render.delete = false;
     },
-    // FIX: ==========================================================
+
     onClickDeleteProductKit(productKit) {
       console.warn('MANUFACTURER: onClickDeleteProductKit');
       console.log('productKit for delete', productKit);
       this.currentItem.data = productKit;
       this.forms.message.text = 'Удалить продуктовый набор?';
       this.forms.message.active = true;
+    },
+    onClickSellProductKit(productKit) {
+      console.warn('MANUFACTURER.VUE: onClickSellProductKit');
+      console.warn(productKit);
+      this.forms.activeForm = 'formSellProductKit';
+      this.forms.titleForm = 'выставить на продажу';
+      this.forms.formSellProductKit.disableFields['product_kit_id'] = true;
+      this.forms.formSellProductKit.model.data['product_kit_id'] =
+        productKit.id;
+      this.forms.formSellProductKit.select['team_id'] = this.arrays.namesTeam;
+      this.forms.formSellProductKit.active = true;
+      this.currentItem.data = productKit;
+    },
+    async onClickApplySellProductKit(saleOfferProductKit) {
+      console.warn('MANUFACTURER: onClickApplySellProductKit');
+      this.forms.formSellProductKit.applySucces = false;
+      console.log(saleOfferProductKit);
+      const teamId = this.dict.namesTeam[saleOfferProductKit['team_id']];
+      saleOfferProductKit['team_id'] = teamId;
+      console.log(saleOfferProductKit);
+      const teamAccount = this.dict.teams[Number(teamId)].account;
+      console.log('TEAM ACC', teamAccount);
+      const account = await this.$store.dispatch(
+        'account/getAccountById',
+        teamAccount
+      );
+      const teamBalance = account.balance;
+
+      if (saleOfferProductKit.price <= teamBalance) {
+        const offerSalePlace = await this.$store.dispatch(
+          'offer/offerSalePlace',
+          {
+            team_id: teamId,
+            price: saleOfferProductKit.price,
+            product_kit_id: saleOfferProductKit.product_kit_id,
+          }
+        );
+        console.log(offerSalePlace);
+        const offerId = offerSalePlace.id;
+        const offerSaleAcquire = await this.$store.dispatch(
+          'offer/offerSaleAcquire',
+          {offerId: offerId, teamId: teamId}
+        );
+        console.log(offerSaleAcquire);
+
+        this.$store.commit('offer/SET_offerSale_COMPLETE');
+        this.onClickApplyDeleteProductKit();
+        this.forms.formSellProductKit.applySucces = true;
+      } else {
+        this.forms.hasErrors = true;
+        const msgError = 'У команды недостаточно средств для покупки';
+        this.forms.errors.push(msgError);
+      }
     },
 
     // NOTE: Products
@@ -603,86 +645,7 @@ export default {
         this.deleteState.errors.push(error);
       }
     },
-    // async onClickDeleteProductKit(productKit) {
-    //   const productId = Number.parseInt(productKit.product);
-    //   this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_RUN');
-    //   try {
-    //     const response = await this.$store.dispatch(
-    //       'productKit/delProductKit',
-    //       productId
-    //     );
-    //     console.warn(response);
-    //   } catch (error) {
-    //     console.warn(error);
 
-    //     this.$store.commit('productKit/SET_PRODUCT_KIT_DELETE_ERROR');
-    //   }
-    // },
-    onClickSellProductKit(productKit) {
-      console.warn('MANUFACTURER.VUE: onClickSellProductKit');
-      console.warn(productKit);
-      this.forms.activeForm = 'formSellProductKit';
-      this.forms.titleForm = 'выставить на продажу';
-      this.forms.formSellProductKit.disableFields['product_kit_id'] = true;
-      this.forms.formSellProductKit.model.data['product_kit_id'] =
-        productKit.id;
-      this.forms.formSellProductKit.select['team_id'] = this.arrays.namesTeam;
-      this.forms.formSellProductKit.active = true;
-    },
-    // TODO: =====================================================================================
-
-    async onClickApplySellProductKit(saleOfferProductKit) {
-      console.warn('MANUFACTURER: onClickApplySellProductKit');
-      this.forms.formSellProductKit.applySucces = false;
-      // console.log(this.forms.formSellProductKit.model.data);
-      console.log(saleOfferProductKit);
-      const teamId = this.dict.namesTeam[saleOfferProductKit['team_id']];
-      saleOfferProductKit['team_id'] = teamId;
-      console.log(saleOfferProductKit);
-      const teamAccount = this.dict.teams[Number(teamId)].account;
-      console.log('TEAM ACC', teamAccount);
-      // FIX: func of get team_balance
-      const account = await this.$store.dispatch(
-        'account/getAccountById',
-        teamAccount
-      );
-      const teamBalance = account.balance;
-
-      if (saleOfferProductKit.price <= teamBalance) {
-        const offerSalePlace = await this.$store.dispatch(
-          'offer/offerSalePlace',
-          {
-            price: saleOfferProductKit.price,
-            product_kit_id: saleOfferProductKit.product_kit_id,
-          }
-        );
-        console.log(offerSalePlace);
-        const offerId = offerSalePlace.id;
-        const offerSaleAcquire = await this.$store.dispatch(
-          'offer/offerSaleAcquire',
-          {offerId: offerId, teamId: teamId}
-        );
-        console.log(offerSaleAcquire);
-
-        this.$store.commit('offer/SET_offerSale_COMPLETE');
-        this.forms.formSellProductKit.applySucces = true;
-      } else {
-        this.forms.hasErrors = true;
-        const msgError = 'У команды недостаточно средств для покупки';
-        this.forms.errors.push(msgError);
-      }
-
-      // console.warn(saleOfferProductKit);
-      // saleOfferProductKit.price = Number.parseInt(saleOfferProductKit.price);
-      // console.error(saleOfferProductKit);
-
-      // const offer = await this.$store.dispatch(
-      //   'offer/offerSalePlace',
-      //   saleOfferProductKit
-      // );
-      // console.error(offer);
-    },
-    // TODO: =====================================================================================
     onClickCancelForm() {
       console.warn('MANUFACTURER.VUE: onClickCancelForm');
       const activeForm = this.forms.activeForm;

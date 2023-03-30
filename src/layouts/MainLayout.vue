@@ -91,8 +91,9 @@
 <script>
 import {app} from '@/_config';
 import User from '@/store/models/User';
-
+// import OfferSale from '@/store/models/OfferSale';
 import Load from '@/UI/Load.vue';
+import OfferApi from '@/api/offer.api';
 
 import {mapGetters} from 'vuex';
 // import Product from '@/store/models/Product';
@@ -102,6 +103,7 @@ export default {
     return {
       test: '',
       title: app.title,
+      // FIX:Как уведомить игрока о покупке оффера?
       userId: 0,
       loading: {
         main: this.$store.getters['mainLayout/LOADING'],
@@ -148,17 +150,12 @@ export default {
   watch: {
     async isOffersUpdate(offersUpdate) {
       console.error('WATCH: isOffersUpdate', offersUpdate);
-      if (offersUpdate) {
-        // OfferSale.api()
-        //   .getListOffersSale()
-        //   .then((result) => {
-        //     this.arrays.offers = result.response.data;
-        //   });
-        await this.$store.dispatch('offer/getOffersSale');
-        await this.$store.dispatch('products/getProducts');
-        await this.$store.dispatch('productKit/getProductKits');
-        this.$store.commit('shopState/SET_OFFERS_UPDATE_COMPLETE');
-      }
+      // if (offersUpdate) {
+      //   await this.$store.dispatch('offer/getOffersSale');
+      //   await this.$store.dispatch('products/getProducts');
+      //   await this.$store.dispatch('productKit/getProductKits');
+      //   this.$store.commit('shopState/SET_OFFERS_UPDATE_COMPLETE');
+      // }
     },
     async isProductsUpdate(productsUpdate) {
       if (productsUpdate) {
@@ -170,18 +167,17 @@ export default {
   async created() {
     this.connection = new WebSocket('ws://localhost:8000/ws/');
     this.connection.onmessage = () => {
-      this.$store.dispatch('offer/getOffersSale').then((response) => {
+      OfferApi.offersSale().then((response) => {
         // this.myJson_s = response.data;
-        console.log('OFFERS: SALE ', response);
-      }),
-        this.$store.dispatch('offer/getOffersPurchase').then((response) => {
-          // this.myJson_p = response.data;
-          console.log('OFFERS: PURCHASE ', response);
-        });
+        console.log('OFFERS SALE\n', response.data);
+      });
+
+      // OfferApi.offersPurchase().then((response) => {
+      //   // this.myJson_p = response.data;
+      //   console.log('OFFERS PURCHASE\n', response.data);
+      // });
       // FIX: Как узнать о продаже оффера?
     };
-    console.warn(User.api());
-
     if (this.isLoggedIn) {
       const username = this.currentUser.username;
       const responseUser = await this.$store.dispatch(
@@ -208,6 +204,7 @@ export default {
         console.warn('LIST TEAMS\n', teams);
       }
       if (roleUser == 'player' && !dataUser.is_superuser) {
+        console.warn(User.api());
         const teamId = dataUser.team;
         console.error('DATA USER\n', dataUser);
         this.$store.commit('team/SET_BALANCE_RUNNING');

@@ -26,6 +26,7 @@
 
           <div class="d-flex justify-center" v-else>
             <div v-for="productKit in productKits" :key="productKit.id">
+              {{ productKit }}
               <ProductKitCard
                 :nameProduct="dicts.products[productKit.product_kit.product]"
                 :countItems="productKit.count"

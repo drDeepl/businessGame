@@ -16,11 +16,6 @@ export const router = new Router({
       component: () => import('@/layouts/MainLayout.vue'),
       children: [
         {
-          path: '/socket',
-          name: 'socket',
-          component: () => import('@/views/Socket.vue'),
-        },
-        {
           path: '/profile',
           name: 'profile',
           component: () => import('@/views/Profile.vue'),
