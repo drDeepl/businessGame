@@ -230,7 +230,7 @@ import CreateSellOffer from '@/models/model.productKit.sell';
 import Form from '@/UI/Form.vue';
 import ProductCard from '@/UI/ProductCard.vue';
 import Empty from '@/UI/Empty.vue';
-// FIX: import DialogError from '@/UI/DialogError.vue';
+
 import Load from '@/UI/Load.vue';
 import ErrorAlert from '@/UI/ErrorAlert.vue';
 
@@ -377,7 +377,7 @@ export default {
       isDeleteProductKitRun: 'productKit/GET_PRODUCT_KIT_DELETE_RUN',
       isGetProductKits: 'productKit/STATE_getProductKits',
 
-      dataCurrentUser: 'user/GET_DATA_CURRENT_USER',
+      dataCurrentUser: 'user/GET_CURRENT_USER_DATA',
     }),
     stateProduct() {
       return this.$store.getters['stateShop/GET_STATE_PRODUCT'];
@@ -586,12 +586,14 @@ export default {
           }
         );
         console.log(offerSalePlace);
-        const offerId = offerSalePlace.id;
-        const offerSaleAcquire = await this.$store.dispatch(
-          'offer/offerSaleAcquire',
-          {offerId: offerId, teamId: teamId}
-        );
-        console.log(offerSaleAcquire);
+        // FIX: На время проверки вебсокетов закомменчу
+        // const offerId = offerSalePlace.id;
+        // const offerSaleAcquire = await this.$store.dispatch(
+        //   'offer/offerSaleAcquire',
+        //   {offerId: offerId, teamId: teamId}
+        // );
+        // console.log(offerSaleAcquire);
+        // FIX: ========================================
 
         this.$store.commit('offer/SET_offerSale_COMPLETE');
         this.onClickApplyDeleteProductKit();

@@ -1,6 +1,7 @@
 import ProductService from '@/services/product.service';
 import ProductStorage from '@/store/models/ProductStorage';
 import Product from './models/Product';
+import Messages from '@/models/model.messages';
 
 export const products = {
   namespaced: true,
@@ -57,6 +58,20 @@ export const products = {
         : responseWrap.response.data;
       context.commit('SET_GET_LIST_PRODUCTS_COMPLETE');
       return products;
+    },
+    async getProduct(context, productId) {
+      console.warn('module.productKit: getProductKit');
+      let response = {status: 200, error: false, data: null, message: ''};
+      const responseWrap = await Product.api()
+        .getProduct(productId)
+        .catch((error) => (response.status = error.status));
+      if (response.status === 200) {
+        response.data = responseWrap.response.data;
+      } else {
+        response.message = Messages.error;
+        response.error = true;
+      }
+      return response;
     },
     async deleteProduct(context, productId) {
       console.warn('MODULE.PRODUCTS: deleteProduct');

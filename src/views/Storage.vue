@@ -209,7 +209,7 @@ export default {
       prepareProduct: 'storageTeam/GET_STATE_PREPARE_PRODUCT',
       prepareProductTimeToFinal: 'storageTeam/GET_prepareProduct_TIME',
       isGetProductKits: 'storageTeam/GET_STATE_TEAM_PRODUCTS_KIT_RUN',
-      dataCurrentUser: 'user/GET_DATA_CURRENT_USER',
+      dataCurrentUser: 'user/GET_CURRENT_USER_DATA',
       offerPurchaseComplete: 'offer/GET_OFFER_ACQUIRE_COMPLETE',
       offerPurchaseInProgress: 'offer/GET_STATE_OFFER_PREPARE',
     }),

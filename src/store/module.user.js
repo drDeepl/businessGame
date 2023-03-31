@@ -17,7 +17,7 @@ export const user = {
       updating: false,
     },
     deleteUser: false,
-    dataCurrentUser: null,
+    currentUserData: null,
     linksSidebarByRole: {
       // INFO: role: [{title: String, url: String,}]
       player: playerSidebarLinks,
@@ -109,8 +109,8 @@ export const user = {
     },
   },
   getters: {
-    GET_DATA_CURRENT_USER: (state) => {
-      return state.dataCurrentUser;
+    GET_CURRENT_USER_DATA: (state) => {
+      return state.currentUserData;
     },
     GET_CREATE_USER: (state) => {
       console.warn('MODULE.USER: GET_CREATE_USER');
@@ -134,8 +134,8 @@ export const user = {
     },
   },
   mutations: {
-    SET_DATA_CURRENT_USER: function (state, userData) {
-      state.dataCurrentUser = userData;
+    SET_CURRENT_USER_DATA: function (state, userData) {
+      state.currentUserData = userData;
     },
     SET_CREATING_USER: function (state) {
       state.createUser = true;

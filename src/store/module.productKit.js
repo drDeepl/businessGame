@@ -1,4 +1,5 @@
 import ProductKit from './models/ProductKit';
+import Messages from '@/models/model.messages';
 export const productKit = {
   namespaced: true,
   state: {
@@ -30,7 +31,35 @@ export const productKit = {
       const data = responseWrap.response.data;
       return data;
     },
+    async getProductKit(context, productKitId) {
+      console.warn('module.productKit: getProductKit');
+      let response = {status: 200, error: false, data: null, message: ''};
+      const responseWrap = await ProductKit.api()
+        .getProductKit(productKitId)
+        .catch((error) => (response.status = error.status));
+      if (response.status === 200) {
+        response.data = responseWrap.response.data;
+      } else {
+        response.message = Messages.error;
+        response.error = true;
+      }
+      return response;
+    },
 
+    async getProductFromProductKit(context, productKitId) {
+      console.warn('module.productKit: getProductKit');
+      let response = {status: 200, error: false, data: null, message: ''};
+      const responseWrap = await ProductKit.api()
+        .getProductFromProductKit(productKitId)
+        .catch((error) => (response.status = error.status));
+      if (response.status === 200) {
+        response.data = responseWrap.response.data;
+      } else {
+        response.message = Messages.error;
+        response.error = true;
+      }
+      return response;
+    },
     async delProductKit(context, productKitId) {
       console.warn('STORE.MODULE.PRODUCT_KIT: deleteProductKit');
       // FIX: Как обработать ошибку?

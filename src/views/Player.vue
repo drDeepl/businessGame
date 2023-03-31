@@ -27,7 +27,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      dataCurrentUser: 'user/GET_DATA_CURRENT_USER',
+      dataCurrentUser: 'user/GET_CURRENT_USER_DATA',
     }),
   },
 };

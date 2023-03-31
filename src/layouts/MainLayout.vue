@@ -78,6 +78,24 @@
           <div class="row">
             <div class="col-lg-12">
               <div class="content-wrapper">
+                <DialogAlert
+                  v-if="alert.newOffer.active"
+                  title="Предложение о покупке"
+                  :active="alert.newOffer.active"
+                >
+                  <OfferProductKitCard
+                    :title="alert.newOffer.offer"
+                    :item="alert.newOffer.offer"
+                    :modelItem="model.offerSale"
+                  ></OfferProductKitCard>
+                </DialogAlert>
+                <DialogError
+                  v-if="alert.error.active"
+                  :title="alert.error.message"
+                  :active="alert.error.active"
+                >
+                  <v-btn @click.prevent="onClickErrorClose" text>закрыть</v-btn>
+                </DialogError>
                 <router-view />
               </div>
             </div>
@@ -91,20 +109,33 @@
 <script>
 import {app} from '@/_config';
 import User from '@/store/models/User';
-// import OfferSale from '@/store/models/OfferSale';
+
+import OfferProductKitCard from '@/UI/OfferProductKitCard.vue';
 import Load from '@/UI/Load.vue';
+import DialogAlert from '@/UI/DialogAlert.vue';
+import DialogError from '@/UI/DialogError.vue';
 import OfferApi from '@/api/offer.api';
 
+import SaleOffer from '@/models/model.offer.sale';
 import {mapGetters} from 'vuex';
-// import Product from '@/store/models/Product';
-// import ProductKit from '@/store/models/ProductKit';
+
 export default {
+  components: {Load, DialogAlert, DialogError, OfferProductKitCard},
   data() {
     return {
       test: '',
       title: app.title,
-      // FIX:Как уведомить игрока о покупке оффера?
-      userId: 0,
+      alert: {
+        newOffer: {active: false, offer: null},
+        error: {active: false, message: null},
+      },
+      model: {
+        offerSale: SaleOffer,
+      },
+      arrays: {
+        saleOffers: [],
+        purchaseOffers: [],
+      },
       loading: {
         main: this.$store.getters['mainLayout/LOADING'],
         sidebarUserInfo: true,
@@ -130,6 +161,7 @@ export default {
       balanceTeam: 'team/GET_BALANCE_VALUE',
       activeTab: 'mainLayout/GET_CURRENT_TAB',
       isOffersUpdate: 'shopState/GET_OFFERS_UPDATE_RUNNING',
+      currentUserData: 'user/GET_CURRENT_USER_DATA',
     }),
     currentUser() {
       return this.$store.state.auth.user;
@@ -148,14 +180,23 @@ export default {
     },
   },
   watch: {
-    async isOffersUpdate(offersUpdate) {
-      console.error('WATCH: isOffersUpdate', offersUpdate);
-      // if (offersUpdate) {
-      //   await this.$store.dispatch('offer/getOffersSale');
-      //   await this.$store.dispatch('products/getProducts');
-      //   await this.$store.dispatch('productKit/getProductKits');
-      //   this.$store.commit('shopState/SET_OFFERS_UPDATE_COMPLETE');
-      // }
+    async 'alert.newOffer.offer'(offer) {
+      // FIX: Добавить в оффер название продукта
+      console.log('NEW OFFER SALE: ', offer);
+      // TODO: Write on backend feature to getNameProduct on ProductKitId
+      const response = await this.$store.dispatch(
+        'productKit/getProductFromProductKit',
+        offer.product_kit
+      );
+
+      if (response.error) {
+        this.alert.error.active = true;
+        this.alert.error.message = response.message;
+      } else {
+        const product = response.data;
+
+        console.log('PRODUCT', product);
+      }
     },
     async isProductsUpdate(productsUpdate) {
       if (productsUpdate) {
@@ -170,6 +211,19 @@ export default {
       OfferApi.offersSale().then((response) => {
         // this.myJson_s = response.data;
         console.log('OFFERS SALE\n', response.data);
+        console.log('USERS DATA\n', this.currentUserData);
+        const currentUserTeam = this.currentUserData.team;
+        const offer = response.data.pop();
+        const offerToTeam = offer.team;
+
+        if (currentUserTeam === offerToTeam) {
+          console.log(
+            `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
+          );
+          this.alert.newOffer.offer = offer;
+          this.alert.newOffer.active = true;
+          // this.arrays.saleOffers.push(offer);
+        }
       });
 
       // OfferApi.offersPurchase().then((response) => {
@@ -186,7 +240,7 @@ export default {
       );
 
       const dataUser = responseUser.data;
-      this.$store.commit('user/SET_DATA_CURRENT_USER', dataUser);
+      this.$store.commit('user/SET_CURRENT_USER_DATA', dataUser);
       const roleUser = dataUser.role.toLowerCase();
 
       await this.$store.dispatch('products/getProducts');
@@ -229,6 +283,10 @@ export default {
   },
 
   methods: {
+    onClickErrorClose() {
+      this.alert.error.active = false;
+      this.alert.error.message = null;
+    },
     async onClickMenu() {
       this.sidebar.isActive = !this.sidebar.isActive;
 
@@ -255,6 +313,5 @@ export default {
       this.$router.push('/profile');
     },
   },
-  components: {Load},
 };
 </script>

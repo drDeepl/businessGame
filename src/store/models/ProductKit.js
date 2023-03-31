@@ -2,6 +2,7 @@ import {Model} from '@vuex-orm/core';
 import Product from './Product';
 // import ProductProductKit from './ProductProductKit';
 import TokenService from '@/services/token.service';
+
 console.warn('MODEL.PRODUCT_KIT');
 
 export default class ProductKit extends Model {
@@ -28,6 +29,14 @@ export default class ProductKit extends Model {
       async getListProductKits() {
         console.warn('STORE.MODEL.PRODUCT_KIT: getListProductKits');
         return this.get('product-kits');
+      },
+      async getProductKit(productKitId) {
+        console.warn('STORE.MODEL.PRODUCT_KIT: getProductKit');
+        return this.get('product-kits/' + productKitId);
+      },
+      async getProductFromProductKit(productKitId) {
+        console.warn('STORE.MODEL.PRODUCT_KIT: getProductKit');
+        return this.get('product-kits/name-product/' + productKitId);
       },
       async deleteProductKit(productKitId) {
         console.warn('STORE.MODEL.PRODUCT_KIT: deleteProductKit');

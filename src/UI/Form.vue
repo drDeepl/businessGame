@@ -1,97 +1,96 @@
 <template>
-  <v-dialog
-    v-model="activate"
-    persistent
-    :width="messageSuccess ? '5em' : '25rem'"
-    content-class="panel-tabs"
-  >
-    <v-expand-transition>
-      <Alert
-        v-if="messageSuccess"
-        :showAlertSuccess="messageSuccess"
-        title="Готово!"
-      >
-        <v-btn
-          class="mt-3 mb-2 btn-apply"
-          @click.prevent="messageSuccess = false"
+  <div>
+    <v-dialog
+      v-model="activate"
+      persistent
+      :width="messageSuccess ? '5em' : '25rem'"
+      content-class="panel-tabs"
+    >
+      <v-expand-transition>
+        <Alert
+          v-if="messageSuccess"
+          :showAlertSuccess="messageSuccess"
+          title="Готово!"
         >
-          продолжить</v-btn
-        >
-      </Alert>
-
-      <v-card v-else class="border-top-card pa-0 ma-0">
-        <v-form
-          ref="form"
-          class="admin-form pa-2"
-          @submit.prevent="onClickApplyForm"
-        >
-          <div class="form-title d-flex justify-center">
-            <span>{{ title }}</span>
-          </div>
-
-          <!-- // INFO: Проверка на показ элементов -->
-          <div v-for="textField in Object.keys(model.props)" :key="textField">
-            <!-- // NOTE: Если свойство модели совпадает со свойством select -->
-            <!-- // NOTE: То текстовое поле не отображается -->
-            <div v-if="Object.keys(select).indexOf(textField) >= 0">
-              <v-select
-                v-if="!disableFields.hasOwnProperty(textField)"
-                color="#6c63ff"
-                class="pr-2 pl-2 ma-1"
-                v-model="createdModel[textField]"
-                :items="select[textField]"
-                :label="model.props[textField]"
-                :rules="form.rules.field"
-              >
-              </v-select>
+          <!-- default messageSuccess = false -->
+          <v-btn class="mt-3 mb-2 btn-apply" @click="onClickAlertApplySuccess">
+            продолжить</v-btn
+          >
+        </Alert>
+        <v-card v-else class="border-top-card pa-0 ma-0">
+          <v-form
+            ref="form"
+            class="admin-form pa-2"
+            @submit.prevent="onClickApplyForm"
+          >
+            <div class="form-title d-flex justify-center">
+              <span>{{ title }}</span>
             </div>
-            <div v-else>
-              <v-text-field
-                v-if="!disableFields.hasOwnProperty(textField)"
-                color="#6c63ff"
-                class="pr-2 pl-2 ma-1"
-                v-model="createdModel[textField]"
-                :label="model.props[textField]"
-                :rules="form.rules[model.ruleValidate[textField]]"
-                required
-              ></v-text-field>
-            </div>
-          </div>
-          <v-alert v-if="errorsMessage.length > 0">
-            <v-card-text class="ma-0 pa-0"
-              >Возникли следующие ошибки:</v-card-text
-            >
-            <ul class="form-errors-container">
-              <li
-                class="form-error-message"
-                v-for="error in errorsMessage"
-                :key="error"
-              >
-                <v-card-text class="mt-1 pa-0 form-error-text">
-                  {{ error }}
-                </v-card-text>
-              </li>
-            </ul>
-          </v-alert>
-          <slot></slot>
-          <div class="admin-btn-form pb-2 pt-1">
-            <v-btn
-              class="btn-apply"
-              :loading="load"
-              @click="onClickApplyForm()"
-            >
-              Подтвердить
-            </v-btn>
 
-            <v-spacer></v-spacer>
-            <v-btn class="btn-cancel" @click.prevent="onClickCancelForm">
-              Отмена
-            </v-btn>
-          </div>
-        </v-form>
-      </v-card>
-    </v-expand-transition>
-  </v-dialog>
+            <!-- // INFO: Проверка на показ элементов -->
+            <div v-for="textField in Object.keys(model.props)" :key="textField">
+              <!-- // NOTE: Если свойство модели совпадает со свойством select -->
+              <!-- // NOTE: То текстовое поле не отображается -->
+              <div v-if="Object.keys(select).indexOf(textField) >= 0">
+                <v-select
+                  v-if="!disableFields.hasOwnProperty(textField)"
+                  color="#6c63ff"
+                  class="pr-2 pl-2 ma-1"
+                  v-model="createdModel[textField]"
+                  :items="select[textField]"
+                  :label="model.props[textField]"
+                  :rules="form.rules.field"
+                >
+                </v-select>
+              </div>
+              <div v-else>
+                <v-text-field
+                  v-if="!disableFields.hasOwnProperty(textField)"
+                  color="#6c63ff"
+                  class="pr-2 pl-2 ma-1"
+                  v-model="createdModel[textField]"
+                  :label="model.props[textField]"
+                  :rules="form.rules[model.ruleValidate[textField]]"
+                  required
+                ></v-text-field>
+              </div>
+            </div>
+            <v-alert v-if="errorsMessage.length > 0">
+              <v-card-text class="ma-0 pa-0"
+                >Возникли следующие ошибки:</v-card-text
+              >
+              <ul class="form-errors-container">
+                <li
+                  class="form-error-message"
+                  v-for="error in errorsMessage"
+                  :key="error"
+                >
+                  <v-card-text class="mt-1 pa-0 form-error-text">
+                    {{ error }}
+                  </v-card-text>
+                </li>
+              </ul>
+            </v-alert>
+            <slot></slot>
+            <div class="admin-btn-form pb-2 pt-1">
+              <v-btn
+                class="btn-apply"
+                :loading="load"
+                @click="onClickApplyForm()"
+              >
+                Подтвердить
+              </v-btn>
+
+              <v-spacer></v-spacer>
+              <v-btn class="btn-cancel" @click="onClickCancelForm">
+                Отмена
+              </v-btn>
+            </div>
+          </v-form>
+        </v-card>
+      </v-expand-transition>
+    </v-dialog>
+  </div>
 </template>
 
 <script>
@@ -181,6 +180,7 @@ export default {
       console.warn('FORM.VUE: watch succes validate');
       if (value) {
         this.$refs.form.reset();
+
         this.messageSuccess = true;
       }
     },
@@ -209,9 +209,15 @@ export default {
     },
     onClickCancelForm() {
       console.warn('FORM.vue: onClickCancelForm');
+      this.messageSuccess = false;
       this.$refs.form.reset();
       // this.$refs.form.resetValidation();
       return this.cancelForm();
+    },
+    onClickAlertApplySuccess() {
+      console.warn('FORM.vue: onClickAlertApplySuccess');
+      this.cancelForm();
+      this.messageSuccess = false;
     },
     onClickSelect(textField) {
       console.warn('FORM.VUE: onClickSelect');

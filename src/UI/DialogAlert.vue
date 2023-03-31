@@ -1,5 +1,5 @@
 <template>
-  <div class="dialog-alert-wrapper">
+  <div class="dialog-error-wrapper">
     <v-dialog
       persistent
       max-width="20em"

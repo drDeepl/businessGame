@@ -241,9 +241,9 @@ export default {
       longPollId: 'shopState/GET_LONG_POLL_ID',
       isOffersUpdateComplete: 'shopState/GET_OFFERS_UPDATE_COMPLETE',
       balanceTeam: 'team/GET_BALANCE_VALUE',
-      dataCurrentUser: 'user/GET_DATA_CURRENT_USER',
+      dataCurrentUser: 'user/GET_CURRENT_USER_DATA',
       offersListUpdate: 'offer/GET_OFFERS_LIST_UPDATE',
-      currentUserData: 'user/GET_DATA_CURRENT_USER',
+      currentUserData: 'user/GET_CURRENT_USER_DATA',
       isOfferAcquireError: 'offer/GET_OFFER_ACQUIRE_ERROR',
     }),
     offersSale: {

@@ -1,4 +1,4 @@
-export default class SaleOffer {
+class SaleOffer {
   constructor() {
     this.props = {
       id: 'id',
@@ -45,3 +45,5 @@ export default class SaleOffer {
     };
   }
 }
+
+export default new SaleOffer();
