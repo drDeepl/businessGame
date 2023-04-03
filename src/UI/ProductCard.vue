@@ -5,7 +5,7 @@
       v-for="array in Object.entries(title)"
       :key="array[0]"
     >
-      <span>{{ array[1] }}</span>
+      <span class="title-text">{{ array[1] }}</span>
     </v-card-title>
     <div
       class="product-card-content"

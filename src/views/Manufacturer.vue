@@ -133,6 +133,7 @@
               >
             </ErrorAlert>
           </div>
+
           <Empty v-else title="Склад с продуктовыми наборами пуст" />
         </v-tab-item>
       </v-tabs>
@@ -392,10 +393,7 @@ export default {
     currentUser() {
       return this.$store.state.auth.user;
     },
-    // products() {
-    //   console.warn('MANUFACTURER.VUE: products');
-    //   return this.$store.$db().model('products').query().get();
-    // },
+
     productKits() {
       console.warn('MANUFACTURER.VUE: productKits');
       return this.arrays.productKits;
@@ -586,14 +584,6 @@ export default {
           }
         );
         console.log(offerSalePlace);
-        // FIX: На время проверки вебсокетов закомменчу
-        // const offerId = offerSalePlace.id;
-        // const offerSaleAcquire = await this.$store.dispatch(
-        //   'offer/offerSaleAcquire',
-        //   {offerId: offerId, teamId: teamId}
-        // );
-        // console.log(offerSaleAcquire);
-        // FIX: ========================================
 
         this.$store.commit('offer/SET_offerSale_COMPLETE');
         this.onClickApplyDeleteProductKit();

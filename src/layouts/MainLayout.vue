@@ -78,17 +78,41 @@
           <div class="row">
             <div class="col-lg-12">
               <div class="content-wrapper">
-                <DialogAlert
+                <v-dialog
                   v-if="alert.newOffer.active"
-                  title="Предложение о покупке"
-                  :active="alert.newOffer.active"
+                  :value="alert.newOffer.active"
+                  persistent
+                  max-width="20em"
                 >
                   <OfferProductKitCard
                     :title="alert.newOffer.offer"
                     :item="alert.newOffer.offer"
                     :modelItem="model.offerSale"
-                  ></OfferProductKitCard>
-                </DialogAlert>
+                    :propsItemToShow="
+                      Object.keys(model.offerSale.props).filter(
+                        (item) => !model.offerSale.hideShow[item]
+                      )
+                    "
+                    :isSucces="alert.success.active"
+                    :successApply="onClickNewOfferCancel"
+                  >
+                    <v-btn
+                      class="btn-apply"
+                      @click="onClickNewOfferApply"
+                      :loading="alert.load.newOffer"
+                    >
+                      Принять
+                    </v-btn>
+
+                    <v-btn
+                      class="btn-cancel"
+                      @click="onClickNewOfferCancel"
+                      :disabled="alert.load.newOffer"
+                    >
+                      Отклонить
+                    </v-btn>
+                  </OfferProductKitCard>
+                </v-dialog>
                 <DialogError
                   v-if="alert.error.active"
                   :title="alert.error.message"
@@ -112,7 +136,7 @@ import User from '@/store/models/User';
 
 import OfferProductKitCard from '@/UI/OfferProductKitCard.vue';
 import Load from '@/UI/Load.vue';
-import DialogAlert from '@/UI/DialogAlert.vue';
+
 import DialogError from '@/UI/DialogError.vue';
 import OfferApi from '@/api/offer.api';
 
@@ -120,14 +144,29 @@ import SaleOffer from '@/models/model.offer.sale';
 import {mapGetters} from 'vuex';
 
 export default {
-  components: {Load, DialogAlert, DialogError, OfferProductKitCard},
+  components: {Load, DialogError, OfferProductKitCard},
   data() {
     return {
       test: '',
       title: app.title,
       alert: {
-        newOffer: {active: false, offer: null},
+        newOffer: {
+          active: false,
+          offer: null,
+          // active: true,
+          // offer: {
+          //   id: 10,
+          //   trader: 'manurer',
+          //   team: 1,
+          //   price: '2.00',
+          //   timestamp: '2023-03-31T02:21:53.375Z',
+          //   state: 'Active',
+          //   product_kit: 'горький шоколад',
+          // },
+        },
+        success: {active: false, message: null},
         error: {active: false, message: null},
+        load: {newOffer: false, success: false, error: false},
       },
       model: {
         offerSale: SaleOffer,
@@ -183,19 +222,24 @@ export default {
     async 'alert.newOffer.offer'(offer) {
       // FIX: Добавить в оффер название продукта
       console.log('NEW OFFER SALE: ', offer);
-      // TODO: Write on backend feature to getNameProduct on ProductKitId
-      const response = await this.$store.dispatch(
-        'productKit/getProductFromProductKit',
-        offer.product_kit
-      );
+      if (offer) {
+        const response = await this.$store.dispatch(
+          'productKit/getProductFromProductKit',
+          offer.product_kit
+        );
+        const trader = await this.$store.dispatch('user/getUser', offer.trader);
 
-      if (response.error) {
-        this.alert.error.active = true;
-        this.alert.error.message = response.message;
-      } else {
-        const product = response.data;
+        if (response.error) {
+          this.alert.error.active = true;
+          this.alert.error.message = response.message;
+        } else {
+          const product = response.data;
+          this.alert.newOffer.offer.product_kit = product.name;
+          this.alert.newOffer.offer.trader = trader.username;
+          this.alert.newOffer.active = true;
 
-        console.log('PRODUCT', product);
+          console.log('PRODUCT', product);
+        }
       }
     },
     async isProductsUpdate(productsUpdate) {
@@ -206,32 +250,6 @@ export default {
     },
   },
   async created() {
-    this.connection = new WebSocket('ws://localhost:8000/ws/');
-    this.connection.onmessage = () => {
-      OfferApi.offersSale().then((response) => {
-        // this.myJson_s = response.data;
-        console.log('OFFERS SALE\n', response.data);
-        console.log('USERS DATA\n', this.currentUserData);
-        const currentUserTeam = this.currentUserData.team;
-        const offer = response.data.pop();
-        const offerToTeam = offer.team;
-
-        if (currentUserTeam === offerToTeam) {
-          console.log(
-            `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
-          );
-          this.alert.newOffer.offer = offer;
-          this.alert.newOffer.active = true;
-          // this.arrays.saleOffers.push(offer);
-        }
-      });
-
-      // OfferApi.offersPurchase().then((response) => {
-      //   // this.myJson_p = response.data;
-      //   console.log('OFFERS PURCHASE\n', response.data);
-      // });
-      // FIX: Как узнать о продаже оффера?
-    };
     if (this.isLoggedIn) {
       const username = this.currentUser.username;
       const responseUser = await this.$store.dispatch(
@@ -258,6 +276,32 @@ export default {
         console.warn('LIST TEAMS\n', teams);
       }
       if (roleUser == 'player' && !dataUser.is_superuser) {
+        this.connection = new WebSocket('ws://localhost:8000/ws/');
+        this.connection.onmessage = () => {
+          OfferApi.offersSale().then((response) => {
+            // this.myJson_s = response.data;
+            console.log('OFFERS SALE\n', response.data);
+            console.log('USERS DATA\n', this.currentUserData);
+            const currentUserTeam = this.currentUserData.team;
+            const offer = response.data.pop();
+            const offerToTeam = offer.team;
+
+            if (currentUserTeam === offerToTeam) {
+              console.log(
+                `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
+              );
+              this.alert.newOffer.offer = offer;
+
+              // this.arrays.saleOffers.push(offer);
+            }
+          });
+
+          // OfferApi.offersPurchase().then((response) => {
+          //   // this.myJson_p = response.data;
+          //   console.log('OFFERS PURCHASE\n', response.data);
+          // });
+          // FIX: Как узнать о продаже оффера?
+        };
         console.warn(User.api());
         const teamId = dataUser.team;
         console.error('DATA USER\n', dataUser);
@@ -305,6 +349,35 @@ export default {
     setActiveTab(title) {
       this.$store.commit('mainLayout/SET_CURRENT_TAB', title);
     },
+    onClickNewOfferCancel() {
+      console.warn('MAINLAYOUT: onClickNewOfferCancel');
+      this.alert.newOffer.active = false;
+      this.alert.newOffer.offer = null;
+      this.alert.load.newOffer = false;
+    },
+    async onClickNewOfferApply() {
+      console.warn('MAINLAYOUT: onClickNewOfferApply');
+      this.alert.load.newOffer = true;
+      const offerSalePlace = this.alert.newOffer.offer;
+      console.log(offerSalePlace);
+      let offerId = offerSalePlace.id;
+      const teamId = offerSalePlace.team;
+      const responseOfferSaleAcquire = await this.$store.dispatch(
+        'offer/offerSaleAcquire',
+        {offerId: offerId, teamId: teamId}
+      );
+      console.log(responseOfferSaleAcquire);
+      if (responseOfferSaleAcquire.status === 200) {
+        console.log('Offer sell success');
+        this.alert.load.newOffer = false;
+        this.alert.success.active = true;
+      } else {
+        this.onClickNewOfferCancel();
+        this.alert.error.active = true;
+        this.alert.error.message = responseOfferSaleAcquire.message;
+      }
+    },
+
     OnLogOut() {
       this.$store.dispatch('auth/logout');
       this.$router.push('/');

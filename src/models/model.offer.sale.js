@@ -4,8 +4,9 @@ class SaleOffer {
       id: 'id',
       product: 'Комплект для продукта',
       product_kit: 'Продуктовый набор',
-      price: 'Цена',
       trader: 'Продавец',
+      price: 'Цена',
+      team: 'Команда',
       timestamp: 'Создан',
       state: 'Статус',
     };
@@ -13,6 +14,7 @@ class SaleOffer {
       id: 'number',
       product: 'field',
       trader: 'number',
+      team: 'field',
       price: 'number',
       timestamp: 'field',
       state: 'field',
@@ -22,6 +24,7 @@ class SaleOffer {
       id: 'number',
       product: 'field',
       trader: 'number',
+      team: 'number',
       price: 'number',
       timestamp: 'string',
       state: 'string',
@@ -31,6 +34,7 @@ class SaleOffer {
       id: '',
       product: '',
       trader: '',
+      team: '',
       price: 0,
       timestamp: '',
       state: '',
@@ -39,9 +43,9 @@ class SaleOffer {
     this.hideShow = {
       id: true,
       timestamp: true,
-      product_kit: true,
+      state: true,
       product: true,
-      trader: true,
+      team: true,
     };
   }
 }

@@ -10,7 +10,7 @@
         <v-card-title
           class="offer-card-text dialog-error-title font-weight-medium"
         >
-          <span class="dialog-error-title-text">
+          <span class="dialog-error-title-text title-text">
             {{ title }}
           </span>
         </v-card-title>

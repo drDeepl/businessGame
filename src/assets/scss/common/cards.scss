@@ -1,6 +1,20 @@
 .border-top-card {
   border-top: $border-top-width solid $color-purple !important;
 }
+
+.card-border-top-color-green {
+  border-top: $border-top-width solid $color-green !important;
+}
+
+.card-border-top-color-purple {
+  border-top: $border-top-width solid $color-purple !important;
+  border-radius: inherit;
+}
+
+.v-dialog.v-dialog--active {
+  border-radius: $card-radius !important;
+}
+
 .cards-container {
   display: grid !important;
   grid-template-columns: 16em 16em;
@@ -29,6 +43,45 @@
   width: 84vw;
 }
 
+.offer-card-content {
+  display: grid;
+  grid-template-columns: repeat(2, 7em);
+  justify-content: center;
+  grid-gap: 1em;
+}
+
+.offer-sale {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.offer-sale.head {
+  margin-top: 0.5em;
+  grid-column-start: 1 !important;
+  grid-column-end: 3 !important;
+}
+
+.offer-sale > .offer-sale-row-text {
+  color: $color-soft-orange;
+}
+.offer-sale > .offer-sale-row-label {
+  color: $color-grey;
+}
+
+.offer-sale.main {
+  // border: 1px solid $color-orange;
+  border-radius: $card-radius;
+  background-color: $color-background-orange;
+  box-shadow: 2px 2px 3px $color-soft-orange;
+}
+
+.offer-sale-row-label {
+  padding-bottom: 0;
+  margin-top: 1em;
+}
+
 @media (max-width: 480px) {
   .products-cards {
     display: flex;
@@ -43,117 +96,15 @@
   }
 }
 
-.offer-card {
-  padding-top: 1em;
-  padding-bottom: 1em;
-  // min-height: 10em;
-  // min-width: 13em;
+.offer-sale-row-label {
+  padding: 0;
+  margin: 0;
 }
 
-// .card-wrapper {
-//   border: 1px solid red !important;
-// }
-
-.offer-card-title,
-.offer-card-suibtitle {
-  display: flex !important;
-  flex-direction: column !important;
+.offer-sale-row-text {
+  padding: 0;
+  margin: 0;
 }
-
-.offer-card-title-text {
-  letter-spacing: 0.4em;
-}
-
-.offer-card-content {
-  display: grid !important;
-  margin-top: 0 !important;
-
-  grid-template-areas:
-    'head head'
-    'subtitle subtitle'
-    'price state' !important;
-}
-
-.offer-card-title.team-name {
-  font-size: 0.8em;
-  text-align: center;
-}
-
-.offer-card-item {
-  display: flex !important;
-  justify-content: center;
-}
-
-.offer-card-text {
-  padding: 0.4em !important;
-  font-size: 0.9em !important;
-}
-
-.offer-card-text-main {
-  align-self: center;
-}
-
-.offer-card-text-subtitle {
-  font-size: 0.95em !important;
-}
-
-.offer-card-head {
-  grid-area: head !important;
-  flex-direction: column;
-  align-items: center;
-}
-
-.offer-card-item.trader {
-  grid-area: subtitle !important;
-}
-
-.offer-card-item.price {
-  grid-area: price !important;
-}
-
-.offer-card-item.state {
-  grid-area: state !important;
-}
-
-.offer-card-text {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center;
-  font-size: 0.8em;
-}
-
-.offer-card-text-trader {
-  color: $color-orange;
-}
-.offer-card-text-main {
-  font-size: 1.16em;
-  border: 1px solid $color-green;
-  border-radius: 15px;
-  padding: 0.2em 1em;
-  color: $color-green;
-  background-color: $color-background-green;
-}
-
-.offer-card-text-main.state {
-  color: $color-purple;
-  background-color: $color-purple-background;
-  border: 1px solid $color-purple;
-  border-radius: 15px;
-  text-transform: lowercase;
-}
-
-.offer-card-text-main.price {
-  color: $color-orange;
-  border: 1px solid $color-orange;
-  background: $color-background-orange;
-  border-radius: 15px;
-}
-
-.offer-card-text-main.price,
-.offer-card-text-main.state {
-  padding: 0.1em 0.7em 0.2em 0.7em; // NOTE: top right bottom left
-}
-
 .card-action {
   cursor: pointer;
   :hover {

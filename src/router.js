@@ -47,11 +47,7 @@ export const router = new Router({
           name: 'customer',
           component: () => import('@/views/Customer.vue'),
         },
-        {
-          path: '/shop',
-          name: 'shop',
-          component: () => import('@/views/Shop.vue'),
-        },
+
         {
           path: '/storage',
           name: 'storage',

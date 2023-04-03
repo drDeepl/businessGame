@@ -3,8 +3,9 @@
     <div class="player-layout">
       <p>
         <span v-if="dataCurrentUser"
-          >Привет, {{ dataCurrentUser.username }}</span
-        >
+          >Привет, {{ dataCurrentUser.username }}
+        </span>
+
         <v-skeleton-loader v-else type="list-item"></v-skeleton-loader>
       </p>
     </div>
