@@ -42,12 +42,18 @@ export const offer = {
     async createOfferPurchase(context, modelOfferPurchase) {
       console.warn('MODULE.OFFER: createOfferPurchase');
       console.log(modelOfferPurchase);
+      const response = {status: 200, data: null, message: ''};
       let requestData = Object.assign({}, modelOfferPurchase);
-      const responseWrap = await OfferPurchase.api().offerPurchasePlace(
-        requestData
-      );
-      context.commit('SET_offerSale_COMPLETE');
-      return responseWrap.response.data;
+      const responseWrap = await OfferPurchase.api()
+        .offerPurchasePlace(requestData)
+        .catch((resp) => {
+          response.status = resp.status;
+        });
+      if (response.status === 200) {
+        response.data = responseWrap.response.data;
+        return response;
+      }
+      return response;
     },
     async offerPurchaseAcquire(context, offer_id) {
       const responseWrap = await OfferPurchase.api().offerPurchaseAcquire(

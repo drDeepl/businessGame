@@ -48,9 +48,9 @@ export default {
   components: {Alert},
   props: {
     title: {
-      type: Object,
+      type: String,
       default() {
-        return {};
+        return '';
       },
     },
     item: {

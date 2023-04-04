@@ -84,8 +84,7 @@
                   persistent
                   max-width="20em"
                 >
-                  <OfferProductKitCard
-                    :title="alert.newOffer.offer"
+                  <OfferCard
                     :item="alert.newOffer.offer"
                     :modelItem="model.offerSale"
                     :propsItemToShow="
@@ -111,7 +110,7 @@
                     >
                       Отклонить
                     </v-btn>
-                  </OfferProductKitCard>
+                  </OfferCard>
                 </v-dialog>
                 <DialogError
                   v-if="alert.error.active"
@@ -134,7 +133,7 @@
 import {app} from '@/_config';
 import User from '@/store/models/User';
 
-import OfferProductKitCard from '@/UI/OfferProductKitCard.vue';
+import OfferCard from '@/UI/OfferCard.vue';
 import Load from '@/UI/Load.vue';
 
 import DialogError from '@/UI/DialogError.vue';
@@ -144,7 +143,7 @@ import SaleOffer from '@/models/model.offer.sale';
 import {mapGetters} from 'vuex';
 
 export default {
-  components: {Load, DialogError, OfferProductKitCard},
+  components: {Load, DialogError, OfferCard},
   data() {
     return {
       test: '',
@@ -251,6 +250,7 @@ export default {
   },
   async created() {
     if (this.isLoggedIn) {
+      this.connection = new WebSocket('ws://localhost:8000/ws/');
       const username = this.currentUser.username;
       const responseUser = await this.$store.dispatch(
         'user/getUserDataByUsername',
@@ -275,8 +275,8 @@ export default {
 
         console.warn('LIST TEAMS\n', teams);
       }
+
       if (roleUser == 'player' && !dataUser.is_superuser) {
-        this.connection = new WebSocket('ws://localhost:8000/ws/');
         this.connection.onmessage = () => {
           OfferApi.offersSale().then((response) => {
             // this.myJson_s = response.data;
@@ -291,16 +291,8 @@ export default {
                 `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
               );
               this.alert.newOffer.offer = offer;
-
-              // this.arrays.saleOffers.push(offer);
             }
           });
-
-          // OfferApi.offersPurchase().then((response) => {
-          //   // this.myJson_p = response.data;
-          //   console.log('OFFERS PURCHASE\n', response.data);
-          // });
-          // FIX: Как узнать о продаже оффера?
         };
         console.warn(User.api());
         const teamId = dataUser.team;
@@ -319,6 +311,14 @@ export default {
         // this.sidebarUserInfo.balance.value = dataAccount.balance;
         this.$store.commit('team/SET_BALANCE', dataAccount.balance);
         this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
+      }
+      if (roleUser == 'customer') {
+        this.connection.onmessage = () => {
+          OfferApi.offersPurchase().then((response) => {
+            // this.myJson_p = response.data;
+            console.log('OFFERS PURCHASE\n', response.data);
+          });
+        };
       }
       this.sidebar.links = sidebarLinks;
     } else {
@@ -352,6 +352,8 @@ export default {
     onClickNewOfferCancel() {
       console.warn('MAINLAYOUT: onClickNewOfferCancel');
       this.alert.newOffer.active = false;
+      this.alert.success.active = false;
+      this.alert.error.active = false;
       this.alert.newOffer.offer = null;
       this.alert.load.newOffer = false;
     },

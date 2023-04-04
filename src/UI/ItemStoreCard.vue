@@ -3,18 +3,18 @@
     <v-card class="store-card-product-kit-wrapper" elevation="0">
       <v-card-title class="store-card-product-kit-title row-container pa-0">
         <small v-if="isProductKit">Комплект для продукта:</small>
-        <div class="justify-end">
+
+        <!-- <span>{{ item }}</span> -->
+        <div class="d-flex flex-column align-center justify-center">
+          <span class="">{{ nameProduct }}</span>
           <v-badge
             :value="countItems"
             :content="countItems + ' шт.'"
             color="red"
-            class="store-card-product-kit-subtitle mt-2"
+            inline
           >
           </v-badge>
         </div>
-
-        <span class="">{{ nameProduct }}</span>
-        <span>{{ item }}</span>
       </v-card-title>
 
       <v-card-text

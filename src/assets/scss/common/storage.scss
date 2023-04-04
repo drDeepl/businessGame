@@ -17,10 +17,13 @@
   grid-area: title !important;
 }
 
+.store-card-product-kit-title > span {
+  text-align: justify;
+  vertical-align: top;
+}
+
 .store-card-product-kit-subtitle {
   grid-area: subtitle !important;
-  //   align-self: center !important;
-  //   color: $color-red !important;
 }
 
 .store-card-product-kit-content-item {
@@ -31,7 +34,7 @@
 .store-card-product-kit-content-item > span {
   color: $color-orange;
   text-align: center;
-  width: 2.5em;
+  width: 20vw !important;
 }
 
 .store-card-product-kit-content-item.count {
@@ -64,3 +67,8 @@
   align-self: center !important;
 }
 
+.storage-content {
+  display: grid;
+  grid-template-columns: repeat(2, 50vw);
+  justify-content: center;
+}

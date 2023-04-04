@@ -55,10 +55,10 @@
                 ></v-text-field>
               </div>
             </div>
-            <v-alert v-if="errorsMessage.length > 0">
-              <v-card-text class="ma-0 pa-0"
-                >Возникли следующие ошибки:</v-card-text
-              >
+            <v-alert
+              v-if="errorsMessage.length > 0"
+              class="alert-error-form-layer"
+            >
               <ul class="form-errors-container">
                 <li
                   class="form-error-message"
@@ -82,7 +82,11 @@
               </v-btn>
 
               <v-spacer></v-spacer>
-              <v-btn class="btn-cancel" @click="onClickCancelForm">
+              <v-btn
+                class="btn-cancel"
+                :disabled="load"
+                @click="onClickCancelForm"
+              >
                 Отмена
               </v-btn>
             </div>
@@ -124,7 +128,7 @@ export default {
     },
     applySuccess: Boolean,
     select: {
-      // NOTE: {textField: {label: string, value: string}}
+      // NOTE: {textField: [items]}
       types: Object,
       default() {
         return {};

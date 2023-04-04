@@ -24,9 +24,8 @@
             <Empty title="Склад с продуктовыми наборами пуст" />
           </div>
 
-          <div class="d-flex justify-center" v-else>
+          <div class="storage-content" v-else>
             <div v-for="productKit in productKits" :key="productKit.id">
-              {{ productKit }}
               <ProductKitCard
                 :nameProduct="dicts.products[productKit.product_kit.product]"
                 :countItems="productKit.count"
@@ -86,7 +85,14 @@
               :countItems="product.count"
               :modelItem="cards.product.model"
             >
-              <v-btn text large color="deep-orange"> Продать </v-btn>
+              <v-btn
+                text
+                large
+                color="deep-orange"
+                @click="onClickSellProduct(product)"
+              >
+                Продать
+              </v-btn>
             </ProductCard>
 
             <!-- // FIX: Исправить или удалить -->
@@ -110,6 +116,19 @@
             >
               <!-- // FIX: Удалить -->
             </Form>
+            <Form
+              :title="form.title"
+              :activate="form.sellProduct.active"
+              v-if="form.sellProduct.active"
+              :model="form.sellProduct.model"
+              :load="form.isLoad"
+              :parentFunction="onClickApplySellProduct"
+              :cancelForm="onClickCancelForm"
+              :disableFields="form.sellProduct.model.hideShow"
+              :select="{customer_id: Object.keys(dicts.customers)}"
+              :errorsMessage="form.errors"
+            >
+            </Form>
           </div>
         </v-tab-item>
       </v-tabs>
@@ -125,6 +144,7 @@ import User from '@/store/models/User';
 
 import ProductKit from '@/models/model.productKit';
 import Product from '@/models/model.product';
+import CreateProductSell from '@/models/model.product.sell';
 
 import Load from '@/UI/Load.vue';
 import ItemStoreCard from '@/UI/ItemStoreCard.vue';
@@ -149,11 +169,20 @@ export default {
         progress: 0,
         productKit_id: null,
       },
+      form: {
+        currentActive: '',
+        title: '',
+        isLoad: false,
+        success: false,
+        errors: [],
+        currentData: null,
+        sellProduct: {active: false, model: CreateProductSell},
+      },
       arrays: {productKits: [], teamProducts: [], customerNames: []},
       error: {
         arraysCustomerNames: false,
       },
-      dicts: {products: {}}, // INFO: {productId:Name}
+      dicts: {products: {}, customers: {}}, // INFO: {productId:Name}
       cards: {
         productKit: {
           model: new ProductKit(),
@@ -167,10 +196,16 @@ export default {
   async created() {
     this.load.main = true;
     const answer = await this.$store.dispatch('user/getCustomerNames');
+    let customers = null;
+    if (answer.status === 200) {
+      customers = answer.data;
+      customers.forEach((customer) => {
+        this.dicts.customers[customer.username] = customer.id;
+      });
+    } else {
+      this.errors.arraysCustomerNames = true;
+    }
 
-    answer.status === 200
-      ? (this.arrays.customerNames = answer.data)
-      : (this.errors.arraysCustomerNames = true);
     const username = this.$store.state.auth.user.username;
     const userData = (await User.api().getUserByUsername(username)).response
       .data;
@@ -287,6 +322,47 @@ export default {
         .first();
       const nameProduct = product.name ? product.name : '';
       return nameProduct;
+    },
+    onClickCancelForm() {
+      console.warn('STORAGE: onClickCancelForm');
+      const activeForm = this.form.currentActive;
+      this.form[activeForm].active = false;
+      this.form.currentData = null;
+      this.form.title = '';
+      this.form.errors = [];
+    },
+    onClickSellProduct(product) {
+      console.warn('STORAGE: onClickSellProduct');
+      console.log(product);
+      this.form.currentData = product;
+      this.form.currentActive = 'sellProduct';
+      this.form.title = `Продажа продукта "${product.product.name}"`;
+      this.form.sellProduct.active = true;
+    },
+    async onClickApplySellProduct(modelOfferProductSell) {
+      console.warn('STORAGE: onClickApplySellProduct');
+      if (modelOfferProductSell.count <= this.form.currentData.count) {
+        this.form.isLoad = true;
+        const product_id = this.form.currentData.product.id;
+        const customer_id =
+          this.dicts.customers[modelOfferProductSell.customer_id];
+        modelOfferProductSell.product_id = product_id;
+        modelOfferProductSell.customer_id = customer_id;
+        const response = await this.$store.dispatch(
+          'offer/createOfferPurchase',
+          modelOfferProductSell
+        );
+        if (response.status === 200) {
+          this.form.success = true;
+          console.log(response.data);
+        } else {
+          this.form.errors.push('Произошла ошибка во время продажи');
+          this.form.isLoad = false;
+          return;
+        }
+      } else {
+        this.form.errors.push('Недостаточно продуктов для продажи');
+      }
     },
   },
 };
