@@ -43,13 +43,13 @@ export const offer = {
       console.warn('MODULE.OFFER: createOfferPurchase');
       console.log(modelOfferPurchase);
       const response = {status: 200, data: null, message: ''};
-      let requestData = Object.assign({}, modelOfferPurchase);
+      // let requestData = Object.assign({}, modelOfferPurchase);
       const responseWrap = await OfferPurchase.api()
-        .offerPurchasePlace(requestData)
+        .offerPurchasePlace(modelOfferPurchase)
         .catch((resp) => {
           response.status = resp.status;
         });
-      if (response.status === 200) {
+      if (response.status == 200) {
         response.data = responseWrap.response.data;
         return response;
       }

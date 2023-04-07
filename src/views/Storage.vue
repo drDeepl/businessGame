@@ -72,12 +72,20 @@
             </div>
           </div>
         </v-tab-item>
-        <v-tab-item class="flex-column justify-center">
+        <!-- // INFO: Вкладка с продуктами -->
+        <v-tab-item
+          :class="
+            teamProducts.length == 0
+              ? 'flex-column justify-center'
+              : 'storage-content'
+          "
+        >
           <div v-if="teamProducts.length == 0">
             <Empty title="Склад с продуктами пуст" />
           </div>
+
           <div v-else v-for="product in teamProducts" :key="product['$id']">
-            {{ arrays.customerNames }}
+            <span>После продажи продуктов их кол-во не изменяется</span>
             <ProductCard
               :isProductKit="false"
               :nameProduct="product.product.name"
@@ -94,42 +102,21 @@
                 Продать
               </v-btn>
             </ProductCard>
-
-            <!-- // FIX: Исправить или удалить -->
-            <Form
-              v-if="false"
-              :activate="false"
-              :title="
-                'Продажа ' +
-                ' \'\'' +
-                product.product.name +
-                '\'\' ' +
-                product.count +
-                ' шт.'
-              "
-              :model="forms.createOfferProduct.model"
-              :applySucces="offerPurchaseComplete"
-              :parenFunction="onClickSellProduct"
-              :load="offerPurchaseInProgress"
-              :cancelForm="() => (forms.createOfferProduct.active = false)"
-              :parentFunction="onClickSellProduct"
-            >
-              <!-- // FIX: Удалить -->
-            </Form>
-            <Form
-              :title="form.title"
-              :activate="form.sellProduct.active"
-              v-if="form.sellProduct.active"
-              :model="form.sellProduct.model"
-              :load="form.isLoad"
-              :parentFunction="onClickApplySellProduct"
-              :cancelForm="onClickCancelForm"
-              :disableFields="form.sellProduct.model.hideShow"
-              :select="{customer_id: Object.keys(dicts.customers)}"
-              :errorsMessage="form.errors"
-            >
-            </Form>
           </div>
+          <Form
+            :title="form.title"
+            :activate="form.sellProduct.active"
+            v-if="form.sellProduct.active"
+            :model="form.sellProduct.model"
+            :load="form.isLoad"
+            :parentFunction="onClickApplySellProduct"
+            :cancelForm="onClickCancelForm"
+            :disableFields="form.sellProduct.model.hideShow"
+            :select="{customer_id: Object.keys(dicts.customers)}"
+            :errorsMessage="form.errors"
+            :applySuccess="form.success"
+          >
+          </Form>
         </v-tab-item>
       </v-tabs>
     </div>
@@ -330,6 +317,7 @@ export default {
       this.form.currentData = null;
       this.form.title = '';
       this.form.errors = [];
+      this.form.isLoad = false;
     },
     onClickSellProduct(product) {
       console.warn('STORAGE: onClickSellProduct');
@@ -352,6 +340,7 @@ export default {
           'offer/createOfferPurchase',
           modelOfferProductSell
         );
+        console.log('RESPONSE OFFER PURCHASE PLACE\n', response);
         if (response.status === 200) {
           this.form.success = true;
           console.log(response.data);

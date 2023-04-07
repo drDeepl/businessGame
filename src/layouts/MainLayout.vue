@@ -79,13 +79,13 @@
             <div class="col-lg-12">
               <div class="content-wrapper">
                 <v-dialog
-                  v-if="alert.newOffer.active"
-                  :value="alert.newOffer.active"
+                  v-if="alert.newOfferSale.active"
+                  :value="alert.newOfferSale.active"
                   persistent
                   max-width="20em"
                 >
                   <OfferCard
-                    :item="alert.newOffer.offer"
+                    :item="alert.newOfferSale.offer"
                     :modelItem="model.offerSale"
                     :propsItemToShow="
                       Object.keys(model.offerSale.props).filter(
@@ -142,27 +142,22 @@ import OfferApi from '@/api/offer.api';
 import SaleOffer from '@/models/model.offer.sale';
 import {mapGetters} from 'vuex';
 
+import {
+  getItemFromLocalStorage,
+  setItemToLocalStorage,
+} from '@/services/utils.service';
 export default {
   components: {Load, DialogError, OfferCard},
   data() {
     return {
-      test: '',
+      connection: null,
       title: app.title,
       alert: {
-        newOffer: {
+        newOfferSale: {
           active: false,
           offer: null,
-          // active: true,
-          // offer: {
-          //   id: 10,
-          //   trader: 'manurer',
-          //   team: 1,
-          //   price: '2.00',
-          //   timestamp: '2023-03-31T02:21:53.375Z',
-          //   state: 'Active',
-          //   product_kit: 'горький шоколад',
-          // },
         },
+        newOfferPurchase: {active: false, offer: null},
         success: {active: false, message: null},
         error: {active: false, message: null},
         load: {newOffer: false, success: false, error: false},
@@ -218,7 +213,7 @@ export default {
     },
   },
   watch: {
-    async 'alert.newOffer.offer'(offer) {
+    async 'alert.newOfferSale.offer'(offer) {
       // FIX: Добавить в оффер название продукта
       console.log('NEW OFFER SALE: ', offer);
       if (offer) {
@@ -233,10 +228,9 @@ export default {
           this.alert.error.message = response.message;
         } else {
           const product = response.data;
-          this.alert.newOffer.offer.product_kit = product.name;
-          this.alert.newOffer.offer.trader = trader.username;
-          this.alert.newOffer.active = true;
-
+          this.alert.newOfferSale.offer.product_kit = product.name;
+          this.alert.newOfferSale.offer.trader = trader.username;
+          this.alert.newOfferSale.active = true;
           console.log('PRODUCT', product);
         }
       }
@@ -250,7 +244,35 @@ export default {
   },
   async created() {
     if (this.isLoggedIn) {
+      // INFO: Work of WebSockets ====================================================
       this.connection = new WebSocket('ws://localhost:8000/ws/');
+      this.connection.onmessage = () => {
+        OfferApi.offersSale().then((response) => {
+          console.log('OFFERS SALE\n', response.data);
+          console.log('USERS DATA\n', this.currentUserData);
+          const currentUserTeam = this.currentUserData.team;
+          const offer = response.data.pop();
+          let itemFromLocalStorage = getItemFromLocalStorage('idsOffersSale');
+          let idsOffersSale = itemFromLocalStorage ? itemFromLocalStorage : [];
+          console.log('IDS OFFERS SALE\n', idsOffersSale);
+          const lastAddedOfferId = idsOffersSale.at(-1);
+          if (lastAddedOfferId == offer.id) {
+            return;
+          }
+          idsOffersSale.push(offer.id);
+          const offerToTeam = offer.team;
+
+          if (currentUserTeam === offerToTeam) {
+            console.log(
+              `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
+            );
+            this.alert.newOfferSale.offer = offer;
+          }
+          setItemToLocalStorage('idsOffersSale', idsOffersSale);
+        });
+      };
+
+      // INFO: ============================================================================= END
       const username = this.currentUser.username;
       const responseUser = await this.$store.dispatch(
         'user/getUserDataByUsername',
@@ -277,23 +299,6 @@ export default {
       }
 
       if (roleUser == 'player' && !dataUser.is_superuser) {
-        this.connection.onmessage = () => {
-          OfferApi.offersSale().then((response) => {
-            // this.myJson_s = response.data;
-            console.log('OFFERS SALE\n', response.data);
-            console.log('USERS DATA\n', this.currentUserData);
-            const currentUserTeam = this.currentUserData.team;
-            const offer = response.data.pop();
-            const offerToTeam = offer.team;
-
-            if (currentUserTeam === offerToTeam) {
-              console.log(
-                `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
-              );
-              this.alert.newOffer.offer = offer;
-            }
-          });
-        };
         console.warn(User.api());
         const teamId = dataUser.team;
         console.error('DATA USER\n', dataUser);
@@ -351,16 +356,18 @@ export default {
     },
     onClickNewOfferCancel() {
       console.warn('MAINLAYOUT: onClickNewOfferCancel');
-      this.alert.newOffer.active = false;
+      this.alert.newOfferSale.active = false;
+      this.alert.newOfferPurchase.active = null;
       this.alert.success.active = false;
       this.alert.error.active = false;
-      this.alert.newOffer.offer = null;
+      this.alert.newOfferSale.offer = null;
+      this.alert.newOfferPurchase.offer = null;
       this.alert.load.newOffer = false;
     },
     async onClickNewOfferApply() {
       console.warn('MAINLAYOUT: onClickNewOfferApply');
       this.alert.load.newOffer = true;
-      const offerSalePlace = this.alert.newOffer.offer;
+      const offerSalePlace = this.alert.newOfferSale.offer;
       console.log(offerSalePlace);
       let offerId = offerSalePlace.id;
       const teamId = offerSalePlace.team;
@@ -368,11 +375,11 @@ export default {
         'offer/offerSaleAcquire',
         {offerId: offerId, teamId: teamId}
       );
-      console.log(responseOfferSaleAcquire);
       if (responseOfferSaleAcquire.status === 200) {
         console.log('Offer sell success');
         this.alert.load.newOffer = false;
         this.alert.success.active = true;
+        console.log(Object.keys(this.connection));
       } else {
         this.onClickNewOfferCancel();
         this.alert.error.active = true;
