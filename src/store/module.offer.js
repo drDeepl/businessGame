@@ -1,5 +1,6 @@
 import OfferSale from './models/OfferSale';
 import OfferPurchase from './models/OfferPurchase';
+import {decorateResponseApi} from '@/services/utils.service';
 export const offer = {
   namespaced: true,
   state: {
@@ -12,12 +13,14 @@ export const offer = {
   actions: {
     async offerSalePlace(context, saleOfferProductKit) {
       console.warn('MODULE.OFFER: offerSalePlace');
-      const responseWrap = await OfferSale.api().offerSalePlace(
+      // const responseWrap = await OfferSale.api().offerSalePlace(
+      //   saleOfferProductKit
+      // );
+      const response = await decorateResponseApi(
+        OfferSale.api().offerSalePlace,
         saleOfferProductKit
       );
-      console.warn(responseWrap);
-
-      return responseWrap.response.data;
+      return response;
     },
     async offerSaleAcquire(context, payload) {
       const response = {status: 200, data: null, message: ''};
@@ -29,9 +32,19 @@ export const offer = {
       response.message = 'Произошла ошибка во время покупки';
       return response;
     },
+    async getOfferState(context, offerId) {
+      console.warn('MODULE.OFFER: getOfferState');
+      const response = await decorateResponseApi(
+        OfferSale.api().getOfferState,
+        offerId
+      );
+
+      return response;
+    },
     async getOffersPurchase(context) {
       console.warn('MODULE.OFFER: getListOffersPurchase');
       console.log(context);
+
       const responseWrap = await OfferPurchase.api().getListOfferPurchase();
 
       const offersPurchase = responseWrap.response.data.items
@@ -39,20 +52,25 @@ export const offer = {
         : responseWrap.response.data;
       return offersPurchase;
     },
+    // NOTE: Что, если создать подобие декоратора для запросов?
     async createOfferPurchase(context, modelOfferPurchase) {
       console.warn('MODULE.OFFER: createOfferPurchase');
       console.log(modelOfferPurchase);
-      const response = {status: 200, data: null, message: ''};
-      // let requestData = Object.assign({}, modelOfferPurchase);
-      const responseWrap = await OfferPurchase.api()
-        .offerPurchasePlace(modelOfferPurchase)
-        .catch((resp) => {
-          response.status = resp.status;
-        });
-      if (response.status == 200) {
-        response.data = responseWrap.response.data;
-        return response;
-      }
+      const response = await decorateResponseApi(
+        OfferPurchase.api().offerPurchasePlace,
+        modelOfferPurchase
+      );
+      // const response = {status: 200, data: null, message: ''};
+      // // let requestData = Object.assign({}, modelOfferPurchase);
+      // const responseWrap = await OfferPurchase.api()
+      //   .offerPurchasePlace(modelOfferPurchase)
+      //   .catch((resp) => {
+      //     response.status = resp.status;
+      //   });
+      // if (response.status == 200) {
+      //   response.data = responseWrap.response.data;
+      //   return response;
+      // }
       return response;
     },
     async offerPurchaseAcquire(context, offer_id) {

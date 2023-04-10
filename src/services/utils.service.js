@@ -7,3 +7,17 @@ export const setItemToLocalStorage = function (key, value) {
   const item = JSON.stringify(value);
   localStorage.setItem(key, item);
 };
+
+export const decorateResponseApi = async function (func, context) {
+  let response = {status: 200, data: null, message: ''};
+  console.log('CONTEXT: ', context);
+  const responseWrap = await func(context).catch((resp) => {
+    response.status = resp.response.status;
+  });
+  if (response.status != 200) {
+    response.message = 'Что-то пошло не так';
+    return response;
+  }
+  response.data = responseWrap.response.data;
+  return response;
+};

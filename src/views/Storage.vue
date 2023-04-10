@@ -344,6 +344,7 @@ export default {
         if (response.status === 200) {
           this.form.success = true;
           console.log(response.data);
+          this.$store.dispatch('offer/')
         } else {
           this.form.errors.push('Произошла ошибка во время продажи');
           this.form.isLoad = false;
@@ -356,5 +357,3 @@ export default {
   },
 };
 </script>
-
-<style></style>

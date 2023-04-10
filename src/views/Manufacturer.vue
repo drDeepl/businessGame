@@ -575,7 +575,7 @@ export default {
       const teamBalance = account.balance;
 
       if (saleOfferProductKit.price <= teamBalance) {
-        const offerSalePlace = await this.$store.dispatch(
+        const responseOfferSalePlace = await this.$store.dispatch(
           'offer/offerSalePlace',
           {
             team_id: teamId,
@@ -583,9 +583,13 @@ export default {
             product_kit_id: saleOfferProductKit.product_kit_id,
           }
         );
-        console.log(offerSalePlace);
-
-        this.$store.commit('offer/SET_offerSale_COMPLETE');
+        console.log(responseOfferSalePlace);
+        if (responseOfferSalePlace.status != 200) {
+          this.forms.hasErrors = true;
+          const msgError = 'У команды недостаточно средств для покупки';
+          this.forms.errors.push(msgError);
+          return;
+        }
         this.onClickApplyDeleteProductKit();
         this.forms.formSellProductKit.applySucces = true;
       } else {

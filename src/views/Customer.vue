@@ -1,32 +1,52 @@
 <template>
   <div class="customer-page-wrapper layout-showcase">
     <Load v-if="render.main"></Load>
-    <v-card-title>В разработке</v-card-title>
+    <div v-else>
+      <v-card-title></v-card-title>
+    </div>
   </div>
 </template>
 
-<script>
+<script lang="js">
 import Load from '@/UI/Load.vue';
-import OfferApi from '@/api/offer.api';
+
+
+
 export default {
+  components: {Load, },
+
   data() {
     return {
+      alert: {
+        success: {active: false, message: null},
+        error: {active: false, message: null},
+        load: {newOffer: false, success: false, error: false},
+      },
+      model: {},
       render: {main: false},
     };
   },
+  watch: {
+    async 'alert.newOfferSale.offer'(offer) {
+      if(offer){
+        console.warn("new offer alert")
+        console.log(offer)
+        this.alert.newOfferPurchase.active =true;
+
+      }
+      return
+
+  }
+  },
   async created() {
     this.render.main = true;
-    this.connection = new WebSocket('ws://localhost:8000/ws/');
-    this.connection.onmessage = () => {
-      OfferApi.offersPurchase().then((response) => {
-        console.warn('OFFERS PURCHASE\n', response.data);
-      });
-    };
+
     this.render.main = false;
   },
+
   computed: {},
   methods: {},
 
-  components: {Load},
+
 };
 </script>

@@ -216,6 +216,14 @@ export default {
     async 'alert.newOfferSale.offer'(offer) {
       // FIX: Добавить в оффер название продукта
       console.log('NEW OFFER SALE: ', offer);
+      const offerState = await this.$store.dispatch(
+        'offer/getOfferState',
+        offer.id
+      );
+      console.log(offerState);
+      if (offerState.status == 404) {
+        return;
+      }
       if (offer) {
         const response = await this.$store.dispatch(
           'productKit/getProductFromProductKit',
@@ -256,6 +264,7 @@ export default {
           let idsOffersSale = itemFromLocalStorage ? itemFromLocalStorage : [];
           console.log('IDS OFFERS SALE\n', idsOffersSale);
           const lastAddedOfferId = idsOffersSale.at(-1);
+
           if (lastAddedOfferId == offer.id) {
             return;
           }
@@ -266,6 +275,7 @@ export default {
             console.log(
               `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
             );
+
             this.alert.newOfferSale.offer = offer;
           }
           setItemToLocalStorage('idsOffersSale', idsOffersSale);
