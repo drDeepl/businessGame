@@ -21,9 +21,11 @@
 @import 'common/button';
 @import 'common/icon';
 @import 'common/text';
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap');
+
 body,
 #app {
-  font-family: Montserrat;
+  font-family: $mainFont;
   font-size: $mainFontSize;
   color: $mainFontColor;
   font-weight: $mainFontWeight;

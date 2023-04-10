@@ -280,6 +280,11 @@ export default {
           }
           setItemToLocalStorage('idsOffersSale', idsOffersSale);
         });
+        OfferApi.offersPurchase().then((response) => {
+          console.log('OFFERS ACQUIRE\n', response.data);
+          const currentOfferAcquire = response.data.at(-1);
+          console.error('TODO: show transations');
+        });
       };
 
       // INFO: ============================================================================= END

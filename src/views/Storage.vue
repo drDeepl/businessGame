@@ -344,7 +344,7 @@ export default {
         if (response.status === 200) {
           this.form.success = true;
           console.log(response.data);
-          this.$store.dispatch('offer/')
+          // const response = await this.$store.dispatch('offer/offerPurchaseAcquire')
         } else {
           this.form.errors.push('Произошла ошибка во время продажи');
           this.form.isLoad = false;

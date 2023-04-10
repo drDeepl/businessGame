@@ -10,7 +10,6 @@ import Product from './models/Product';
 import ProductKit from './models/ProductKit';
 import OfferSale from './models/OfferSale';
 import OfferPurchase from './models/OfferPurchase';
-import Transaction from './models/Transaction';
 import Token from './models/Token';
 
 import {auth} from './module.auth';
@@ -25,6 +24,7 @@ import {shopState} from './module.shop.state';
 import {storageTeam} from './module.storage.team';
 import {admin} from './module.admin';
 import {customer} from './module.customer';
+import {profile} from './module.profile';
 import instance from '@/api/main';
 import ProductKitStorage from '@/store/models/ProductKitStorage';
 import ProductStorage from '@/store/models/ProductStorage';
@@ -52,7 +52,6 @@ database.register(Product);
 database.register(ProductKit);
 database.register(OfferSale);
 database.register(OfferPurchase);
-database.register(Transaction);
 
 export default new Vuex.Store({
   modules: {
@@ -68,6 +67,7 @@ export default new Vuex.Store({
     storageTeam,
     admin,
     customer,
+    profile,
   },
   plugins: [VuexORM.install(database)],
 });

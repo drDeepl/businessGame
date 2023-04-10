@@ -60,25 +60,18 @@ export const offer = {
         OfferPurchase.api().offerPurchasePlace,
         modelOfferPurchase
       );
-      // const response = {status: 200, data: null, message: ''};
-      // // let requestData = Object.assign({}, modelOfferPurchase);
-      // const responseWrap = await OfferPurchase.api()
-      //   .offerPurchasePlace(modelOfferPurchase)
-      //   .catch((resp) => {
-      //     response.status = resp.status;
-      //   });
-      // if (response.status == 200) {
-      //   response.data = responseWrap.response.data;
-      //   return response;
-      // }
+
       return response;
     },
     async offerPurchaseAcquire(context, offer_id) {
-      const responseWrap = await OfferPurchase.api().offerPurchaseAcquire(
+      // const responseWrap = await OfferPurchase.api().offerPurchaseAcquire(
+      //   offer_id
+      // );
+      const response = await decorateResponseApi(
+        OfferPurchase.api().offerPurchaseAcquire,
         offer_id
       );
-
-      return responseWrap;
+      return response;
     },
   },
   getters: {

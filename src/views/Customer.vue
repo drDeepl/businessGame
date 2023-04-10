@@ -7,13 +7,11 @@
   </div>
 </template>
 
-<script lang="js">
+<script>
 import Load from '@/UI/Load.vue';
 
-
-
 export default {
-  components: {Load, },
+  components: {Load},
 
   data() {
     return {
@@ -28,15 +26,13 @@ export default {
   },
   watch: {
     async 'alert.newOfferSale.offer'(offer) {
-      if(offer){
-        console.warn("new offer alert")
-        console.log(offer)
-        this.alert.newOfferPurchase.active =true;
-
+      if (offer) {
+        console.warn('new offer alert');
+        console.log(offer);
+        this.alert.newOfferPurchase.active = true;
       }
-      return
-
-  }
+      return;
+    },
   },
   async created() {
     this.render.main = true;
@@ -46,7 +42,5 @@ export default {
 
   computed: {},
   methods: {},
-
-
 };
 </script>
