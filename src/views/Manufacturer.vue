@@ -568,10 +568,11 @@ export default {
       console.log(saleOfferProductKit);
       const teamAccount = this.dict.teams[Number(teamId)].account;
       console.log('TEAM ACC', teamAccount);
-      const account = await this.$store.dispatch(
+      const accountResponse = await this.$store.dispatch(
         'account/getAccountById',
         teamAccount
       );
+      const account = accountResponse.status == 200 ? accountResponse.data : {};
       const teamBalance = account.balance;
 
       if (saleOfferProductKit.price <= teamBalance) {

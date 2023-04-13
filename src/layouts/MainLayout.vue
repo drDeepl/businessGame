@@ -28,7 +28,7 @@
             <v-progress-circular v-else indeterminate></v-progress-circular>
           </li>
           <li id="balance" class="user-info-row">
-            <div v-if="!stateBalanceRunning">
+            <div v-if="!render.balance">
               <span class="sidebar-user-info title">
                 <small> баланс </small>
               </span>
@@ -150,6 +150,7 @@ export default {
   components: {Load, DialogError, OfferCard},
   data() {
     return {
+      render: {balance: false},
       connection: null,
       title: app.title,
       alert: {
@@ -253,6 +254,7 @@ export default {
   async created() {
     if (this.isLoggedIn) {
       // INFO: Work of WebSockets ====================================================
+      this.render.balance = true;
       this.connection = new WebSocket('ws://localhost:8000/ws/');
       this.connection.onmessage = () => {
         OfferApi.offersSale().then((response) => {
@@ -283,6 +285,7 @@ export default {
         OfferApi.offersPurchase().then((response) => {
           console.log('OFFERS ACQUIRE\n', response.data);
           const currentOfferAcquire = response.data.at(-1);
+          console.log('CURRENT OFFER ACQUIRE', currentOfferAcquire);
           console.error('TODO: show transations');
         });
       };
@@ -319,23 +322,25 @@ export default {
         console.error('DATA USER\n', dataUser);
         this.$store.commit('team/SET_BALANCE_RUNNING');
         const dataTeam = await this.$store.dispatch('team/getDataTeam', teamId);
-        const dataAccount = await this.$store.dispatch(
+        const responseAccount = await this.$store.dispatch(
           'account/getAccountById',
           dataTeam.account
         );
-
+        const dataAccount =
+          responseAccount.status == 200 ? responseAccount.data : {};
         this.sidebarUserInfo.role.value = roleUser;
 
         this.sidebarUserInfo.username.value = username;
+
         this.sidebarUserInfo.team.value = dataTeam.name;
-        // this.sidebarUserInfo.balance.value = dataAccount.balance;
+
         this.$store.commit('team/SET_BALANCE', dataAccount.balance);
         this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
+        this.render.balance = false;
       }
       if (roleUser == 'customer') {
         this.connection.onmessage = () => {
           OfferApi.offersPurchase().then((response) => {
-            // this.myJson_p = response.data;
             console.log('OFFERS PURCHASE\n', response.data);
           });
         };
@@ -347,6 +352,14 @@ export default {
   },
 
   methods: {
+    getDataOrError(response) {
+      if (response.status == 200) {
+        return response.data;
+      } else {
+        this.alert.error.message = response.message;
+        this.alert.error.active = true;
+      }
+    },
     onClickErrorClose() {
       this.alert.error.active = false;
       this.alert.error.message = null;
@@ -393,8 +406,21 @@ export default {
       if (responseOfferSaleAcquire.status === 200) {
         console.log('Offer sell success');
         this.alert.load.newOffer = false;
+
+        // TODO: Update balance
+        console.log(this.currentUserData);
+        const teamId = this.currentUserData.team;
+
+        this.render.balance = true;
+        const responseTeamBalance = await this.$store.dispatch(
+          'team/getBalance',
+          teamId
+        );
+        const account = this.getDataOrError(responseTeamBalance);
+        console.log(account);
+        this.$store.commit('team/SET_BALANCE', account.balance);
+        this.render.balance = false;
         this.alert.success.active = true;
-        console.log(Object.keys(this.connection));
       } else {
         this.onClickNewOfferCancel();
         this.alert.error.active = true;

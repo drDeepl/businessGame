@@ -1,4 +1,5 @@
 import Account from './models/Account';
+import {decorateResponseApi} from '@/services/utils.service';
 export const account = {
   namespaced: true,
   state: {
@@ -8,12 +9,16 @@ export const account = {
     async getAccountById(context, accountId) {
       console.warn('MODULE.ACCOUNT');
       context.commit('SET_GET_ACCOUNT');
-      const responseWrap = await Account.api().getAccount(accountId);
-      context.commit('SET_GET_ACCOUNT_COMPLETE');
-      const data = responseWrap.response.items
-        ? responseWrap.response.items.data
-        : responseWrap.response.data;
-      return data;
+      const response = await decorateResponseApi(
+        Account.api().getAccount,
+        accountId
+      );
+      // const responseWrap = await Account.api().getAccount(accountId);
+      // context.commit('SET_GET_ACCOUNT_COMPLETE');
+      // const data = responseWrap.response.items
+      //   ? responseWrap.response.items.data
+      //   : responseWrap.response.data;
+      return response;
     },
   },
   getters: {

@@ -1,4 +1,5 @@
 import Team from './models/Team';
+import {decorateResponseApi} from '@/services/utils.service';
 export const team = {
   namespaced: true,
   state: {
@@ -55,6 +56,13 @@ export const team = {
 
       return responseWrap.response.data;
     },
+
+    async getBalance(context, teamId) {
+      console.log('MODULE.TEAM: Team balance');
+      const response = decorateResponseApi(Team.api().getBalance, teamId);
+      return response;
+    },
+
     async deleteTeam(context, teamId) {
       console.warn('TEAM.MODULE: deleteTeam');
       console.log(context);
@@ -126,16 +134,6 @@ export const team = {
     },
     SET_GET_TEAMS_COMPLETE: function (state) {
       state.getTeams = false;
-    },
-    SET_NAMES_TEAM: function (state, arrayNamesTeams) {
-      state.getNamesTeams.getNames = true;
-
-      let arrayNames = [];
-      for (let i = 0; i < arrayNamesTeams.length; i++) {
-        arrayNames.push(arrayNamesTeams[i].name);
-      }
-      state.getNamesTeams.listNamesTeams = arrayNames;
-      state.getNamesTeams.getNames = false;
     },
   },
 };

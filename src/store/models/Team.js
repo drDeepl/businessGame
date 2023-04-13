@@ -29,6 +29,9 @@ export default class Team extends Model {
         console.warn('MODEL.TEAM: getTeam');
         return this.get('teams/' + teamId);
       },
+      async getBalance(teamId) {
+        return this.get('teams/balance/' + teamId);
+      },
       async getParticipantsTeams(teamId) {
         console.warn('MODEL.TEAM: getParticipantsTeams');
         return this.get('teams/' + teamId + '/participants');
