@@ -32,7 +32,6 @@ export default class OfferSale extends Model {
       },
       async getOfferState(offerId) {
         console.warn('MODEL.OFFER: getOfferState');
-
         return this.get('offers/sale/state-offer/' + offerId);
       },
       async offerSaleAcquire(offerId, teamId) {

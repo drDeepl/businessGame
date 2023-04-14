@@ -172,8 +172,8 @@ svg.button-toggle {
 
 .mainLayout-sidebar-row {
   margin-bottom: 0.5em;
-
   transition: border-left 0.2s;
+  padding: 0 !important;
 }
 
 .mainLayout-sidebar-row:hover {
@@ -182,4 +182,8 @@ svg.button-toggle {
   *:hover {
     color: $color-white;
   }
+}
+
+.mainLayout-sidebar-row > span > a {
+  padding: 0.7em 1em;
 }

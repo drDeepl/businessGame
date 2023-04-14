@@ -54,8 +54,8 @@
             </router-link>
           </span>
         </li>
-        <li class="sidebar-logout mainLayout-sidebar-row">
-          <a class="sidebar-link" href @click="OnLogOut">Выйти </a>
+        <li class="mainLayout-sidebar-row">
+          <a class="sidebar-link ma-3" href @click="OnLogOut">Выйти </a>
         </li>
       </ul>
     </aside>
@@ -142,10 +142,6 @@ import OfferApi from '@/api/offer.api';
 import SaleOffer from '@/models/model.offer.sale';
 import {mapGetters} from 'vuex';
 
-import {
-  getItemFromLocalStorage,
-  setItemToLocalStorage,
-} from '@/services/utils.service';
 export default {
   components: {Load, DialogError, OfferCard},
   data() {
@@ -217,15 +213,15 @@ export default {
     async 'alert.newOfferSale.offer'(offer) {
       // FIX: Добавить в оффер название продукта
       console.log('NEW OFFER SALE: ', offer);
-      const offerState = await this.$store.dispatch(
-        'offer/getOfferState',
-        offer.id
-      );
-      console.log(offerState);
-      if (offerState.status == 404) {
-        return;
-      }
       if (offer) {
+      //   const offerState = await this.$store.dispatch(
+      //   'offer/getOfferState',
+      //   offer.id
+      // );
+      // console.log("OFFER STATE:", offerState);
+      //   if (offerState.status != 200) {
+      //   return;
+      // }
         const response = await this.$store.dispatch(
           'productKit/getProductFromProductKit',
           offer.product_kit
@@ -261,26 +257,25 @@ export default {
           console.log('OFFERS SALE\n', response.data);
           console.log('USERS DATA\n', this.currentUserData);
           const currentUserTeam = this.currentUserData.team;
-          const offer = response.data.pop();
-          let itemFromLocalStorage = getItemFromLocalStorage('idsOffersSale');
-          let idsOffersSale = itemFromLocalStorage ? itemFromLocalStorage : [];
-          console.log('IDS OFFERS SALE\n', idsOffersSale);
-          const lastAddedOfferId = idsOffersSale.at(-1);
+          const offer = response.data.at(-1);
 
-          if (lastAddedOfferId == offer.id) {
-            return;
-          }
-          idsOffersSale.push(offer.id);
+          // TODO: Тут будет проверка статуса оффера
+          // TODO: Если оффер активный, то показать оффер, иначе ничего не не делать
+
           const offerToTeam = offer.team;
-
+          let offerState = null;
+          OfferApi.getOfferSaleState(offer.id).then(response=> {offerState=response
+            console.log(response)
+            this.alert.newOfferSale.offer = offer;  
+          });
+          console.log("OFFER STATE:\n", offerState)
           if (currentUserTeam === offerToTeam) {
             console.log(
               `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
             );
 
-            this.alert.newOfferSale.offer = offer;
+            // this.alert.newOfferSale.offer = offer;
           }
-          setItemToLocalStorage('idsOffersSale', idsOffersSale);
         });
         OfferApi.offersPurchase().then((response) => {
           console.log('OFFERS ACQUIRE\n', response.data);
