@@ -41,6 +41,12 @@ export const offer = {
 
       return response;
     },
+
+    async offerChangeStateAwait(context, offerId){
+      console.warn('MODULE.OFFER: offerChangeState');
+      const response = decorateResponseApi(OfferSale.api.offerChangeStateAwait, offerId)
+      return response
+    },
     async getOffersPurchase(context) {
       console.warn('MODULE.OFFER: getListOffersPurchase');
       console.log(context);
@@ -64,9 +70,7 @@ export const offer = {
       return response;
     },
     async offerPurchaseAcquire(context, offer_id) {
-      // const responseWrap = await OfferPurchase.api().offerPurchaseAcquire(
-      //   offer_id
-      // );
+      
       const response = await decorateResponseApi(
         OfferPurchase.api().offerPurchaseAcquire,
         offer_id

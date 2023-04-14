@@ -105,7 +105,7 @@
 
                     <v-btn
                       class="btn-cancel"
-                      @click="onClickNewOfferCancel"
+                      @click="() => {newOfferSaleToAwait(alert.newOfferSale.offer.id); onClickNewOfferCancel(); }"
                       :disabled="alert.load.newOffer"
                     >
                       Отклонить
@@ -347,6 +347,12 @@ export default {
   },
 
   methods: {
+    newOfferSaleToAwait(offerId){
+    console.error("TDODO: newOfferToAwait");
+    console.log(offerId);
+    /*Данный метод изменяет статус оффера на AWAIT*/
+
+  },
     getDataOrError(response) {
       if (response.status == 200) {
         return response.data;
@@ -386,7 +392,9 @@ export default {
       this.alert.newOfferSale.offer = null;
       this.alert.newOfferPurchase.offer = null;
       this.alert.load.newOffer = false;
+      
     },
+
     async onClickNewOfferApply() {
       console.warn('MAINLAYOUT: onClickNewOfferApply');
       this.alert.load.newOffer = true;
