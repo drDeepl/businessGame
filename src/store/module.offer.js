@@ -13,9 +13,7 @@ export const offer = {
   actions: {
     async offerSalePlace(context, saleOfferProductKit) {
       console.warn('MODULE.OFFER: offerSalePlace');
-      // const responseWrap = await OfferSale.api().offerSalePlace(
-      //   saleOfferProductKit
-      // );
+
       const response = await decorateResponseApi(
         OfferSale.api().offerSalePlace,
         saleOfferProductKit
@@ -42,10 +40,13 @@ export const offer = {
       return response;
     },
 
-    async offerChangeStateAwait(context, offerId){
-      console.warn('MODULE.OFFER: offerChangeState');
-      const response = decorateResponseApi(OfferSale.api.offerChangeStateAwait, offerId)
-      return response
+    async offerSaleChangeStateAwait(context, offerId) {
+      console.warn('MODULE.OFFER: offerSaleChangeState');
+      const response = await decorateResponseApi(
+        OfferSale.api().offerSaleChangeStateAwait,
+        offerId
+      );
+      return response;
     },
     async getOffersPurchase(context) {
       console.warn('MODULE.OFFER: getListOffersPurchase');
@@ -69,11 +70,11 @@ export const offer = {
 
       return response;
     },
-    async offerPurchaseAcquire(context, offer_id) {
-      
+    async offerPurchaseAcquire(context, model) {
+      // INFO: model = {offerId: int, customer_id: int}
       const response = await decorateResponseApi(
         OfferPurchase.api().offerPurchaseAcquire,
-        offer_id
+        model
       );
       return response;
     },

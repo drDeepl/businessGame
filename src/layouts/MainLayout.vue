@@ -105,7 +105,12 @@
 
                     <v-btn
                       class="btn-cancel"
-                      @click="() => {newOfferSaleToAwait(alert.newOfferSale.offer.id); onClickNewOfferCancel(); }"
+                      @click="
+                        () => {
+                          newOfferSaleToAwait(alert.newOfferSale.offer.id);
+                          onClickNewOfferCancel();
+                        }
+                      "
                       :disabled="alert.load.newOffer"
                     >
                       Отклонить
@@ -154,7 +159,7 @@ export default {
           active: false,
           offer: null,
         },
-        newOfferPurchase: {active: false, offer: null},
+
         success: {active: false, message: null},
         error: {active: false, message: null},
         load: {newOffer: false, success: false, error: false},
@@ -214,14 +219,6 @@ export default {
       // FIX: Добавить в оффер название продукта
       console.log('NEW OFFER SALE: ', offer);
       if (offer) {
-      //   const offerState = await this.$store.dispatch(
-      //   'offer/getOfferState',
-      //   offer.id
-      // );
-      // console.log("OFFER STATE:", offerState);
-      //   if (offerState.status != 200) {
-      //   return;
-      // }
         const response = await this.$store.dispatch(
           'productKit/getProductFromProductKit',
           offer.product_kit
@@ -252,39 +249,6 @@ export default {
       // INFO: Work of WebSockets ====================================================
       this.render.balance = true;
       this.connection = new WebSocket('ws://localhost:8000/ws/');
-      this.connection.onmessage = () => {
-        OfferApi.offersSale().then((response) => {
-          console.log('OFFERS SALE\n', response.data);
-          console.log('USERS DATA\n', this.currentUserData);
-          const currentUserTeam = this.currentUserData.team;
-          const offer = response.data.at(-1);
-
-          // TODO: Тут будет проверка статуса оффера
-          // TODO: Если оффер активный, то показать оффер, иначе ничего не не делать
-
-          const offerToTeam = offer.team;
-          let offerState = null;
-          OfferApi.getOfferSaleState(offer.id).then(response=> {offerState=response
-            console.log(response)
-            this.alert.newOfferSale.offer = offer;  
-          });
-          console.log("OFFER STATE:\n", offerState)
-          if (currentUserTeam === offerToTeam) {
-            console.log(
-              `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
-            );
-
-            // this.alert.newOfferSale.offer = offer;
-          }
-        });
-        OfferApi.offersPurchase().then((response) => {
-          console.log('OFFERS ACQUIRE\n', response.data);
-          const currentOfferAcquire = response.data.at(-1);
-          console.log('CURRENT OFFER ACQUIRE', currentOfferAcquire);
-          console.error('TODO: show transations');
-        });
-      };
-
       // INFO: ============================================================================= END
       const username = this.currentUser.username;
       const responseUser = await this.$store.dispatch(
@@ -312,6 +276,36 @@ export default {
       }
 
       if (roleUser == 'player' && !dataUser.is_superuser) {
+        // INFO: websocket for SaleOffers
+        this.connection.onmessage = () => {
+          OfferApi.offersSale().then((response) => {
+            console.log('OFFERS SALE\n', response.data);
+            console.log('USERS DATA\n', this.currentUserData);
+            const currentUserTeam = this.currentUserData.team;
+            const offer = response.data.at(-1);
+            const offerToTeam = offer.team;
+            let offerState = null;
+            // OfferApi.getOfferSaleState(offer.id).then((response) => {
+            //   offerState = response;
+            //   console.log(response);
+            //   this.alert.newOfferSale.offer = offer;
+            // });
+            console.log('OFFER STATE:\n', offerState);
+            if (currentUserTeam === offerToTeam) {
+              console.log(
+                `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
+              );
+
+              this.alert.newOfferSale.offer = offer;
+            }
+          });
+          // OfferApi.offersPurchase().then((response) => {
+          //   console.log('OFFERS ACQUIRE\n', response.data);
+          //   const currentOfferAcquire = response.data.at(-1);
+          //   console.log('CURRENT OFFER ACQUIRE', currentOfferAcquire);
+          //   console.error('TODO: show transations');
+          // });
+        };
         console.warn(User.api());
         const teamId = dataUser.team;
         console.error('DATA USER\n', dataUser);
@@ -347,12 +341,12 @@ export default {
   },
 
   methods: {
-    newOfferSaleToAwait(offerId){
-    console.error("TDODO: newOfferToAwait");
-    console.log(offerId);
-    /*Данный метод изменяет статус оффера на AWAIT*/
-
-  },
+    async newOfferSaleToAwait(offerId) {
+      /*Данный метод изменяет статус оффера на AWAIT*/
+      console.error('TDODO: newOfferToAwait');
+      console.log(offerId);
+      await this.$store.dispatch('offer/offerSaleChangeStateAwait', offerId);
+    },
     getDataOrError(response) {
       if (response.status == 200) {
         return response.data;
@@ -386,13 +380,11 @@ export default {
     onClickNewOfferCancel() {
       console.warn('MAINLAYOUT: onClickNewOfferCancel');
       this.alert.newOfferSale.active = false;
-      this.alert.newOfferPurchase.active = null;
       this.alert.success.active = false;
       this.alert.error.active = false;
       this.alert.newOfferSale.offer = null;
       this.alert.newOfferPurchase.offer = null;
       this.alert.load.newOffer = false;
-      
     },
 
     async onClickNewOfferApply() {

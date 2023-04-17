@@ -35,8 +35,8 @@ export default class OfferSale extends Model {
         return this.get('offers/sale/state-offer/' + offerId);
       },
 
-      async offerChangeStateAwait(context){
-        return this.post('offers/sale/offer-to-await?offer_id=' + context.offerId)
+      async offerSaleChangeStateAwait(offerId) {
+        return this.post('offers/sale/offer-to-await?offer_id=' + offerId);
       },
 
       async offerSaleAcquire(offerId, teamId) {

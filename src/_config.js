@@ -7,7 +7,6 @@ export const adminSidebarLinks = [
     title: 'Панель администратора',
     url: '/admin',
     titleTabs: [
-      {title: 'Мой профиль', url: '/profile'},
       {title: 'Создать пользователя', form: 'formCreateUser'},
       {title: 'Создать команду', form: 'formCreateTeam'},
     ],

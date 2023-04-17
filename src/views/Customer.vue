@@ -16,6 +16,11 @@ export default {
   data() {
     return {
       alert: {
+        newOfferSale: {
+          active: false,
+          offer: null,
+        },
+
         success: {active: false, message: null},
         error: {active: false, message: null},
         load: {newOffer: false, success: false, error: false},
@@ -26,12 +31,26 @@ export default {
   },
   watch: {
     async 'alert.newOfferSale.offer'(offer) {
+      // FIX: Добавить в оффер название продукта
+      console.log('NEW OFFER SALE: ', offer);
       if (offer) {
-        console.warn('new offer alert');
-        console.log(offer);
-        this.alert.newOfferPurchase.active = true;
+        const response = await this.$store.dispatch(
+          'productKit/getProductFromProductKit',
+          offer.product_kit
+        );
+        const trader = await this.$store.dispatch('user/getUser', offer.trader);
+
+        if (response.error) {
+          this.alert.error.active = true;
+          this.alert.error.message = response.message;
+        } else {
+          const product = response.data;
+          this.alert.newOfferSale.offer.product_kit = product.name;
+          this.alert.newOfferSale.offer.trader = trader.username;
+          this.alert.newOfferSale.active = true;
+          console.log('PRODUCT', product);
+        }
       }
-      return;
     },
   },
   async created() {
@@ -41,6 +60,8 @@ export default {
   },
 
   computed: {},
-  methods: {},
+  methods: {
+    
+  },
 };
 </script>

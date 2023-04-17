@@ -28,15 +28,16 @@ export default class OfferPurchase extends Model {
         console.log(modelOfferPurchasePlace);
         return this.post('offers/purchase/place', modelOfferPurchasePlace);
       },
-      async offerPurchaseAcquire(offerId, team_id) {
+      async offerPurchaseAcquire(context) {
         console.warn('MODEL.OFFER: offerPurchaseAcquire');
-
+        const offerId = context.offerId;
+        const customer_id = context.customer_id;
         return this.post(
           'offers/purchase/acquire?offer_id=' +
             offerId +
             '&' +
-            'team_id=' +
-            team_id
+            'customer_id=' +
+            customer_id
         );
       },
     },

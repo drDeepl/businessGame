@@ -196,7 +196,7 @@ export default {
     const username = this.$store.state.auth.user.username;
     const userData = (await User.api().getUserByUsername(username)).response
       .data;
-    console.error(userData);
+    console.error('CREATED: USER DATA\n', userData);
     const team_id = userData.team;
     console.error(team_id);
     const products = await this.$store.dispatch('products/getProducts');
@@ -336,15 +336,21 @@ export default {
           this.dicts.customers[modelOfferProductSell.customer_id];
         modelOfferProductSell.product_id = product_id;
         modelOfferProductSell.customer_id = customer_id;
-        const response = await this.$store.dispatch(
+        const responsePlace = await this.$store.dispatch(
           'offer/createOfferPurchase',
           modelOfferProductSell
         );
-        console.log('RESPONSE OFFER PURCHASE PLACE\n', response);
-        if (response.status === 200) {
+        console.log('RESPONSE OFFER PURCHASE PLACE\n', responsePlace);
+        if (responsePlace.status === 200) {
           this.form.success = true;
-          console.log(response.data);
-          // const response = await this.$store.dispatch('offer/offerPurchaseAcquire')
+          console.log(responsePlace.data);
+          const offer = responsePlace.data;
+
+          const responseAcquire = await this.$store.dispatch(
+            'offer/offerPurchaseAcquire',
+            {offerId: offer.id, customer_id: customer_id}
+          );
+          console.log(responseAcquire);
         } else {
           this.form.errors.push('Произошла ошибка во время продажи');
           this.form.isLoad = false;
