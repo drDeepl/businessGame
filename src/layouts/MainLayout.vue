@@ -159,6 +159,10 @@ export default {
           active: false,
           offer: null,
         },
+        newOfferPurchase: {
+          active: false,
+          offer: null,
+        },
 
         success: {active: false, message: null},
         error: {active: false, message: null},
@@ -196,8 +200,11 @@ export default {
       balanceTeam: 'team/GET_BALANCE_VALUE',
       activeTab: 'mainLayout/GET_CURRENT_TAB',
       isOffersUpdate: 'shopState/GET_OFFERS_UPDATE_RUNNING',
-      currentUserData: 'user/GET_CURRENT_USER_DATA',
+      // currentUserData: 'user/GET_CURRENT_USER_DATA',
     }),
+    currentUserData() {
+      return this.$store.state.user.currentUserData;
+    },
     currentUser() {
       return this.$store.state.auth.user;
     },
@@ -411,9 +418,9 @@ export default {
           'team/getBalance',
           teamId
         );
-        const account = this.getDataOrError(responseTeamBalance);
-        console.log(account);
-        this.$store.commit('team/SET_BALANCE', account.balance);
+        const balance = this.getDataOrError(responseTeamBalance);
+        console.log('MAINLAYOUT: team balance', balance);
+        this.$store.commit('team/SET_BALANCE', balance);
         this.render.balance = false;
         this.alert.success.active = true;
       } else {

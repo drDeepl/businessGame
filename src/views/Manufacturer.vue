@@ -201,6 +201,7 @@
         :hasErrors="forms.message.active"
       >
         <v-btn
+          v-if="forms.message.text.toLowerCase() != 'продуктовый набор удалён!'"
           class="btn-cancel"
           @click="onClickApplyDeleteProductKit()"
           :loading="render.delete"
@@ -566,14 +567,15 @@ export default {
       const teamId = this.dict.namesTeam[saleOfferProductKit['team_id']];
       saleOfferProductKit['team_id'] = teamId;
       console.log(saleOfferProductKit);
-      const teamAccount = this.dict.teams[Number(teamId)].account;
+      const currentTeam = this.dict.teams[Number(teamId)];
+      const teamAccount = currentTeam.account;
       console.log('TEAM ACC', teamAccount);
       const accountResponse = await this.$store.dispatch(
         'account/getAccountById',
         teamAccount
       );
       const account = accountResponse.status == 200 ? accountResponse.data : {};
-      const teamBalance = account.balance;
+      const teamBalance = Number(account.balance);
 
       if (saleOfferProductKit.price <= teamBalance) {
         const responseOfferSalePlace = await this.$store.dispatch(
@@ -584,6 +586,7 @@ export default {
             product_kit_id: saleOfferProductKit.product_kit_id,
           }
         );
+        console.warn('RESPONSE OFFER SALE PLACE');
         console.log(responseOfferSalePlace);
         if (responseOfferSalePlace.status != 200) {
           this.forms.hasErrors = true;

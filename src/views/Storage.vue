@@ -26,6 +26,7 @@
 
           <div class="storage-content" v-else>
             <div v-for="productKit in productKits" :key="productKit.id">
+              {{ productKit }}
               <ProductKitCard
                 :nameProduct="dicts.products[productKit.product_kit.product]"
                 :countItems="productKit.count"
@@ -86,6 +87,7 @@
 
           <div v-else v-for="product in teamProducts" :key="product['$id']">
             <span>После продажи продуктов их кол-во не изменяется</span>
+            {{ teamProducts }}
             <ProductCard
               :isProductKit="false"
               :nameProduct="product.product.name"
