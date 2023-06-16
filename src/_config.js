@@ -2,6 +2,7 @@
 export const develop = true;
 // NOTE:========================================
 // INFO: sidebar links
+
 export const adminSidebarLinks = [
   {
     title: 'Панель администратора',

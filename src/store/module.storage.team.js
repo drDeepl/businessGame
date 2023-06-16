@@ -53,6 +53,8 @@ export const storageTeam = {
       const responseWrap = await ProductStorage.api().getListProducts(teamId);
       const response = responseWrap.response;
       if (response.status == 200) {
+        console.error('RESPONSE TEAM PRODUCT');
+        console.log(response.data);
         const products = response.data.items
           ? response.data.items
           : response.data;

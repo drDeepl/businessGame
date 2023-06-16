@@ -219,6 +219,7 @@ export default {
       'storageTeam/getTeamProductKits',
       team_id
     );
+
     this.arrays.productKits = productKits.filter(
       (pk) => this.dicts.products[pk.product_kit.product]
     );

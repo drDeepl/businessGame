@@ -291,13 +291,7 @@ export default {
             const currentUserTeam = this.currentUserData.team;
             const offer = response.data.at(-1);
             const offerToTeam = offer.team;
-            let offerState = null;
-            // OfferApi.getOfferSaleState(offer.id).then((response) => {
-            //   offerState = response;
-            //   console.log(response);
-            //   this.alert.newOfferSale.offer = offer;
-            // });
-            console.log('OFFER STATE:\n', offerState);
+
             if (currentUserTeam === offerToTeam) {
               console.log(
                 `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
@@ -334,13 +328,7 @@ export default {
         this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
         this.render.balance = false;
       }
-      if (roleUser == 'customer') {
-        this.connection.onmessage = () => {
-          OfferApi.offersPurchase().then((response) => {
-            console.log('OFFERS PURCHASE\n', response.data);
-          });
-        };
-      }
+
       this.sidebar.links = sidebarLinks;
     } else {
       this.$router.push('/');
