@@ -114,7 +114,7 @@
             :parentFunction="onClickApplySellProduct"
             :cancelForm="onClickCancelForm"
             :disableFields="form.sellProduct.model.hideShow"
-            :select="{customer_id: Object.keys(dicts.customers)}"
+            :select="{to_customer: Object.keys(dicts.customers)}"
             :errorsMessage="form.errors"
             :applySuccess="form.success"
           >
@@ -336,9 +336,9 @@ export default {
         this.form.isLoad = true;
         const product_id = this.form.currentData.product.id;
         const customer_id =
-          this.dicts.customers[modelOfferProductSell.customer_id];
+          this.dicts.customers[modelOfferProductSell.to_customer];
         modelOfferProductSell.product_id = product_id;
-        modelOfferProductSell.customer_id = customer_id;
+        modelOfferProductSell.to_customer = customer_id;
         const responsePlace = await this.$store.dispatch(
           'offer/createOfferPurchase',
           modelOfferProductSell
@@ -347,13 +347,13 @@ export default {
         if (responsePlace.status === 200) {
           this.form.success = true;
           console.log(responsePlace.data);
-          const offer = responsePlace.data;
+          // const offer = responsePlace.data;
 
-          const responseAcquire = await this.$store.dispatch(
-            'offer/offerPurchaseAcquire',
-            {offerId: offer.id, customer_id: customer_id}
-          );
-          console.log(responseAcquire);
+          // const responseAcquire = await this.$store.dispatch(
+          //   'offer/offerPurchaseAcquire',
+          //   {offerId: offer.id, customer_id: customer_id}
+          // );
+          // console.log(responseAcquire);
         } else {
           this.form.errors.push('Произошла ошибка во время продажи');
           this.form.isLoad = false;

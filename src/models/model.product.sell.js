@@ -4,7 +4,7 @@ class CreateProductSell {
       price: 'Стоимость',
       count: 'Количество',
       product_id: 'Продукт',
-      customer_id: 'Покупатель:',
+      to_customer: 'Покупатель:',
     };
     this.types = {
       price: 'number',
@@ -16,13 +16,13 @@ class CreateProductSell {
       price: 'number',
       count: 'number',
       product_id: 'field',
-      customer_id: 'field',
+      to_customer: 'field',
     };
     this.data = {
       price: '',
       count: '',
       product_id: '',
-      customer_id: '',
+      to_customer: '',
     };
     this.hideShow = {product_id: true};
   }

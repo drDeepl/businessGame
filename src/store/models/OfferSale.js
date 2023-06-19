@@ -20,10 +20,13 @@ export default class OfferSale extends Model {
       Authorization: TokenService.getLocalAccessToken(),
     },
     actions: {
-      async getListOffersSale() {
+      async getListOffersSale(teamId) {
         console.warn('MODEL.OFFER: getListOffersSale');
-
-        return this.get('offers/sale/list');
+        if (!teamId) {
+          return this.get('offers/sale/list');
+        } else {
+          return this.get(`offers/sale/list/${teamId}`);
+        }
       },
       async offerSalePlace(modelPlaceOffer) {
         console.warn('MODEL.OFFER: offerSalePlace');

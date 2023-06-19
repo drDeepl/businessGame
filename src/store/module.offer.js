@@ -11,9 +11,15 @@ export const offer = {
     },
   },
   actions: {
+    async getOffersSale(context, teamId) {
+      console.warn('MODULE.OFFER: getOffers');
+      const response = await decorateResponseApi(
+        OfferSale.api().getListOffersSale,
+        teamId
+      );
+      return response;
+    },
     async offerSalePlace(context, saleOfferProductKit) {
-      console.warn('MODULE.OFFER: offerSalePlace');
-
       const response = await decorateResponseApi(
         OfferSale.api().offerSalePlace,
         saleOfferProductKit
