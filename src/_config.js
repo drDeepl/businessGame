@@ -20,6 +20,7 @@ export const card = {
 export const playerSidebarLinks = [
   {title: 'Мой профиль', url: '/profile'},
   {title: 'Склад', url: '/storage'},
+  {title: 'Предложения', url: '/player'},
 ];
 
 export const manufacturerSidebarLinks = [

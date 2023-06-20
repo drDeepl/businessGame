@@ -28,9 +28,15 @@
             <small class="offer-sale-row-label">
               {{ modelItem.props[prop] }}
             </small>
-            <span class="offer-sale-row-text">
+            <span class="offer-sale-row-text" v-if="prop != 'product_kit'">
               {{ item[prop] }}
             </span>
+            <v-progress-circular
+              v-else-if="render.nameProduct"
+              indeterminate
+              color="grey"
+            ></v-progress-circular>
+            <span v-else>{{ item[prop] }} </span>
           </div>
         </div>
         <v-divider class="mt-3"></v-divider>
@@ -45,6 +51,11 @@
 <script>
 import Alert from '@/UI/Alert.vue';
 export default {
+  data() {
+    return {
+      render: {nameProduct: false},
+    };
+  },
   components: {Alert},
   props: {
     title: {
@@ -73,6 +84,28 @@ export default {
         return false;
       },
     },
+    isGetNameProduct: {
+      type: Boolean,
+      required: false,
+      default() {
+        return false;
+      },
+    },
+  },
+  async created() {
+    console.warn('OFFER CARD: created');
+    const item = this.item;
+
+    if (this.isGetNameProduct) {
+      console.log(item);
+      this.render.nameProduct = true;
+      const responseProduct = await this.$store.dispatch(
+        'productKit/getProductFromProductKit',
+        item.product_kit
+      );
+      this.item.product_kit = responseProduct.data.name;
+      this.render.nameProduct = false;
+    }
   },
 };
 </script>

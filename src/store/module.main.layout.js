@@ -3,6 +3,13 @@ export const mainLayout = {
   state: {
     loading: false,
     currentTab: null,
+    alert: {
+      currentState: null,
+      success: false,
+      info: false,
+      error: false,
+      message: '',
+    },
   },
   actions: {},
   getters: {
@@ -11,6 +18,9 @@ export const mainLayout = {
     },
     LOADING: (state) => {
       return state.loading;
+    },
+    GET_STATE_ALERT: (state) => {
+      return state.alert;
     },
   },
   mutations: {
@@ -22,6 +32,16 @@ export const mainLayout = {
     },
     SET_STATE_LOADING_COMPLETE: function (state) {
       state.loading = true;
+    },
+    SET_STATE_ALERT: function (state, stateAlert, message) {
+      state.alert.currentState = stateAlert;
+      state.alert[stateAlert] = true;
+      state.alert.message = message;
+    },
+    CLEAR_STATE_ALERT: function (state) {
+      const currentState = state.alert.currentState;
+      state.alert[currentState] = false;
+      state.message = '';
     },
   },
 };
