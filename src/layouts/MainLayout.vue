@@ -49,7 +49,10 @@
           @click.prevent="
             () =>
               rowModel.url == 'player'
-                ? onClickTab(rowModel, arrays.offersAwaited)
+                ? onClickTab(rowModel, {
+                    offersAwaited: arrays.offersAwaited,
+                    toUpdateOffersBadge: updateOffersAwaitedCount,
+                  })
                 : onClickTab(rowModel)
           "
         >
@@ -67,7 +70,6 @@
             </v-badge>
           </span>
           <span v-else class="mainLayout-sidebar-row-text">
-            {{ alert.newOfferSale.count }}
             {{ rowModel.title }}
           </span>
           <!-- </router-link> -->
@@ -126,6 +128,7 @@
                       @click="
                         () => {
                           newOfferSaleToAwait(alert.newOfferSale.offer.id);
+                          addOfferSaleToAwaitedList(alert.newOfferSale.offer);
                           onClickNewOfferCancel();
                         }
                       "
@@ -317,9 +320,9 @@ export default {
                 `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
               );
               if (this.alert.newOfferSale.offer) {
-                this.newOfferSaleToAwait(offer.id).then(
-                  () => (this.alert.newOfferSale.count += 1)
-                );
+                this.newOfferSaleToAwait(offer.id).then(() => {
+                  this.addOfferSaleToAwaitedList(offer);
+                });
               } else {
                 this.alert.newOfferSale.offer = offer;
               }
@@ -369,7 +372,6 @@ export default {
 
   methods: {
     async newOfferSaleToAwait(offerId) {
-      /*Данный метод изменяет статус оффера на AWAIT*/
       console.error('TDODO: newOfferToAwait');
       console.log(offerId);
       await this.$store.dispatch('offer/offerSaleChangeStateAwait', offerId);
@@ -381,6 +383,16 @@ export default {
         this.alert.error.message = response.message;
         this.alert.error.active = true;
       }
+    },
+
+    addOfferSaleToAwaitedList(offer) {
+      console.warn('MAINLAYOUT: addOfferSaleToAwaitedList');
+      this.arrays.offersAwaited.push(offer);
+      this.alert.newOfferSale.count += 1;
+    },
+    updateOffersAwaitedCount(count) {
+      console.warn('MAINLYAOUT: updateOffersAwaitedCount');
+      this.alert.newOfferSale.count = count;
     },
     onClickErrorClose() {
       this.alert.error.active = false;

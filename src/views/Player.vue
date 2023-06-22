@@ -80,16 +80,13 @@ export default {
       const currentUserData = responseUser.data;
       this.currentUserData = currentUserData;
 
-      // const responseOffersSale = await this.$store.dispatch(
-      //   'offer/getOffersSale',
+      // const responseOffersAwaited = await this.$store.dispatch(
+      //   'offer/getOfferAwaitedSell',
       //   this.currentUserData.team
       // );
-      const responseOffersAwaited = await this.$store.dispatch(
-        'offer/getOfferAwaitedSell',
-        this.currentUserData.team
-      );
-      console.log(responseOffersAwaited);
-      const offersSale = responseOffersAwaited.data;
+      // console.log(responseOffersAwaited);
+
+      const offersSale = this.$route.params.data.offersAwaited;
       this.arrays.offersSale = offersSale;
     } else {
       this.$router.push('/login');
@@ -125,6 +122,7 @@ export default {
       console.log(responseOffersAwaited);
       const offersSale = responseOffersAwaited.data;
       this.arrays.offersSale = offersSale;
+      await this.$route.params.data.toUpdateOffersBadge(offersSale.length);
       this.render.offersContainer = false;
     },
 
