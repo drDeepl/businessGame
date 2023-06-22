@@ -38,6 +38,11 @@ export default class OfferSale extends Model {
         return this.get('offers/sale/state-offer/' + offerId);
       },
 
+      async getOffersSaleAwaited(teamId) {
+        console.warn('OFFER.API: getOffersSaleAwaited');
+        return this.get('offers/sale/list/state/await/' + teamId);
+      },
+
       async offerSaleChangeStateAwait(offerId) {
         return this.post('offers/sale/offer-to-await?offer_id=' + offerId);
       },

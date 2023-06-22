@@ -77,11 +77,16 @@ export default {
       const currentUserData = responseUser.data;
       this.currentUserData = currentUserData;
 
-      const responseOffersSale = await this.$store.dispatch(
-        'offer/getOffersSale',
+      // const responseOffersSale = await this.$store.dispatch(
+      //   'offer/getOffersSale',
+      //   this.currentUserData.team
+      // );
+      const responseOffersAwaited = await this.$store.dispatch(
+        'offer/getOfferAwaitedSell',
         this.currentUserData.team
       );
-      const offersSale = responseOffersSale.data;
+      console.log(responseOffersAwaited);
+      const offersSale = responseOffersAwaited.data;
       this.arrays.offersSale = offersSale;
     } else {
       this.$router.push('/login');

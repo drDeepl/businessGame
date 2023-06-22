@@ -1,6 +1,7 @@
 import OfferSale from './models/OfferSale';
 import OfferPurchase from './models/OfferPurchase';
 import {decorateResponseApi} from '@/services/utils.service';
+
 export const offer = {
   namespaced: true,
   state: {
@@ -19,6 +20,16 @@ export const offer = {
       );
       return response;
     },
+
+    async getOfferAwaitedSell(context, teamId) {
+      console.warn('MODULE.OFFER: getOffersSaleAwaited');
+      const response = await decorateResponseApi(
+        OfferSale.api().getOffersSaleAwaited,
+        teamId
+      );
+      return response;
+    },
+
     async offerSalePlace(context, saleOfferProductKit) {
       const response = await decorateResponseApi(
         OfferSale.api().offerSalePlace,
