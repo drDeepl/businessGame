@@ -6,7 +6,7 @@ export const develop = true;
 export const adminSidebarLinks = [
   {
     title: 'Панель администратора',
-    url: '/admin',
+    url: 'admin',
     titleTabs: [
       {title: 'Создать пользователя', form: 'formCreateUser'},
       {title: 'Создать команду', form: 'formCreateTeam'},
@@ -18,14 +18,14 @@ export const card = {
   color: '#6c63ff',
 };
 export const playerSidebarLinks = [
-  {title: 'Мой профиль', url: '/profile'},
-  {title: 'Склад', url: '/storage'},
-  {title: 'Предложения', url: '/player'},
+  {title: 'Предложения', url: 'player'},
+  {title: 'Мой профиль', url: 'profile'},
+  {title: 'Склад', url: 'storage'},
 ];
 
 export const manufacturerSidebarLinks = [
-  {title: 'Мой профиль', url: '/profile'},
-  {title: 'Склад', url: '/manufacturer'},
+  {title: 'Мой профиль', url: 'profile'},
+  {title: 'Склад', url: 'manufacturer'},
   // {title: 'Магазин', url: '/shop'},
 ];
 

@@ -28,7 +28,7 @@
             <v-progress-circular v-else indeterminate></v-progress-circular>
           </li>
           <li id="balance" class="user-info-row">
-            <div v-if="!render.balance">
+            <div v-if="!render.balance && !isRenderBalance">
               <span class="sidebar-user-info title">
                 <small> баланс </small>
               </span>
@@ -44,18 +44,36 @@
       <ul class="sidebar-nav">
         <li
           class="mainLayout-sidebar-row"
-          v-for="key in sidebar.links"
-          :key="key.url"
-          @click.prevent="onClickTab"
+          v-for="rowModel in sidebar.links"
+          :key="rowModel.url"
+          @click.prevent="
+            () =>
+              rowModel.url == 'player'
+                ? onClickTab(rowModel, arrays.offersAwaited)
+                : onClickTab(rowModel)
+          "
         >
-          <span @click="setActiveTab(key.title)">
-            <router-link :to="key.url">
-              <span class="mainLayout-sidebar-row-text">{{ key.title }}</span>
-            </router-link>
+          <!-- <router-link :to="rowModel.url"> -->
+          <span
+            v-if="rowModel.url == 'player'"
+            class="mainLayout-sidebar-row-text sidebar-link"
+          >
+            <v-badge
+              :content="alert.newOfferSale.count"
+              :value="alert.newOfferSale.count > 0"
+              color="red"
+            >
+              {{ rowModel.title }}
+            </v-badge>
           </span>
+          <span v-else class="mainLayout-sidebar-row-text">
+            {{ alert.newOfferSale.count }}
+            {{ rowModel.title }}
+          </span>
+          <!-- </router-link> -->
         </li>
         <li class="mainLayout-sidebar-row">
-          <a class="sidebar-link ma-3" href @click="OnLogOut">Выйти </a>
+          <a class="sidebar-link" href @click="OnLogOut">Выйти </a>
         </li>
       </ul>
     </aside>
@@ -158,6 +176,7 @@ export default {
         newOfferSale: {
           active: false,
           offer: null,
+          count: 0,
         },
         newOfferPurchase: {
           active: false,
@@ -174,6 +193,7 @@ export default {
       arrays: {
         saleOffers: [],
         purchaseOffers: [],
+        offersAwaited: [],
       },
       loading: {
         main: this.$store.getters['mainLayout/LOADING'],
@@ -196,7 +216,7 @@ export default {
     ...mapGetters({
       isLoggedIn: 'auth/isLoggedIn',
       isGetTeam: 'team/GET_TEAM_STATE',
-      stateBalanceRunning: 'team/GET_BALANCE_STATE_RUNNING',
+      isRenderBalance: 'team/GET_BALANCE_STATE',
       balanceTeam: 'team/GET_BALANCE_VALUE',
       activeTab: 'mainLayout/GET_CURRENT_TAB',
       isOffersUpdate: 'shopState/GET_OFFERS_UPDATE_RUNNING',
@@ -275,7 +295,7 @@ export default {
       if (dataUser.is_superuser) {
         console.warn('GET TEAMS');
         const teams = await this.$store.dispatch('team/getTeams');
-        const adminRow = {title: 'Панель администратора', url: '/admin'};
+        const adminRow = {title: 'Панель администратора', url: 'admin'};
         sidebarLinks.shift();
         sidebarLinks.push(adminRow);
 
@@ -290,14 +310,19 @@ export default {
             console.log('USERS DATA\n', this.currentUserData);
             const currentUserTeam = this.currentUserData.team;
             const offer = response.data.at(-1);
-            const offerToTeam = offer.team;
+            const offerToTeam = offer ? offer.team : null;
 
             if (currentUserTeam === offerToTeam) {
               console.log(
                 `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentUserTeam}`
               );
-
-              this.alert.newOfferSale.offer = offer;
+              if (this.alert.newOfferSale.offer) {
+                this.newOfferSaleToAwait(offer.id).then(
+                  () => (this.alert.newOfferSale.count += 1)
+                );
+              } else {
+                this.alert.newOfferSale.offer = offer;
+              }
             }
           });
           // OfferApi.offersPurchase().then((response) => {
@@ -309,6 +334,13 @@ export default {
         };
         console.warn(User.api());
         const teamId = dataUser.team;
+        const responseOffersAwaited = await this.$store.dispatch(
+          'offer/getOfferAwaitedSell',
+          teamId
+        );
+        const offerSaleCount = responseOffersAwaited.data.length;
+        this.alert.newOfferSale.count = offerSaleCount;
+        this.arrays.offersAwaited = responseOffersAwaited.data;
         console.error('DATA USER\n', dataUser);
         this.$store.commit('team/SET_BALANCE_RUNNING');
         const dataTeam = await this.$store.dispatch('team/getDataTeam', teamId);
@@ -365,12 +397,27 @@ export default {
       }
     },
 
-    onClickTab() {
+    onClickTab(rowModel, data) {
       this.sidebar.className = 'sidebar-container';
       this.sidebar.isActive = !this.sidebar.isActive;
+      this.setActiveTab(rowModel, data);
     },
-    setActiveTab(title) {
-      this.$store.commit('mainLayout/SET_CURRENT_TAB', title);
+    setActiveTab(rowModel, data) {
+      console.log(rowModel);
+      console.log(data);
+      const routeName = rowModel.url;
+      const title = rowModel.title;
+      const activeTab = this.activeTab ? this.activeTab.toLowerCase() : '';
+      console.log(activeTab);
+      console.log(title);
+      if (activeTab != title) {
+        this.$store.commit('mainLayout/SET_CURRENT_TAB', title);
+
+        this.$router.push({
+          name: routeName,
+          params: {data, currentRoute: rowModel},
+        });
+      }
     },
     onClickNewOfferCancel() {
       console.warn('MAINLAYOUT: onClickNewOfferCancel');
@@ -380,6 +427,19 @@ export default {
       this.alert.newOfferSale.offer = null;
       this.alert.newOfferPurchase.offer = null;
       this.alert.load.newOffer = false;
+    },
+
+    async updateTeamBalance(teamId) {
+      console.warn('MAINLAYOUT: updateTeamBalance');
+      this.render.balance = true;
+      const responseTeamBalance = await this.$store.dispatch(
+        'team/getBalance',
+        teamId
+      );
+      const balance = this.getDataOrError(responseTeamBalance);
+      console.log('MAINLAYOUT: team balance', balance);
+      this.$store.commit('team/SET_BALANCE', balance);
+      this.render.balance = false;
     },
 
     async onClickNewOfferApply() {
@@ -397,19 +457,20 @@ export default {
         console.log('Offer sell success');
         this.alert.load.newOffer = false;
 
-        // TODO: Update balance
         console.log(this.currentUserData);
         const teamId = this.currentUserData.team;
-
+        // await this.updateTeamBalance(teamId);
         this.render.balance = true;
-        const responseTeamBalance = await this.$store.dispatch(
-          'team/getBalance',
-          teamId
-        );
-        const balance = this.getDataOrError(responseTeamBalance);
-        console.log('MAINLAYOUT: team balance', balance);
-        this.$store.commit('team/SET_BALANCE', balance);
+        await this.$store.dispatch('team/updateTeamBalance', teamId);
         this.render.balance = false;
+        // const responseTeamBalance = await this.$store.dispatch(
+        //   'team/getBalance',
+        //   teamId
+        // );
+        // const balance = this.getDataOrError(responseTeamBalance);
+        // console.log('MAINLAYOUT: team balance', balance);
+        // this.$store.commit('team/SET_BALANCE', balance);
+        // this.render.balance = false;
         this.alert.success.active = true;
       } else {
         this.onClickNewOfferCancel();

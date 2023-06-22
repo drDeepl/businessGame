@@ -63,6 +63,21 @@ export const team = {
       return response;
     },
 
+    async updateTeamBalance(context, teamId) {
+      console.warn('MODULE.TEAM: updateTeamBalance');
+      context.commit('SET_BALANCE_RUNNING');
+      let result = {isHaveError: false};
+      const responseTeamBalance = await context.dispatch('getBalance', teamId);
+      if (responseTeamBalance.status == 200) {
+        console.log(responseTeamBalance);
+        context.commit('SET_BALANCE', responseTeamBalance.data);
+      } else {
+        result.isHaveError = true;
+      }
+      context.commit('SET_BALANCE_RUNNING_COMPLETE');
+      return result;
+    },
+
     async deleteTeam(context, teamId) {
       console.warn('TEAM.MODULE: deleteTeam');
       console.log(context);
@@ -88,7 +103,7 @@ export const team = {
     GET_BALANCE_VALUE: (state) => {
       return state.getBalance.value;
     },
-    GET_BALANCE_STATE_RUNNING: (state) => {
+    GET_BALANCE_STATE: (state) => {
       return state.getBalance.running;
     },
     GET_DATA_TEAM_BY_ID: (state) => (id) => {
@@ -115,8 +130,10 @@ export const team = {
       state.deleteTeam = false;
     },
     SET_BALANCE: function (state, balance) {
+      console.warn('MODULE.TEAM: set balance');
       state.getBalance.value = balance;
     },
+
     SET_BALANCE_RUNNING: function (state) {
       state.getBalance.running = true;
     },

@@ -7,9 +7,10 @@
         </span>
         <v-skeleton-loader v-else type="list-item"></v-skeleton-loader>
         <!-- {{ currentUserData }} -->
-        <span>сделать показ офферов</span>
       </p>
-      <div>
+
+      <Load v-if="render.offersContainer"></Load>
+      <div v-else class="cards-container">
         <OfferCard
           v-for="offer in arrays.offersSale"
           :key="offer.id"
@@ -39,14 +40,16 @@
 import {mapGetters} from 'vuex';
 import OfferCard from '@/UI/OfferCard.vue';
 import Alert from '@/UI/Alert.vue';
+import Load from '@/UI/Load.vue';
 import SaleOffer from '@/models/model.offer.sale';
 export default {
-  components: {OfferCard, Alert},
+  components: {OfferCard, Alert, Load},
   data() {
     return {
       currentUserData: null,
       render: {
         page: true,
+        offersContainer: false,
       },
       model: {
         offerSale: SaleOffer,
@@ -93,6 +96,7 @@ export default {
     }
 
     this.render.page = false;
+    // TODO console.error(this.$route.params.data);
   },
   methods: {
     async onClickBuyOffer(offerSalePlace) {
@@ -105,11 +109,28 @@ export default {
       );
       if (responseOfferSaleAcquire.status == 200) {
         this.$store.commit('mainLayout/SET_STATE_ALERT', 'success');
+
+        this.$store.dispatch('team/updateTeamBalance', teamId);
       }
       console.log(responseOfferSaleAcquire);
     },
-    onClickSuccessApply() {
+
+    async updateListOffers() {
+      console.warn('PLAYER: updateListOffers');
+      this.render.offersContainer = true;
+      const responseOffersAwaited = await this.$store.dispatch(
+        'offer/getOfferAwaitedSell',
+        this.currentUserData.team
+      );
+      console.log(responseOffersAwaited);
+      const offersSale = responseOffersAwaited.data;
+      this.arrays.offersSale = offersSale;
+      this.render.offersContainer = false;
+    },
+
+    async onClickSuccessApply() {
       console.warn('PLAYER: onClickSuccessApply');
+      await this.updateListOffers();
       this.$store.commit('mainLayout/CLEAR_STATE_ALERT');
     },
   },
