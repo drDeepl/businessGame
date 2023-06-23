@@ -71,20 +71,12 @@ export default {
       },
     };
   },
-  // validations: {
-  //   form: {
-  //     username: {required},
-  //     password: {required},
-  //   },
-  // },
+
   methods: {
     async onLogIn() {
       console.warn('Login.vue: onLogin');
       this.load = true;
-      // this.$v.form.$touch();
-      // if (this.$v.form.$error) {
-      //   console.log('Login.vue: error validate');
-      // }
+
       console.log('Is Errors? ');
       try {
         const user = new LoginForm(this.form);
@@ -99,12 +91,18 @@ export default {
 
         const response = await User.api().getUserByUsername(username);
         const userData = response.response.data;
+        console.error('LOGIN.VUE: USER DATA');
+        console.log(userData);
         const role = userData.role.toLowerCase();
         if (userData.is_superuser) {
           this.$router.push('/admin');
         } else {
           this.$store.commit('mainLayout/SET_CURRENT_TAB', role);
-          this.$router.push('/' + role);
+          // this.$router.push('/' + role);
+          this.$router.push({
+            name: 'profile',
+            params: {currentUserData: userData},
+          });
         }
 
         console.log('After Login');
