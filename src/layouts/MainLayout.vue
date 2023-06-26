@@ -33,7 +33,7 @@
                 <small> баланс </small>
               </span>
               <span class="sidebar-user-info value" id="balance">
-                {{ teamBalance.value }}
+                {{ teamBalance.value }}.00
               </span>
             </div>
             <v-progress-circular v-else indeterminate></v-progress-circular>
@@ -219,7 +219,7 @@ export default {
     ...mapGetters({
       isLoggedIn: 'auth/isLoggedIn',
       isGetTeam: 'team/GET_TEAM_STATE',
-      // isRenderBalance: 'team/GET_BALANCE_STATE',
+
       balanceTeam: 'team/GET_BALANCE_VALUE',
       activeTab: 'mainLayout/GET_CURRENT_TAB',
       isOffersUpdate: 'shopState/GET_OFFERS_UPDATE_RUNNING',
@@ -337,12 +337,6 @@ export default {
               }
             }
           });
-          // OfferApi.offersPurchase().then((response) => {
-          //   console.log('OFFERS ACQUIRE\n', response.data);
-          //   const currentOfferAcquire = response.data.at(-1);
-          //   console.log('CURRENT OFFER ACQUIRE', currentOfferAcquire);
-          //   console.error('TODO: show transations');
-          // });
         };
         console.warn(User.api());
         const teamId = dataUser.team;
@@ -358,22 +352,23 @@ export default {
         // this.alert.newOfferSale.count = offerSaleCount;
         this.arrays.offersAwaited = responseOffersAwaited.data;
         console.error('DATA USER\n', dataUser);
-        this.$store.commit('team/SET_BALANCE_RUNNING');
+        // this.$store.commit('team/SET_BALANCE_RUNNING');
         const dataTeam = await this.$store.dispatch('team/getDataTeam', teamId);
-        const responseAccount = await this.$store.dispatch(
-          'account/getAccountById',
-          dataTeam.account
-        );
-        const dataAccount =
-          responseAccount.status == 200 ? responseAccount.data : {};
+        // const responseAccount = await this.$store.dispatch(
+        //   'account/getAccountById',
+        //   dataTeam.account
+        // );
+        // const dataAccount =
+        //   responseAccount.status == 200 ? responseAccount.data : {};
         this.sidebarUserInfo.role.value = roleUser;
 
         this.sidebarUserInfo.username.value = username;
 
         this.sidebarUserInfo.team.value = dataTeam.name;
 
-        this.$store.commit('team/SET_BALANCE', dataAccount.balance);
-        this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
+        // this.$store.commit('team/SET_BALANCE', dataAccount.balance);
+        // this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
+        await this.$store.dispatch('team/updateTeamBalance', teamId);
         this.render.balance = false;
       }
 

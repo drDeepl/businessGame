@@ -80,7 +80,8 @@
               : 'storage-content'
           "
         >
-          <div v-if="teamProducts.length == 0">
+          <Load v-if="load.teamProducts"></Load>
+          <div v-else-if="teamProducts.length == 0">
             <Empty title="Склад с продуктами пуст" />
           </div>
 
@@ -151,6 +152,7 @@ export default {
     return {
       load: {
         main: false,
+        teamProducts: false,
       },
       prepareProductKit: {
         timer: 0,
@@ -346,9 +348,12 @@ export default {
             {offerId: offer.id, customerId: customer_id}
           );
           if (responseAcquire.status === 200) {
-            await this.$store.dispatch('team/updateTeamBalance');
+            const teamId = this.currentUserData.team;
+            this.load.teamProducts = true;
+            await this.$store.dispatch('team/updateTeamBalance', teamId);
             await this.updateNamesProducts();
-            await this.updateItemsProducts(this.currentUserData.team);
+            await this.updateItemsProducts(teamId);
+            this.load.teamProducts = false;
           }
           console.log(responseAcquire);
         } else {
