@@ -20,7 +20,7 @@ export default class Product extends Model {
 
         return this.get('products');
       },
-      async gerProduct(productId) {
+      async getProduct(productId) {
         console.warn('STORE.MODEL.PRODUCT: getProduct');
         return this.get('products/' + productId);
       },

@@ -33,7 +33,7 @@
                 <small> баланс </small>
               </span>
               <span class="sidebar-user-info value" id="balance">
-                {{ balanceTeam }}
+                {{ teamBalance.value }}
               </span>
             </div>
             <v-progress-circular v-else indeterminate></v-progress-circular>
@@ -62,8 +62,8 @@
             class="mainLayout-sidebar-row-text sidebar-link"
           >
             <v-badge
-              :content="alert.newOfferSale.count"
-              :value="alert.newOfferSale.count > 0"
+              :content="offersAwaitedCount"
+              :value="offersAwaitedCount > 0"
               color="red"
             >
               {{ rowModel.title }}
@@ -219,7 +219,7 @@ export default {
     ...mapGetters({
       isLoggedIn: 'auth/isLoggedIn',
       isGetTeam: 'team/GET_TEAM_STATE',
-      isRenderBalance: 'team/GET_BALANCE_STATE',
+      // isRenderBalance: 'team/GET_BALANCE_STATE',
       balanceTeam: 'team/GET_BALANCE_VALUE',
       activeTab: 'mainLayout/GET_CURRENT_TAB',
       isOffersUpdate: 'shopState/GET_OFFERS_UPDATE_RUNNING',
@@ -234,6 +234,12 @@ export default {
     currentTab() {
       return this.$route.params;
     },
+    teamBalance() {
+      return this.$store.state.team.getBalance;
+    },
+    isRenderBalance() {
+      return this.$store.state.team.getBalance.running;
+    },
 
     users() {
       return this.$store.$db().model('users').all();
@@ -242,6 +248,9 @@ export default {
       return this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE'](
         this.sidebarUserInfo.role
       );
+    },
+    offersAwaitedCount() {
+      return this.$store.state.mainLayout.countAwaitedOffers;
     },
   },
   watch: {
@@ -342,7 +351,11 @@ export default {
           teamId
         );
         const offerSaleCount = responseOffersAwaited.data.length;
-        this.alert.newOfferSale.count = offerSaleCount;
+        this.$store.commit(
+          'mainLayout/SET_COUNT_AWAITED_OFFERS',
+          offerSaleCount
+        );
+        // this.alert.newOfferSale.count = offerSaleCount;
         this.arrays.offersAwaited = responseOffersAwaited.data;
         console.error('DATA USER\n', dataUser);
         this.$store.commit('team/SET_BALANCE_RUNNING');
@@ -388,7 +401,10 @@ export default {
     addOfferSaleToAwaitedList(offer) {
       console.warn('MAINLAYOUT: addOfferSaleToAwaitedList');
       this.arrays.offersAwaited.push(offer);
-      this.alert.newOfferSale.count += 1;
+      let offersCount = this.offersAwaitedCount;
+      // this.alert.newOfferSale.count += 1;
+      offersCount += 1;
+      this.$store.commit('mainLayout/SET_COUNT_AWAITED_OFFERS', offersCount);
     },
     updateOffersAwaitedCount(count) {
       console.warn('MAINLYAOUT: updateOffersAwaitedCount');

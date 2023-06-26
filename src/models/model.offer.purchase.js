@@ -32,11 +32,10 @@ class PurchaseOffer {
       timestamp: '',
       state: '',
     };
-    this.hideShow = {
-      id: true,
-      timestamp: true,
+    this.propsToShow = {
       product: true,
       trader: true,
+      price: true,
     };
   }
 }

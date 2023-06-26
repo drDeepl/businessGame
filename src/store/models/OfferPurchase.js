@@ -31,7 +31,7 @@ export default class OfferPurchase extends Model {
       async offerPurchaseAcquire(context) {
         console.warn('MODEL.OFFER: offerPurchaseAcquire');
         const offerId = context.offerId;
-        const customer_id = context.customer_id;
+        const customer_id = context.customerId;
         return this.post(
           'offers/purchase/acquire?offer_id=' +
             offerId +

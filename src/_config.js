@@ -30,7 +30,8 @@ export const manufacturerSidebarLinks = [
 ];
 
 export const customerSidebarLinks = [
-  // {title: 'Склад', url: '/storage'},
+  {title: 'Мой профиль', url: 'profile'},
+  {title: 'Предложения', url: 'customer'},
 ];
 
 export const app = {

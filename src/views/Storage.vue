@@ -26,7 +26,6 @@
 
           <div class="storage-content" v-else>
             <div v-for="productKit in productKits" :key="productKit.id">
-              {{ productKit }}
               <ProductKitCard
                 :nameProduct="dicts.products[productKit.product_kit.product]"
                 :countItems="productKit.count"
@@ -87,7 +86,7 @@
 
           <div v-else v-for="product in teamProducts" :key="product['$id']">
             <span>После продажи продуктов их кол-во не изменяется</span>
-            {{ teamProducts }}
+
             <ProductCard
               :isProductKit="false"
               :nameProduct="product.product.name"
@@ -239,14 +238,7 @@ export default {
       offerPurchaseInProgress: 'offer/GET_STATE_OFFER_PREPARE',
     }),
     currentUserData() {
-      let username = this.$store.state.auth.user.username;
-      console.warn('Storage.vue\nusername ' + username);
-      return this.$store
-        .$db()
-        .model('users')
-        .query()
-        .where('username', username)
-        .first();
+      return this.$store.state.user.currentUserData;
     },
     productKits() {
       return this.arrays.productKits;
@@ -347,13 +339,18 @@ export default {
         if (responsePlace.status === 200) {
           this.form.success = true;
           console.log(responsePlace.data);
-          // const offer = responsePlace.data;
+          const offer = responsePlace.data;
 
-          // const responseAcquire = await this.$store.dispatch(
-          //   'offer/offerPurchaseAcquire',
-          //   {offerId: offer.id, customer_id: customer_id}
-          // );
-          // console.log(responseAcquire);
+          const responseAcquire = await this.$store.dispatch(
+            'offer/offerPurchaseAcquire',
+            {offerId: offer.id, customerId: customer_id}
+          );
+          if (responseAcquire.status === 200) {
+            await this.$store.dispatch('team/updateTeamBalance');
+            await this.updateNamesProducts();
+            await this.updateItemsProducts(this.currentUserData.team);
+          }
+          console.log(responseAcquire);
         } else {
           this.form.errors.push('Произошла ошибка во время продажи');
           this.form.isLoad = false;
@@ -362,6 +359,39 @@ export default {
       } else {
         this.form.errors.push('Недостаточно продуктов для продажи');
       }
+    },
+    async updateNamesProducts() {
+      console.log('updateNameProducts');
+      const products = await this.$store.dispatch('products/getProducts');
+      let dictsProducts = {};
+      products.forEach((product) => (dictsProducts[product.id] = product.name));
+      this.dicts.products = dictsProducts;
+
+      console.log('DICTS_PRODUCTS:\n', dictsProducts);
+      console.log('PRODUCTS:\n', products);
+    },
+    async updateItemsProducts(teamId) {
+      console.log('updateItemsProducts');
+      this.$store.commit('storageTeam/SET_GET_PRODUCTS_KIT_TEAM_RUN');
+      const teamProducts = await this.$store.dispatch(
+        'storageTeam/getTeamProducts',
+        teamId
+      );
+
+      const productKits = await this.$store.dispatch(
+        'storageTeam/getTeamProductKits',
+        teamId
+      );
+
+      this.arrays.productKits = productKits.filter(
+        (pk) => this.dicts.products[pk.product_kit.product]
+      );
+      console.log(productKits);
+      productKits.forEach((pk) => console.log(pk));
+      this.arrays.teamProducts = teamProducts;
+      // pk.product_kit.product
+      this.$store.commit('storageTeam/SET_GET_PRODUCTS_KIT_TEAM_RUN_COMPLETE');
+      console.log('TEAM_PRODUCTS:\n', teamProducts);
     },
   },
 };

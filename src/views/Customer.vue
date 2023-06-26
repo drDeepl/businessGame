@@ -1,151 +1,123 @@
 <template>
-  <div class="customer-page-wrapper layout-showcase">
-    <Load v-if="render.main"></Load>
-    <div v-else>
-      <v-card-title>{{ currentUserData }}</v-card-title>
-      <v-dialog
-        v-if="alert.newOfferSale.active"
-        :value="alert.newOfferSale.active"
-        persistent
-        max-width="20em"
-      >
-        <OfferCard
-          :item="alert.newOfferSale.offer"
-          :modelItem="model.offerSale"
-          :propsItemToShow="
-            Object.keys(model.offerSale.props).filter(
-              (item) => !model.offerSale.hideShow[item]
-            )
-          "
-          :isSucces="alert.success.active"
-          :successApply="onClickNewOfferCancel"
+  <div class="md-body">
+    <div>
+      <v-card-title class="d-flex justify-center">
+        <v-skeleton-loader
+          v-if="render.main"
+          type="text"
+          class="loader-text-layout"
+        ></v-skeleton-loader>
+        <span v-else>Привет, {{ currentUserData.username }}</span>
+      </v-card-title>
+      <div v-if="!render.main" class="pforile-content cards-container">
+        <div
+          class="ma-1"
+          v-for="offerPurchase in arrays.offersPurchase"
+          :key="offerPurchase.id"
         >
-          <v-btn
-            class="btn-apply"
-            @click="onClickNewOfferApply"
-            :loading="alert.load.newOffer"
+          <OfferCard
+            :item="offerPurchase"
+            :modelItem="offerPurchaseModel.model"
+            :propsItemToShow="['product', 'trader', 'price']"
+            :isGetProductName="true"
+            :isGetTraderUserName="true"
           >
-            Принять
-          </v-btn>
-
-          <v-btn
-            class="btn-cancel"
-            @click="
-              () => {
-                newOfferSaleToAwait(alert.newOfferSale.offer.id);
-                onClickNewOfferCancel();
-              }
-            "
-            :disabled="alert.load.newOffer"
-          >
-            Отклонить
-          </v-btn>
-        </OfferCard>
-      </v-dialog>
-      <DialogError
-        v-if="alert.error.active"
-        :title="alert.error.message"
-        :active="alert.error.active"
-      >
-        <v-btn @click.prevent="onClickErrorClose" text>закрыть</v-btn>
-      </DialogError>
+            <v-btn
+              class="btn-apply"
+              @click="onClickBuyOfferPurchase(offerPurchase)"
+            >
+              Принять
+            </v-btn>
+          </OfferCard>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import Load from '@/UI/Load.vue';
+// import OfferApi from '@/api/offer.api';
+import {mapGetters} from 'vuex';
 import OfferApi from '@/api/offer.api';
-import SaleOffer from '@/models/model.offer.sale';
-
+import OfferCard from '@/UI/OfferCard.vue';
+import PurchaseOffer from '@/models/model.offer.purchase';
 export default {
-  components: {Load},
-
+  components: {OfferCard},
   data() {
     return {
-      connection: new WebSocket('ws://localhost:8000/ws/'),
+      render: {main: false, buyOfferPurchase: false},
       currentUserData: null,
-      alert: {
-        newOfferSale: {
-          active: false,
-          offer: null,
-        },
-        newOfferPurchase: {
-          active: false,
-          offer: null,
-        },
-
-        success: {active: false, message: null},
-        error: {active: false, message: null},
-        load: {newOffer: false, success: false, error: false},
-      },
-      model: {
-        offerSale: SaleOffer,
+      connection: new WebSocket('ws://localhost:8000/ws/'),
+      offerPurchaseModel: {
+        model: PurchaseOffer,
       },
       arrays: {
-        purchaseOffers: [],
+        offersPurchase: [],
       },
-      render: {main: false},
     };
   },
-  watch: {
-    async 'alert.newOfferSale.offer'(offer) {
-      // FIX: Добавить в оффер название продукта
-      console.log('NEW OFFER SALE: ', offer);
-      if (offer) {
-        const response = await this.$store.dispatch(
-          'productKit/getProductFromProductKit',
-          offer.product_kit
-        );
-        const trader = await this.$store.dispatch('user/getUser', offer.trader);
 
-        if (response.error) {
-          this.alert.error.active = true;
-          this.alert.error.message = response.message;
-        } else {
-          const product = response.data;
-          this.alert.newOfferSale.offer.product_kit = product.name;
-          this.alert.newOfferSale.offer.trader = trader.username;
-          this.alert.newOfferSale.active = true;
-          console.log('PRODUCT', product);
-        }
-      }
-    },
-  },
   async created() {
     this.render.main = true;
-    const username = this.currentUser.username;
-    const responseUser = await this.$store.dispatch(
-      'user/getUserDataByUsername',
-      username
-    );
 
-    const dataUser = responseUser.data;
-    this.currentUserData = dataUser;
-    this.connection.onmessage = () => {
-      OfferApi.offersPurchase().then((response) => {
-        console.log('OFFERS SALE CUSTOMER\n', response.data);
-        const currentCustomer = this.currentUserData.id;
-        const offer = response.data.at(-1);
-        const offerToTeam = offer.team;
-
-        if (currentCustomer === offerToTeam) {
-          console.log(
-            `OFFER TO TEAM: ${offerToTeam}\nCURRENT USER TEAM: ${currentCustomer}`
-          );
-
-          this.alert.newOfferSale.offer = offer;
-        }
-      });
-    };
+    if (this.currentUser) {
+      const responseUser = await this.$store.dispatch(
+        'user/getUserDataByUsername',
+        this.currentUser.username
+      );
+      const currentUserData = responseUser.data;
+      this.currentUserData = currentUserData;
+      if (currentUserData.role == 'CUSTOMER') {
+        console.log('USER IS CUSTOMER');
+        const offersPurchaseAwaited = await this.$store.dispatch(
+          'offer/getOffersPurchaseAwaited',
+          currentUserData.id
+        );
+        console.error(offersPurchaseAwaited);
+        this.arrays.offersPurchase = offersPurchaseAwaited;
+        this.connection.onmessage = () => {
+          OfferApi.offersPurchase().then((response) => {
+            console.log('PROFILE: OFFERS PURCHASE\n', response.data);
+            const currentOfferPurchase = response.data.at(-1);
+            const offerId = currentOfferPurchase.id;
+            OfferApi.offerPurchaseSetAwait(offerId).then(
+              (responseOfferAwaited) => {
+                console.error('CHANGE STATE OFFER');
+                this.arrays.offersPurchase.push(responseOfferAwaited.data);
+              }
+            );
+          });
+        };
+      }
+    } else {
+      this.$router.push('/');
+    }
     this.render.main = false;
   },
-
   computed: {
+    ...mapGetters({
+      offersPurchase: 'profile/GET_OFFERS_PURCHASE',
+    }),
+
     currentUser() {
       return this.$store.state.auth.user;
     },
   },
-  methods: {},
+  methods: {
+    async onClickBuyOfferPurchase(offerPurchase) {
+      console.log('onClickBuyOfferPurchase');
+      console.error('OFFER', offerPurchase);
+      this.render.buyOfferPurchase = true;
+      const responseModel = {
+        offerId: offerPurchase.id,
+        customerId: offerPurchase.to_customer,
+      };
+      const responseOfferPurchase = await this.$store.dispatch(
+        'offer/offerPurchaseAcquire',
+        responseModel
+      );
+      console.error('OFFER PURCHASE', responseOfferPurchase);
+    },
+  },
 };
 </script>

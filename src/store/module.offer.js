@@ -1,5 +1,6 @@
 import OfferSale from './models/OfferSale';
 import OfferPurchase from './models/OfferPurchase';
+import OfferApi from '@/api/offer.api';
 import {decorateResponseApi} from '@/services/utils.service';
 
 export const offer = {
@@ -76,6 +77,18 @@ export const offer = {
         : responseWrap.response.data;
       return offersPurchase;
     },
+
+    async getOffersPurchaseAwaited(context, customerId) {
+      console.warn('MODULE.OFFER: getOffersPurchaseAwaited');
+      const responseOffersPurchaseAwaited =
+        await OfferApi.offersPurchaseAwaited(customerId);
+      if (responseOffersPurchaseAwaited.status == 200) {
+        return responseOffersPurchaseAwaited.data;
+      } else {
+        return [];
+      }
+    },
+
     // NOTE: Что, если создать подобие декоратора для запросов?
     async createOfferPurchase(context, modelOfferPurchase) {
       console.warn('MODULE.OFFER: createOfferPurchase');

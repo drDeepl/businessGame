@@ -10,6 +10,7 @@ export const mainLayout = {
       error: false,
       message: '',
     },
+    countAwaitedOffers: 0,
   },
   actions: {},
   getters: {
@@ -42,6 +43,9 @@ export const mainLayout = {
       const currentState = state.alert.currentState;
       state.alert[currentState] = false;
       state.message = '';
+    },
+    SET_COUNT_AWAITED_OFFERS(state, count) {
+      state.countAwaitedOffers = count;
     },
   },
 };

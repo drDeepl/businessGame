@@ -1,7 +1,8 @@
 import ProductService from '@/services/product.service';
 import ProductStorage from '@/store/models/ProductStorage';
 import Product from './models/Product';
-import Messages from '@/models/model.messages';
+
+import {decorateResponseApi} from '@/services/utils.service';
 
 export const products = {
   namespaced: true,
@@ -61,17 +62,13 @@ export const products = {
     },
     async getProduct(context, productId) {
       console.warn('module.productKit: getProductKit');
-      let response = {status: 200, error: false, data: null, message: ''};
-      const responseWrap = await Product.api()
-        .getProduct(productId)
-        .catch((error) => (response.status = error.status));
-      if (response.status === 200) {
-        response.data = responseWrap.response.data;
-      } else {
-        response.message = Messages.error;
-        response.error = true;
-      }
-      return response;
+
+      const responseWrap = await decorateResponseApi(
+        Product.api().getProduct,
+        productId
+      );
+
+      return responseWrap.data;
     },
     async deleteProduct(context, productId) {
       console.warn('MODULE.PRODUCTS: deleteProduct');

@@ -18,7 +18,8 @@
           :item="offer"
           :modelItem="model.offerSale"
           :propsItemToShow="['product_kit', 'trader', 'price', '']"
-          :isGetNameProduct="true"
+          :isGetNameProductFromProductKit="true"
+          :isGetTraderUserName="true"
         >
           <v-btn class="btn-apply" @click="onClickBuyOffer(offer)"
             >Купить</v-btn
@@ -80,13 +81,19 @@ export default {
       const currentUserData = responseUser.data;
       this.currentUserData = currentUserData;
 
-      // const responseOffersAwaited = await this.$store.dispatch(
-      //   'offer/getOfferAwaitedSell',
-      //   this.currentUserData.team
-      // );
-      // console.log(responseOffersAwaited);
+      const dataRoute = this.$route.params.data;
+      let offersSale = null;
+      console.error(dataRoute);
+      if (dataRoute) {
+        offersSale = dataRoute.offersAwaited;
+      } else {
+        const offersAwaitedResponse = await this.$store.dispatch(
+          'offer/getOfferAwaitedSell',
+          currentUserData.team
+        );
+        offersSale = offersAwaitedResponse.data;
+      }
 
-      const offersSale = this.$route.params.data.offersAwaited;
       this.arrays.offersSale = offersSale;
     } else {
       this.$router.push('/login');

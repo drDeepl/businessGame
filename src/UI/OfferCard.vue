@@ -28,15 +28,21 @@
             <small class="offer-sale-row-label">
               {{ modelItem.props[prop] }}
             </small>
-            <span class="offer-sale-row-text" v-if="prop != 'product_kit'">
+
+            <span
+              class="offer-sale-row-text"
+              v-if="
+                prop != 'product_kit' && prop != 'trader' && prop != 'product'
+              "
+            >
               {{ item[prop] }}
             </span>
             <v-progress-circular
-              v-else-if="render.nameProduct"
+              v-else-if="render.nameProduct || render.usernametrader"
               indeterminate
               color="grey"
             ></v-progress-circular>
-            <span v-else>{{ item[prop] }} </span>
+            <span v-else class="offer-sale-row-text">{{ item[prop] }} </span>
           </div>
         </div>
         <v-divider class="mt-3"></v-divider>
@@ -53,7 +59,7 @@ import Alert from '@/UI/Alert.vue';
 export default {
   data() {
     return {
-      render: {nameProduct: false},
+      render: {nameProduct: false, usernametrader: false},
     };
   },
   components: {Alert},
@@ -68,7 +74,7 @@ export default {
       type: Object,
       required: true,
       default() {
-        return false;
+        return {};
       },
     },
     modelItem: {
@@ -84,20 +90,37 @@ export default {
         return false;
       },
     },
-    isGetNameProduct: {
+    isGetNameProductFromProductKit: {
       type: Boolean,
       required: false,
       default() {
         return false;
       },
     },
+    isGetTraderUserName: {
+      type: Boolean,
+      required: false,
+      default() {
+        return false;
+      },
+    },
+    isGetProductName: {
+      type: Boolean,
+      required: false,
+      default() {
+        return false;
+      },
+      toBuyOfferFunc: {
+        type: Function,
+        required: false,
+      },
+    },
   },
   async created() {
     console.warn('OFFER CARD: created');
     const item = this.item;
-
-    if (this.isGetNameProduct) {
-      console.log(item);
+    console.log(item);
+    if (this.isGetNameProductFromProductKit) {
       this.render.nameProduct = true;
       const responseProduct = await this.$store.dispatch(
         'productKit/getProductFromProductKit',
@@ -106,6 +129,28 @@ export default {
       this.item.product_kit = responseProduct.data.name;
       this.render.nameProduct = false;
     }
+    if (this.isGetProductName) {
+      this.render.nameProduct = true;
+      const product = await this.$store.dispatch(
+        'products/getProduct',
+        item.product
+      );
+      this.item.product = product.name;
+      this.render.nameProduct = false;
+    }
+    if (this.isGetTraderUserName) {
+      this.render.usernametrader = true;
+      const userDataResponse = await this.$store.dispatch(
+        'user/getUser',
+        this.item.trader
+      );
+      console.error('RESPONSE USER');
+      console.log(userDataResponse);
+      const usernameTrader = userDataResponse.username;
+      this.item.trader = usernameTrader;
+      this.render.usernametrader = false;
+    }
   },
+  methods: {},
 };
 </script>

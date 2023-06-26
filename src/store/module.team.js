@@ -69,6 +69,7 @@ export const team = {
       let result = {isHaveError: false};
       const responseTeamBalance = await context.dispatch('getBalance', teamId);
       if (responseTeamBalance.status == 200) {
+        console.error('RESPONSE TEAM BALANCE');
         console.log(responseTeamBalance);
         context.commit('SET_BALANCE', responseTeamBalance.data);
       } else {
