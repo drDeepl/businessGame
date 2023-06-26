@@ -204,6 +204,8 @@ export default {
     console.error(team_id);
     const products = await this.$store.dispatch('products/getProducts');
     let dictsProducts = {};
+    console.error('PRODUCTS');
+    console.log(products);
     products.forEach((product) => (dictsProducts[product.id] = product.name));
     console.log('DICGTS_PRODUCTS:\n', dictsProducts);
     console.log('PRODUCTS:\n', products);
@@ -354,8 +356,10 @@ export default {
             await this.updateNamesProducts();
             await this.updateItemsProducts(teamId);
             this.load.teamProducts = false;
+          } else {
+            this.form.errors.push('Произошла ошибка во время продажи');
+            this.form.isLoad = false;
           }
-          console.log(responseAcquire);
         } else {
           this.form.errors.push('Произошла ошибка во время продажи');
           this.form.isLoad = false;

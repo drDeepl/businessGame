@@ -81,20 +81,23 @@ export default {
       const currentUserData = responseUser.data;
       this.currentUserData = currentUserData;
 
-      const dataRoute = this.$route.params.data;
-      let offersSale = null;
-      console.error(dataRoute);
-      if (dataRoute) {
-        offersSale = dataRoute.offersAwaited;
-      } else {
-        const offersAwaitedResponse = await this.$store.dispatch(
-          'offer/getOfferAwaitedSell',
-          currentUserData.team
-        );
-        offersSale = offersAwaitedResponse.data;
-      }
+      // const dataRoute = this.$route.params.data;
+      let offersSale = await this.$store.dispatch(
+        'offer/getOfferAwaitedSell',
+        currentUserData.team
+      );
+      // console.error(dataRoute);
+      // if (dataRoute) {
+      //   offersSale = dataRoute.offersAwaited;
+      // } else {
+      //   const offersAwaitedResponse = await this.$store.dispatch(
+      //     'offer/getOfferAwaitedSell',
+      //     currentUserData.team
+      //   );
+      //   offersSale = offersAwaitedResponse.data;
+      // }
 
-      this.arrays.offersSale = offersSale;
+      this.arrays.offersSale = offersSale.data;
     } else {
       this.$router.push('/login');
     }
