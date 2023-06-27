@@ -86,16 +86,6 @@ export default {
         'offer/getOfferAwaitedSell',
         currentUserData.team
       );
-      // console.error(dataRoute);
-      // if (dataRoute) {
-      //   offersSale = dataRoute.offersAwaited;
-      // } else {
-      //   const offersAwaitedResponse = await this.$store.dispatch(
-      //     'offer/getOfferAwaitedSell',
-      //     currentUserData.team
-      //   );
-      //   offersSale = offersAwaitedResponse.data;
-      // }
 
       this.arrays.offersSale = offersSale.data;
     } else {

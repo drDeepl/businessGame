@@ -39,6 +39,9 @@ export default {
       );
       const currentUserData = responseUser.data;
       this.currentUserData = currentUserData;
+
+      await this.$store.dispatch('offer/getSaleOffersDone');
+
       if (currentUserData.role == 'CUSTOMER') {
         console.log('USER IS CUSTOMER');
         const offersPurchaseAwaited = await this.$store.dispatch(

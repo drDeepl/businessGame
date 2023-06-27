@@ -30,6 +30,12 @@ export const offer = {
       );
       return response;
     },
+    async getSaleOffersDone() {
+      console.warn('MODULE.OFFER: getOfferSaleDone');
+      const responseSaleOffersDone = await OfferApi.getOffersSaleDone();
+      console.error('GET SALE OFFERS DONE');
+      console.log(responseSaleOffersDone);
+    },
 
     async offerSalePlace(context, saleOfferProductKit) {
       const response = await decorateResponseApi(

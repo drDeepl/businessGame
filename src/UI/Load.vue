@@ -4,7 +4,7 @@
       :color="color"
       class="load-bar"
       indeterminate
-      size="64"
+      :size="size"
     ></v-progress-circular>
   </div>
 </template>
@@ -17,6 +17,13 @@ export default {
       required: false,
       default() {
         return '#ee5544';
+      },
+    },
+    size: {
+      type: String,
+      required: false,
+      default() {
+        return '64';
       },
     },
   },

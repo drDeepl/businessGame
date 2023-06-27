@@ -37,11 +37,12 @@
             >
               {{ item[prop] }}
             </span>
-            <v-progress-circular
+            <Load
               v-else-if="render.nameProduct || render.usernametrader"
               indeterminate
               color="grey"
-            ></v-progress-circular>
+              size="20"
+            ></Load>
             <span v-else class="offer-sale-row-text">{{ item[prop] }} </span>
           </div>
         </div>
@@ -56,13 +57,14 @@
 
 <script>
 import Alert from '@/UI/Alert.vue';
+import Load from '@/UI/Load.vue';
 export default {
   data() {
     return {
       render: {nameProduct: false, usernametrader: false},
     };
   },
-  components: {Alert},
+  components: {Alert, Load},
   props: {
     title: {
       type: String,
