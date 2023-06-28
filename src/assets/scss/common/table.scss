@@ -25,3 +25,23 @@
   padding: 13rem;
   padding-top: 0;
 }
+
+.row-table-offers {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100%;
+}
+
+.row-table-offers:nth-child(2n) {
+  background-color: $color-light-grey-transparent !important;
+}
+
+.row-table-offers-value {
+  text-align: center !important;
+  color: $color-light-grey;
+  cursor: default;
+}
+.row-table-header {
+  color: black;
+  text-transform: lowercase;
+}

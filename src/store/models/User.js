@@ -1,6 +1,5 @@
 import {Model} from '@vuex-orm/core';
 import instance from '@/api/main';
-console.warn('MODEL.USER');
 
 export default class User extends Model {
   static entity = 'users';
@@ -58,6 +57,10 @@ export default class User extends Model {
         console.warn('MODEL.USER: getRules');
 
         return this.get('roles');
+      },
+
+      async getUsernameById(userId) {
+        return this.get(`username/${userId}`);
       },
     },
   };

@@ -3,6 +3,35 @@
     <Load v-if="render.main"></Load>
     <div v-else>
       <v-card-title>Привет, {{ currentUserData.username }}</v-card-title>
+      <!-- <OfferTable
+        :offers="arrays.offersSaleDone"
+        :modelOffer="model.saleOffer.props"
+        :fieldToShow="['trader', 'product_kit', 'price']"
+      >
+        
+      </OfferTable> -->
+      <v-card class="offers-table">
+        <v-list-item class="row-table-offers">
+          <v-list-item-content
+            v-for="label in model.saleOffer.fieldToShow"
+            :key="`th_${label}`"
+          >
+            <span class="row-table-offers-value row-table-header">{{
+              model.saleOffer.props[label]
+            }}</span>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item
+          class="row-table-offers"
+          v-for="offerSale in arrays.offersSaleDone"
+          :key="offerSale.id"
+        >
+          <OfferTableRow
+            :offer="offerSale"
+            :fieldToShow="model.saleOffer.fieldToShow"
+          ></OfferTableRow>
+        </v-list-item>
+      </v-card>
     </div>
   </div>
 </template>
@@ -12,19 +41,18 @@
 import {mapGetters} from 'vuex';
 import OfferApi from '@/api/offer.api';
 import Load from '@/UI/Load.vue';
-import PurchaseOffer from '@/models/model.offer.purchase';
+import OfferTableRow from '@/components/OfferTableRow.vue';
+import SaleOffer from '@/models/model.offer.sale';
 export default {
-  components: {Load},
+  components: {Load, OfferTableRow},
   data() {
     return {
       render: {main: false},
       currentUserData: null,
       connection: new WebSocket('ws://localhost:8000/ws/'),
-      offerPurchaseModel: {
-        model: PurchaseOffer,
-      },
+      model: {saleOffer: SaleOffer},
       arrays: {
-        offersPurchase: [],
+        offersSaleDone: [],
       },
     };
   },
@@ -40,7 +68,11 @@ export default {
       const currentUserData = responseUser.data;
       this.currentUserData = currentUserData;
 
-      await this.$store.dispatch('offer/getSaleOffersDone');
+      const offersSaleDone = await this.$store.dispatch(
+        'offer/getSaleOffersDone',
+        1
+      );
+      this.arrays.offersSaleDone = offersSaleDone;
 
       if (currentUserData.role == 'CUSTOMER') {
         console.log('USER IS CUSTOMER');

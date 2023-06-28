@@ -40,6 +40,7 @@ class SaleOffer {
       state: '',
       product_kit: '',
     };
+    this.fieldToShow = ['trader', 'product_kit', 'price'];
     this.hideShow = {
       id: true,
       timestamp: true,

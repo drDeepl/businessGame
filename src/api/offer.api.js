@@ -11,9 +11,9 @@ class OfferApi {
     return instance.get('offers/sale/state-offer/' + offerId);
   }
 
-  async getOffersSaleDone() {
+  async getOffersSaleDone(page) {
     console.warn('MODEL.OFFER: getOfferSaleDone');
-    return instance.get('offers/sale/list/state/done');
+    return instance.post(`offers/sale/list/state/done?page=${page}`);
   }
 
   async offerPurchaseSetAwait(offerId) {

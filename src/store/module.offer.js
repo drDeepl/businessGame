@@ -30,11 +30,16 @@ export const offer = {
       );
       return response;
     },
-    async getSaleOffersDone() {
+    async getSaleOffersDone(context, page) {
       console.warn('MODULE.OFFER: getOfferSaleDone');
-      const responseSaleOffersDone = await OfferApi.getOffersSaleDone();
+      const responseSaleOffersDone = await OfferApi.getOffersSaleDone(page);
       console.error('GET SALE OFFERS DONE');
       console.log(responseSaleOffersDone);
+      if (responseSaleOffersDone.status == 200) {
+        return responseSaleOffersDone.data;
+      } else {
+        return [];
+      }
     },
 
     async offerSalePlace(context, saleOfferProductKit) {
