@@ -7,7 +7,6 @@
           type="text"
           class="loader-text-layout"
         ></v-skeleton-loader>
-        <span v-else>Привет, {{ currentUserData.username }}</span>
       </v-card-title>
       <div v-if="!render.main" class="pforile-content cards-container">
         <div

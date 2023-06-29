@@ -119,7 +119,7 @@
               :disableFields="forms.formSellProductKit.disableFields"
               :parentFunction="onClickApplySellProductKit"
               :cancelForm="onClickCancelForm"
-              :load="$store.getters['offer/GET_offerSale']"
+              :load="render.sellProductKit"
               :applySuccess="forms.formSellProductKit.applySucces"
             >
             </Form>
@@ -251,6 +251,7 @@ export default {
       render: {
         content: false,
         delete: false,
+        sellProductKit: false,
       },
       currentOfferModel: new CreateSellOffer(),
       arrays: {
@@ -399,16 +400,6 @@ export default {
       console.warn('MANUFACTURER.VUE: productKits');
       return this.arrays.productKits;
     },
-    getProduct() {
-      return (id) => {
-        return this.$store
-          .$db()
-          .model('products')
-          .query()
-          .where('id', id)
-          .first();
-      };
-    },
   },
   watch: {
     getListProduct(getProducts) {
@@ -551,6 +542,7 @@ export default {
     onClickSellProductKit(productKit) {
       console.warn('MANUFACTURER.VUE: onClickSellProductKit');
       console.warn(productKit);
+
       this.forms.activeForm = 'formSellProductKit';
       this.forms.titleForm = 'выставить на продажу';
       this.forms.formSellProductKit.disableFields['product_kit_id'] = true;
@@ -563,6 +555,7 @@ export default {
     async onClickApplySellProductKit(saleOfferProductKit) {
       console.warn('MANUFACTURER: onClickApplySellProductKit');
       this.forms.formSellProductKit.applySucces = false;
+      this.render.sellProductKit = true;
       console.log(saleOfferProductKit);
       const teamId = this.dict.namesTeam[saleOfferProductKit['team_id']];
       saleOfferProductKit['team_id'] = teamId;
@@ -601,6 +594,7 @@ export default {
         const msgError = 'У команды недостаточно средств для покупки';
         this.forms.errors.push(msgError);
       }
+      this.render.sellProductKit = false;
     },
 
     // NOTE: Products

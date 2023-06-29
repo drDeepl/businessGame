@@ -22,6 +22,7 @@ export const storageTeam = {
       console.warn('MODULE.STORAGE.TEAM');
       // console.warn(time);
       const intervalTime = 1;
+
       const intervalTimeToPercent = (100 * intervalTime) / time;
       context.commit('SET_PREPARE_PRODUCT_TIME', time);
       let prepare = setInterval(() => {

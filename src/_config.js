@@ -19,19 +19,18 @@ export const card = {
 };
 export const playerSidebarLinks = [
   {title: 'Предложения', url: 'player'},
-  {title: 'Мой профиль', url: 'profile'},
   {title: 'Склад', url: 'storage'},
+  {title: 'Общая история покупок', url: 'transaction'},
 ];
 
 export const manufacturerSidebarLinks = [
-  {title: 'Мой профиль', url: 'profile'},
   {title: 'Склад', url: 'manufacturer'},
-  // {title: 'Магазин', url: '/shop'},
+  {title: 'Общая история покупок', url: 'transaction'},
 ];
 
 export const customerSidebarLinks = [
-  {title: 'Мой профиль', url: 'profile'},
   {title: 'Предложения', url: 'customer'},
+  {title: 'Общая история покупок', url: 'transaction'},
 ];
 
 export const app = {

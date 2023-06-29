@@ -2,15 +2,13 @@
   <div class="md-body">
     <Load v-if="render.main"></Load>
     <div v-else>
-      <v-card-title>Привет, {{ currentUserData.username }}</v-card-title>
-
       <div class="card-transaction-conatiner">
         <v-card outlined class="offer-card-table">
           <v-card-title
             class="offer-card-table-header"
             @click="onClickOpenSaleOffersTable"
           >
-            <span>Транзакции для продуктовых наборов</span>
+            <span>История покупок продуктовых наборов</span>
             <arrow-icon
               :size="30"
               :class="`arrow-btn ${cardTable.saleOffers.active ? 'open' : ''}`"
@@ -44,7 +42,7 @@
             class="offer-card-table-header"
             @click="onClickOpenPurchaseOffersTable"
           >
-            <span>Транзакции для продуктов</span>
+            <span>История покупок продуктов</span>
             <arrow-icon
               :size="30"
               :class="`arrow-btn ${

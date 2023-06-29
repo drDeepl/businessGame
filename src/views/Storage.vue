@@ -25,12 +25,14 @@
           </div>
 
           <div class="storage-content" v-else>
-            <div v-for="productKit in productKits" :key="productKit.id">
+            <div
+              v-for="(productKit, id) in productKits"
+              :key="`${id}${productKit.time}${productKit.product}${productKit.id}`"
+            >
               <ProductKitCard
-                :nameProduct="dicts.products[productKit.product_kit.product]"
-                :countItems="productKit.count"
+                :nameProduct="dicts.products[productKit.product]"
                 :modelItem="cards.productKit.model"
-                :item="productKit.product_kit"
+                :item="productKit"
               >
                 <v-card-actions
                   class="store-product-kit-card-actions ma-0 pa-0"
@@ -39,9 +41,9 @@
                     class="ma-0 pa-0 store-product-card-btn"
                     color="deep-orange"
                     text
-                    @click="onClickPrepareProduct(productKit.product_kit)"
+                    @click="onClickPrepareProduct(productKit)"
                   >
-                    <span>создать</span>
+                    <span>создать продукт</span>
                   </v-btn>
                 </v-card-actions>
               </ProductKitCard>
@@ -65,7 +67,8 @@
                     :value="prepareProductProgress"
                     color="deep-orange"
                   >
-                    {{ prepareProductTimeToFinal }} сек.
+                    <!-- {{ prepareProductTimeToFinal }} сек. -->
+                    {{ Math.round(prepareProductProgress) }}%
                   </v-progress-circular>
                 </v-card>
               </v-overlay>
@@ -220,10 +223,11 @@ export default {
       'storageTeam/getTeamProductKits',
       team_id
     );
-
-    this.arrays.productKits = productKits.filter(
-      (pk) => this.dicts.products[pk.product_kit.product]
-    );
+    this.arrays.productKits = productKits;
+    // this.arrays.productKits = productKits.filter((pk) => {
+    //   console.error(pk);
+    //   this.dicts.products[pk.product];
+    // });
     console.log(productKits);
     productKits.forEach((pk) => console.log(pk)); // pk.product_kit.product
     this.$store.commit('storageTeam/SET_GET_PRODUCTS_KIT_TEAM_RUN_COMPLETE');
@@ -262,23 +266,19 @@ export default {
     async prepareProduct(value) {
       console.error('PREPARE PRODUCT: ' + value);
       if (!value) {
-        let teamId = this.dataCurrentUser.team;
-        const productKit_id = this.prepareProductKit.productKit_id;
-        await this.$store.dispatch('storageTeam/checkCreatedProductKits', {
-          teamId: teamId,
-          productKitId: productKit_id,
-        });
+        const teamId = this.dataCurrentUser.team;
+
         this.arrays.productKits = await this.$store.dispatch(
           'storageTeam/getTeamProductKits',
           teamId
         );
-
+        this.load.teamProducts = true;
         const products = await this.$store.dispatch(
           'storageTeam/getTeamProducts',
           teamId
         );
         this.arrays.teamProducts = products;
-        console.error(products);
+        this.load.teamProducts = false;
       }
     },
   },
@@ -290,11 +290,19 @@ export default {
     async onClickPrepareProduct(productKit) {
       this.$store.commit('storageTeam/SET_PREPARE_PRODUCT');
       console.warn('STORAGE: onClickPrepareProduct');
-      console.warn(productKit);
+
       const timeToPrepare = Number.parseInt(productKit.time);
       this.prepareProductKit.productKit_id = productKit.id;
-
-      await this.$store.dispatch('storageTeam/prepareProduct', timeToPrepare);
+      const teamId = this.dataCurrentUser.team;
+      const productKit_id = this.prepareProductKit.productKit_id;
+      this.$store.dispatch('storageTeam/checkCreatedProductKits', {
+        teamId: teamId,
+        productKitId: productKit_id,
+      });
+      await this.$store.dispatch(
+        'storageTeam/prepareProduct',
+        timeToPrepare * 60
+      ); // INFO: timeToPrepare * 60 перевод в минуты
     },
     getProductName(productId) {
       console.warn('MODULE.STORAGE: getProductName');

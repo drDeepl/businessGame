@@ -1,16 +1,8 @@
 <template>
   <div>
     <div class="player-layout">
-      <p>
-        <span v-if="currentUserData"
-          >Привет, {{ currentUserData.username }}
-        </span>
-        <v-skeleton-loader v-else type="list-item"></v-skeleton-loader>
-        <!-- {{ currentUserData }} -->
-      </p>
-
       <Load v-if="render.offersContainer"></Load>
-      <div v-else class="cards-container">
+      <div v-else-if="arrays.offersSale.length > 0" class="cards-container">
         <OfferCard
           v-for="offer in arrays.offersSale"
           :key="offer.id"
@@ -21,7 +13,10 @@
           :isGetNameProductFromProductKit="true"
           :isGetTraderUserName="true"
         >
-          <v-btn class="btn-apply" @click="onClickBuyOffer(offer)"
+          <v-btn
+            class="btn-apply"
+            @click="onClickBuyOffer(offer)"
+            :loading="render.buyOffer"
             >Купить</v-btn
           >
         </OfferCard>
@@ -33,6 +28,7 @@
           </Alert>
         </v-overlay>
       </div>
+      <Empty v-else title="Предложений ещё нет..."></Empty>
     </div>
   </div>
 </template>
@@ -42,15 +38,17 @@ import {mapGetters} from 'vuex';
 import OfferCard from '@/UI/OfferCard.vue';
 import Alert from '@/UI/Alert.vue';
 import Load from '@/UI/Load.vue';
+import Empty from '@/UI/Empty.vue';
 import SaleOffer from '@/models/model.offer.sale';
 export default {
-  components: {OfferCard, Alert, Load},
+  components: {OfferCard, Alert, Load, Empty},
   data() {
     return {
       currentUserData: null,
       render: {
         page: true,
         offersContainer: false,
+        buyOffer: false,
       },
       model: {
         offerSale: SaleOffer,
@@ -67,6 +65,9 @@ export default {
     }),
     currentUser() {
       return this.$store.state.auth.user;
+    },
+    offersAwaitedCount() {
+      return this.$store.state.mainLayout.countAwaitedOffers;
     },
   },
   async created() {
@@ -98,6 +99,7 @@ export default {
   methods: {
     async onClickBuyOffer(offerSalePlace) {
       console.warn('PLAYER: onClickBuyOffer');
+      this.render.buyOffer = true;
       let offerId = offerSalePlace.id;
       const teamId = offerSalePlace.team;
       const responseOfferSaleAcquire = await this.$store.dispatch(
@@ -108,8 +110,14 @@ export default {
         this.$store.commit('mainLayout/SET_STATE_ALERT', 'success');
 
         this.$store.dispatch('team/updateTeamBalance', teamId);
+        const offerSaleCount = this.offersAwaitedCount - 1;
+        this.$store.commit(
+          'mainLayout/SET_COUNT_AWAITED_OFFERS',
+          offerSaleCount
+        );
       }
-      console.log(responseOfferSaleAcquire);
+
+      this.render.buyOffer = false;
     },
 
     async updateListOffers() {
@@ -119,10 +127,8 @@ export default {
         'offer/getOfferAwaitedSell',
         this.currentUserData.team
       );
-      console.log(responseOffersAwaited);
       const offersSale = responseOffersAwaited.data;
       this.arrays.offersSale = offersSale;
-      await this.$route.params.data.toUpdateOffersBadge(offersSale.length);
       this.render.offersContainer = false;
     },
 

@@ -16,8 +16,8 @@ export const router = new Router({
       component: () => import('@/layouts/MainLayout.vue'),
       children: [
         {
-          path: '/profile',
-          name: 'profile',
+          path: '/transaction',
+          name: 'transaction',
           component: () => import('@/views/Profile.vue'),
         },
         {

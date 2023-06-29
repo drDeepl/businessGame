@@ -8,6 +8,7 @@
         <div class="d-flex flex-column align-center justify-center">
           <span class="">{{ nameProduct }}</span>
           <v-badge
+            v-if="countItems"
             :value="countItems"
             :content="countItems + ' шт.'"
             color="red"

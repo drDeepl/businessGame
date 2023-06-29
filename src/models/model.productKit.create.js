@@ -2,7 +2,7 @@ export default class CreateProductKit {
   constructor() {
     this.props = {
       count: 'Количество продуктов в наборе',
-      time: 'Время приготовления набора / сек.',
+      time: 'Время приготовления набора / мин.',
       product_id: 'Продукт для создания набора продуктов',
     };
     this.ruleValidate = {
