@@ -13,6 +13,14 @@ export const offer = {
     },
   },
   actions: {
+    async getOfferPurchase(context, offerId) {
+      console.warn('MODULE.OFFER: getOfferPurchase');
+      const response = await decorateResponseApi(
+        OfferApi.getOfferPurchase,
+        offerId
+      );
+      return response.status === 200 ? response.data : null;
+    },
     async getOffersSale(context, teamId) {
       console.warn('MODULE.OFFER: getOffers');
       const response = await decorateResponseApi(
@@ -30,11 +38,10 @@ export const offer = {
       );
       return response;
     },
-    async getSaleOffersDone(context, page) {
+    async getSaleOffersDone() {
       console.warn('MODULE.OFFER: getOfferSaleDone');
-      const responseSaleOffersDone = await OfferApi.getOffersSaleDone(page);
-      console.error('GET SALE OFFERS DONE');
-      console.log(responseSaleOffersDone);
+      const responseSaleOffersDone = await OfferApi.getOffersSaleDone();
+
       if (responseSaleOffersDone.status == 200) {
         return responseSaleOffersDone.data;
       } else {
@@ -88,7 +95,15 @@ export const offer = {
         : responseWrap.response.data;
       return offersPurchase;
     },
+    async getPurchaseOffersDone() {
+      console.warn('MODULE.OFFER: getPurchaseOffersDone');
 
+      const responsePurchaseOffer = await OfferApi.getOffersPurchaseDone();
+
+      return responsePurchaseOffer.status === 200
+        ? responsePurchaseOffer.data
+        : [];
+    },
     async getOffersPurchaseAwaited(context, customerId) {
       console.warn('MODULE.OFFER: getOffersPurchaseAwaited');
       const responseOffersPurchaseAwaited =

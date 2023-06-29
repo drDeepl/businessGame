@@ -23,6 +23,20 @@ export default {
   async created() {
     this.render = true;
     const user = await this.$store.dispatch('user/getUser', this.offer.trader);
+    if (this.offer['team']) {
+      const team = await this.$store.dispatch(
+        'team/getDataTeam',
+        this.offer.team
+      );
+      this.offer.team = team.name;
+    }
+    if (this.offer['to_customer']) {
+      const customer = await this.$store.dispatch(
+        'user/getUser',
+        this.offer.to_customer
+      );
+      this.offer.to_customer = customer.username;
+    }
     if (this.offer['product']) {
       const product = await this.$store.dispatch(
         'products/getProduct',

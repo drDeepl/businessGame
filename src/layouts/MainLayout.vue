@@ -380,7 +380,6 @@ export default {
 
   methods: {
     async newOfferSaleToAwait(offerId) {
-      console.error('TDODO: newOfferToAwait');
       console.log(offerId);
       await this.$store.dispatch('offer/offerSaleChangeStateAwait', offerId);
     },

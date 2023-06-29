@@ -10,7 +10,7 @@ export const setItemToLocalStorage = function (key, value) {
 
 export const decorateResponseApi = async function (func, context) {
   let response = {status: 200, data: null, message: ''};
-  console.log('CONTEXT: ', context);
+
   const responseWrap = await func(context).catch((resp) => {
     response.status = resp.response.status;
   });
@@ -18,6 +18,8 @@ export const decorateResponseApi = async function (func, context) {
     response.message = 'Что-то пошло не так';
     return response;
   }
-  response.data = responseWrap.response.data;
+  response.data = responseWrap.response
+    ? responseWrap.response.data
+    : response.data;
   return response;
 };

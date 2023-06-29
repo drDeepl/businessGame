@@ -19,9 +19,12 @@ export const team = {
     async getDataTeam(context, teamId) {
       console.warn('MODULE.TEAM: getTeamData');
       context.commit('SET_GET_TEAM');
-      const responseWrap = await Team.api().getTeam(teamId);
+      const responseWrap = await decorateResponseApi(
+        Team.api().getTeam,
+        teamId
+      );
       context.commit('SET_GET_TEAM_COMPLETE');
-      return responseWrap.response.data;
+      return responseWrap.data;
     },
     async getTeams(context) {
       console.warn('MODULE.TEAM: getTeams');

@@ -1,5 +1,7 @@
 import instance from './main';
 class OfferApi {
+  pathPurchase = 'offers/purchase';
+  pathSale = 'offers/sale';
   offersSale() {
     return instance.get('offers/sale/list');
   }
@@ -11,9 +13,25 @@ class OfferApi {
     return instance.get('offers/sale/state-offer/' + offerId);
   }
 
-  async getOffersSaleDone(page) {
+  async getOfferPurchase(offerId) {
+    console.warn('OFFER.API: getOfferPurchase');
+
+    return instance.get(`${this.pathPurchase}/offer/${offerId}`);
+  }
+
+  async getOfferSale(offerId) {
+    console.warn('OFFER.API: getOfferSale');
+    return instance.get(`${this.pathSale}/offer/${offerId}`);
+  }
+
+  async getOffersSaleDone() {
     console.warn('MODEL.OFFER: getOfferSaleDone');
-    return instance.post(`offers/sale/list/state/done?page=${page}`);
+    return instance.get(`offers/sale/list/state/done`);
+  }
+
+  async getOffersPurchaseDone() {
+    console.warn('MODEL.OFFER: getOfferPurchaseDone');
+    return instance.get(`${this.pathPurchase}/list/state/done`);
   }
 
   async offerPurchaseSetAwait(offerId) {

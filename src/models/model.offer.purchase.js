@@ -5,6 +5,7 @@ class PurchaseOffer {
       product: 'продукт',
       price: 'цена',
       trader: 'продавец',
+      to_customer: 'покупатель',
       timestamp: 'создан',
       state: 'статус',
     };
@@ -12,6 +13,7 @@ class PurchaseOffer {
       id: 'number',
       product: 'number',
       trader: 'number',
+      to_customer: 'number',
       price: 'number',
       timestamp: 'field',
       state: 'field',
@@ -20,6 +22,7 @@ class PurchaseOffer {
       id: 'number',
       product: 'number',
       trader: 'number',
+      to_customer: 'number',
       price: 'number',
       timestamp: 'string',
       state: 'string',
@@ -28,6 +31,7 @@ class PurchaseOffer {
       id: '',
       product: 0,
       trader: '',
+      to_customer: 0,
       price: 0,
       timestamp: '',
       state: '',
@@ -37,6 +41,8 @@ class PurchaseOffer {
       trader: true,
       price: true,
     };
+
+    this.fieldToShow = ['trader', 'product', 'to_customer', 'price'];
   }
 }
 
