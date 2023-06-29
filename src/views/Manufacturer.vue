@@ -172,7 +172,7 @@
         :disableFields="forms.formAddProductKit.disableFields"
         :parentFunction="onClickApplyCreateProductKit"
         :cancelForm="onClickCancelForm"
-        :load="STATE_createProductKit"
+        :load="render.addProductKit"
         :errorsMessage="forms.formAddProductKit.errors"
         :applySuccess="forms.formAddProductKit.applySuccess"
       >
@@ -252,6 +252,7 @@ export default {
         content: false,
         delete: false,
         sellProductKit: false,
+        addProductKit: false,
       },
       currentOfferModel: new CreateSellOffer(),
       arrays: {
@@ -331,7 +332,7 @@ export default {
     this.render.content = true;
     const products = await this.$store.dispatch('products/getProducts');
     const productKits = await this.$store.dispatch('productKit/getProductKits');
-    // TODO: TEST======================================================================
+
     const deletedProductKits = localStorage.getItem('deletedProductKits')
       ? JSON.parse(localStorage.getItem('deletedProductKits'))
       : {};
@@ -340,10 +341,9 @@ export default {
     const productKitWithoutDeleted = productKits.filter((productKit) => {
       return !deletedProductKits[productKit.id];
     });
-    console.log('PRODUCT KITS WITHOUT DELETED', productKitWithoutDeleted);
-    // TODO: TEST======================================================================
+
     const teams = await this.$store.dispatch('team/getTeams');
-    // const namesTeam = teams.items.map((team) => team.name);
+
     let arrayNamesTeam = [];
     let dictNamesTeam = {};
     let dictTeams = {};
@@ -358,9 +358,6 @@ export default {
       dictTeams[Number(team.id)] = team;
     });
 
-    // const teamNames = teams.map((item) => {
-    //   return item.name;
-    // });
     console.log(productKits);
     this.arrays.namesTeam = arrayNamesTeam;
     this.arrays.productKits = productKitWithoutDeleted;
@@ -469,6 +466,7 @@ export default {
 
     async onClickApplyCreateProductKit(productKit) {
       console.warn('MANUFACTURER.vue: onClickApplyCreateProduct');
+      this.render.addProductKit = true;
       this.forms.formAddProductKit.errors = [];
       this.forms.formAddProductKit.applySuccess = false;
       console.error(productKit);
@@ -495,6 +493,7 @@ export default {
         this.arrays.productKits.push(createdProductKit);
       }
       this.$store.commit('productKit/SET_CREATE_PRODUCT_KIT_COMPLETE');
+      this.render.addProductKit = false;
     },
     async updateListProductKits() {
       console.warn('updateListProductKits');
