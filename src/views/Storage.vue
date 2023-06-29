@@ -86,8 +86,6 @@
           </div>
 
           <div v-else v-for="product in teamProducts" :key="product['$id']">
-            <span>После продажи продуктов их кол-во не изменяется</span>
-
             <ProductCard
               :isProductKit="false"
               :nameProduct="product.product.name"
