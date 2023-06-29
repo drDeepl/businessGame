@@ -23,6 +23,7 @@ Vue.config.productionTip = false;
 Vue.use(VeeValidate);
 
 // Vue.component('font-awesome-icon', FontAwesomeIcon);
+
 Vue.component('store-empty', BasketOffOutline);
 Vue.component('success-icon', CheckCircleOutline);
 Vue.component('arrow-icon', ChevronDown);

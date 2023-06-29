@@ -179,3 +179,36 @@
 .alert-card-title {
   color: $color-grey;
 }
+
+.offer-card-table {
+  margin: 1em;
+}
+
+.offers-table {
+  overflow: scroll !important;
+  max-height: 20em !important;
+}
+
+.offer-card-table-header {
+  display: flex !important;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: color 0.4s;
+}
+
+.arrow-btn > svg {
+  transition: transform 0.5s;
+}
+
+.arrow-btn {
+  display: flex;
+  align-content: center !important;
+}
+
+.offer-card-table-header:hover {
+  color: $color-orange;
+}
+
+.arrow-btn.open > svg {
+  transform: rotate(180deg);
+}

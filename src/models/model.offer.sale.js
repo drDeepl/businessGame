@@ -6,7 +6,7 @@ class SaleOffer {
       product_kit: 'Продуктовый набор',
       trader: 'Продавец',
       price: 'Цена',
-      team: 'Команда',
+      team: 'Покупатель',
       timestamp: 'Создан',
       state: 'Статус',
     };

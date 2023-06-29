@@ -5,52 +5,75 @@
       <v-card-title>Привет, {{ currentUserData.username }}</v-card-title>
 
       <div class="card-transaction-conatiner">
-        <v-card class="offers-table">
-          <v-card-title>Транзакции для продуктовых наборов</v-card-title>
-          <v-list-item class="row-table-offers">
-            <v-list-item-content
-              v-for="label in model.saleOffer.fieldToShow"
-              :key="`th_${label}`"
-            >
-              <span class="row-table-offers-value row-table-header">{{
-                model.saleOffer.props[label]
-              }}</span>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item
-            class="row-table-offers"
-            v-for="offerSale in arrays.offersSaleDone"
-            :key="offerSale.id"
+        <v-card outlined class="offer-card-table">
+          <v-card-title
+            class="offer-card-table-header"
+            @click="onClickOpenSaleOffersTable"
           >
-            <OfferTableRow
-              :offer="offerSale"
-              :fieldToShow="model.saleOffer.fieldToShow"
-            ></OfferTableRow>
-          </v-list-item>
+            <span>Транзакции для продуктовых наборов</span>
+            <arrow-icon
+              :size="30"
+              :class="`arrow-btn ${cardTable.saleOffers.active ? 'open' : ''}`"
+            />
+          </v-card-title>
+          <div class="offers-table" v-show="cardTable.saleOffers.active">
+            <v-list-item class="row-table-offers">
+              <v-list-item-content
+                v-for="label in model.saleOffer.fieldToShow"
+                :key="`th_${label}`"
+              >
+                <span class="row-table-offers-value row-table-header">{{
+                  model.saleOffer.props[label]
+                }}</span>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
+              class="row-table-offers"
+              v-for="offerSale in arrays.offersSaleDone"
+              :key="offerSale.id"
+            >
+              <OfferTableRow
+                :offer="offerSale"
+                :fieldToShow="model.saleOffer.fieldToShow"
+              ></OfferTableRow>
+            </v-list-item>
+          </div>
         </v-card>
-        <v-card>
-          <v-card-title>Транзакции для продуктов</v-card-title>
-
-          <v-list-item class="row-table-offers">
-            <v-list-item-content
-              v-for="label in model.purchaseOffer.fieldToShow"
-              :key="`th_${label}`"
-            >
-              <span class="row-table-offers-value row-table-header">{{
-                model.purchaseOffer.props[label]
-              }}</span>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item
-            class="row-table-offers"
-            v-for="offerSale in arrays.offersPurchaseDone"
-            :key="offerSale.id"
+        <v-card outlined class="offer-card-table">
+          <v-card-title
+            class="offer-card-table-header"
+            @click="onClickOpenPurchaseOffersTable"
           >
-            <OfferTableRow
-              :offer="offerSale"
-              :fieldToShow="model.purchaseOffer.fieldToShow"
-            ></OfferTableRow>
-          </v-list-item>
+            <span>Транзакции для продуктов</span>
+            <arrow-icon
+              :size="30"
+              :class="`arrow-btn ${
+                cardTable.purchaseOffers.active ? 'open' : ''
+              }`"
+            />
+          </v-card-title>
+          <div class="offers-table" v-show="cardTable.purchaseOffers.active">
+            <v-list-item class="row-table-offers">
+              <v-list-item-content
+                v-for="label in model.purchaseOffer.fieldToShow"
+                :key="`th_${label}`"
+              >
+                <span class="row-table-offers-value row-table-header">{{
+                  model.purchaseOffer.props[label]
+                }}</span>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
+              class="row-table-offers"
+              v-for="offerSale in arrays.offersPurchaseDone"
+              :key="offerSale.id"
+            >
+              <OfferTableRow
+                :offer="offerSale"
+                :fieldToShow="model.purchaseOffer.fieldToShow"
+              ></OfferTableRow>
+            </v-list-item>
+          </div>
         </v-card>
       </div>
     </div>
@@ -58,9 +81,7 @@
 </template>
 
 <script>
-// import OfferApi from '@/api/offer.api';
 import {mapGetters} from 'vuex';
-// import OfferApi from '@/api/offer.api';
 import Load from '@/UI/Load.vue';
 import OfferTableRow from '@/components/OfferTableRow.vue';
 import SaleOffer from '@/models/model.offer.sale';
@@ -75,6 +96,10 @@ export default {
       currentUserData: null,
       connection: new WebSocket('ws://localhost:8000/ws/'),
       model: {saleOffer: SaleOffer, purchaseOffer: PurchaseOffer},
+      cardTable: {
+        saleOffers: {active: false},
+        purchaseOffers: {active: false},
+      },
       arrays: {
         offersSaleDone: [],
         offersPurchaseDone: [],
@@ -99,7 +124,7 @@ export default {
       const offersPurchaseDone = await this.$store.dispatch(
         'offer/getPurchaseOffersDone'
       );
-      this.arrays.offersPurchaseDone = offersPurchaseDone;
+      this.arrays.offersPurchaseDone = offersPurchaseDone.reverse();
       this.arrays.offersSaleDone = offersSaleDone.reverse();
       this.connection.onmessage = (response) => {
         const dataResponse = JSON.parse(response.data);
@@ -108,7 +133,7 @@ export default {
           console.warn('PURCHASE ACQUIRED');
           OfferApi.getOfferPurchase(dataResponse.id).then(
             (responseOfferPurchase) =>
-              this.arrays.offersPurchaseDone.push(responseOfferPurchase.data)
+              this.arrays.offersPurchaseDone.unshift(responseOfferPurchase.data)
           );
         }
         if (dataResponse.type == 'acquired.sale.offer') {
@@ -129,6 +154,16 @@ export default {
 
     currentUser() {
       return this.$store.state.auth.user;
+    },
+  },
+  methods: {
+    onClickOpenSaleOffersTable() {
+      console.warn('Profile.vue: onClickOpenSaleOffersTable');
+      this.cardTable.saleOffers.active = !this.cardTable.saleOffers.active;
+    },
+    onClickOpenPurchaseOffersTable() {
+      this.cardTable.purchaseOffers.active =
+        !this.cardTable.purchaseOffers.active;
     },
   },
 };
