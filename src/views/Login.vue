@@ -100,7 +100,7 @@ export default {
           this.$store.commit('mainLayout/SET_CURRENT_TAB', role);
           // this.$router.push('/' + role);
           this.$router.push({
-            name: 'profile',
+            name: 'transaction',
             params: {currentUserData: userData},
           });
         }

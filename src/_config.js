@@ -2,6 +2,7 @@
 export const develop = true;
 // NOTE:========================================
 // INFO: sidebar links
+export const domain = develop ? 'localhost:8000' : '94.228.112.177';
 
 export const adminSidebarLinks = [
   {

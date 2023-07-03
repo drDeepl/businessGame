@@ -399,7 +399,7 @@ export default {
       );
 
       this.arrays.productKits = productKits.filter(
-        (pk) => this.dicts.products[pk.product_kit.product]
+        (pk) => this.dicts.products[pk.product]
       );
       console.log(productKits);
       productKits.forEach((pk) => console.log(pk));

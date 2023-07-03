@@ -168,6 +168,8 @@ import OfferApi from '@/api/offer.api';
 import SaleOffer from '@/models/model.offer.sale';
 import {mapGetters} from 'vuex';
 
+import {domain} from '@/_config';
+
 export default {
   components: {Load, DialogError, OfferCard},
   data() {
@@ -287,7 +289,7 @@ export default {
     if (this.isLoggedIn) {
       // INFO: Work of WebSockets ====================================================
       this.render.balance = true;
-      this.connection = new WebSocket('ws://localhost:8000/ws/');
+      this.connection = new WebSocket(`ws://${domain}/ws/`);
       // INFO: ============================================================================= END
       const username = this.currentUser.username;
       const responseUser = await this.$store.dispatch(

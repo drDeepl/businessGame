@@ -85,6 +85,7 @@ import OfferTableRow from '@/components/OfferTableRow.vue';
 import SaleOffer from '@/models/model.offer.sale';
 import PurchaseOffer from '@/models/model.offer.purchase';
 import OfferApi from '@/api/offer.api';
+import {domain} from '@/_config';
 
 export default {
   components: {Load, OfferTableRow},
@@ -92,7 +93,7 @@ export default {
     return {
       render: {main: false},
       currentUserData: null,
-      connection: new WebSocket('ws://localhost:8000/ws/'),
+      connection: new WebSocket(`ws://${domain}/ws/`),
       model: {saleOffer: SaleOffer, purchaseOffer: PurchaseOffer},
       cardTable: {
         saleOffers: {active: false},
