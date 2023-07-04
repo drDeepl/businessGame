@@ -299,22 +299,9 @@ export default {
         teamId: teamId,
         productKitId: productKit_id,
       });
-      await this.$store.dispatch(
-        'storageTeam/prepareProduct',
-        timeToPrepare * 60
-      ); // INFO: timeToPrepare * 60 перевод в минуты
+      await this.$store.dispatch('storageTeam/prepareProduct', timeToPrepare);
     },
-    getProductName(productId) {
-      console.warn('MODULE.STORAGE: getProductName');
-      const product = this.$store
-        .$db()
-        .model('products')
-        .query()
-        .where('id', productId)
-        .first();
-      const nameProduct = product.name ? product.name : '';
-      return nameProduct;
-    },
+
     onClickCancelForm() {
       console.warn('STORAGE: onClickCancelForm');
       const activeForm = this.form.currentActive;
