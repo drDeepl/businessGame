@@ -3,28 +3,28 @@ class CreateProductSell {
     this.props = {
       price: 'Стоимость',
       count: 'Количество',
-      product_id: 'Продукт',
+      product: 'Продукт',
       to_customer: 'Покупатель:',
     };
     this.types = {
       price: 'number',
       count: 'number',
-      product_id: 'number',
+      product: 'number',
       team_id: 'field',
     };
     this.ruleValidate = {
       price: 'number',
       count: 'number',
-      product_id: 'field',
+      product: 'field',
       to_customer: 'field',
     };
     this.data = {
       price: '',
       count: '',
-      product_id: '',
+      product: '',
       to_customer: '',
     };
-    this.hideShow = {product_id: true};
+    this.hideShow = {product: true};
   }
 }
 

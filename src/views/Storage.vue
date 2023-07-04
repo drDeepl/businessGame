@@ -88,10 +88,10 @@
             <Empty title="Склад с продуктами пуст" />
           </div>
 
-          <div v-else v-for="product in teamProducts" :key="product['$id']">
+          <div v-else v-for="product in teamProducts" :key="product.id">
             <ProductCard
               :isProductKit="false"
-              :nameProduct="product.product.name"
+              :nameProduct="product.product_name"
               :item="product"
               :countItems="product.count"
               :modelItem="cards.product.model"
@@ -316,18 +316,22 @@ export default {
       console.log(product);
       this.form.currentData = product;
       this.form.currentActive = 'sellProduct';
-      this.form.title = `Продажа продукта "${product.product.name}"`;
+      this.form.title = `Продажа продукта "${product.product_name}"`;
       this.form.sellProduct.active = true;
     },
     async onClickApplySellProduct(modelOfferProductSell) {
       console.warn('STORAGE: onClickApplySellProduct');
+
       if (modelOfferProductSell.count <= this.form.currentData.count) {
         this.form.isLoad = true;
-        const product_id = this.form.currentData.product.id;
+        // const product_id = this.form.currentData.product.id;
+
+        const product_id = this.form.currentData.product;
         const customer_id =
           this.dicts.customers[modelOfferProductSell.to_customer];
-        modelOfferProductSell.product_id = product_id;
+        modelOfferProductSell.product = product_id;
         modelOfferProductSell.to_customer = customer_id;
+
         const responsePlace = await this.$store.dispatch(
           'offer/createOfferPurchase',
           modelOfferProductSell
