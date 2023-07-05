@@ -1,7 +1,5 @@
-import OfferSale from './models/OfferSale';
-import OfferPurchase from './models/OfferPurchase';
 import OfferApi from '@/api/offer.api';
-import {decorateResponseApi} from '@/services/utils.service';
+import {decorateResponseApi, apiDecorator} from '@/services/utils.service';
 
 export const offer = {
   namespaced: true,
@@ -15,25 +13,21 @@ export const offer = {
   actions: {
     async getOfferPurchase(context, offerId) {
       console.warn('MODULE.OFFER: getOfferPurchase');
-      const response = await decorateResponseApi(
-        OfferApi.getOfferPurchase,
-        offerId
-      );
+      const response = await apiDecorator(OfferApi.getOfferPurchase, offerId);
       return response.status === 200 ? response.data : null;
     },
     async getOffersSale(context, teamId) {
       console.warn('MODULE.OFFER: getOffers');
-      const response = await decorateResponseApi(
-        OfferSale.api().getListOffersSale,
-        teamId
-      );
+
+      const response = await apiDecorator(OfferApi.getListOffersSale, teamId);
       return response;
     },
 
     async getOfferAwaitedSell(context, teamId) {
       console.warn('MODULE.OFFER: getOffersSaleAwaited');
-      const response = await decorateResponseApi(
-        OfferSale.api().getOffersSaleAwaited,
+
+      const response = await apiDecorator(
+        OfferApi.getOffersSaleAwaited,
         teamId
       );
       return response;
@@ -50,36 +44,43 @@ export const offer = {
     },
 
     async offerSalePlace(context, saleOfferProductKit) {
-      const response = await decorateResponseApi(
-        OfferSale.api().offerSalePlace,
+      const response = await apiDecorator(
+        OfferApi.offerSalePlace,
         saleOfferProductKit
       );
       return response;
     },
     async offerSaleAcquire(context, payload) {
       const response = {status: 200, data: null, message: ''};
-      const responseAccountAcquire = await OfferSale.api()
-        .offerSaleAcquire(payload.offerId, payload.teamId)
-        .catch((resp) => (response.status = resp.status));
+      const responseAccountAcquire = await OfferApi.offerSaleAcquire(
+        payload.offerId,
+        payload.teamId
+      ).catch((resp) => (response.status = resp.status));
       response.data =
-        response.status === 200 ? responseAccountAcquire.response.data : null;
+        response.status === 200 ? responseAccountAcquire.data : null;
       response.message = 'Произошла ошибка во время покупки';
       return response;
     },
     async getOfferState(context, offerId) {
       console.warn('MODULE.OFFER: getOfferState');
-      const response = await decorateResponseApi(
-        OfferSale.api().getOfferState,
-        offerId
-      );
+      // const response = await decorateResponseApi(
+      //   OfferSale.api().getOfferState,
+      //   offerId
+      // );
+
+      const response = await apiDecorator(OfferApi.getOfferState, offerId);
 
       return response;
     },
 
     async offerSaleChangeStateAwait(context, offerId) {
       console.warn('MODULE.OFFER: offerSaleChangeState');
+      // const response = await decorateResponseApi(
+      //   OfferSale.api().offerSaleChangeStateAwait,
+      //   offerId
+      // );
       const response = await decorateResponseApi(
-        OfferSale.api().offerSaleChangeStateAwait,
+        OfferApi.offerSaleChangeStateAwait,
         offerId
       );
       return response;
@@ -88,11 +89,11 @@ export const offer = {
       console.warn('MODULE.OFFER: getListOffersPurchase');
       console.log(context);
 
-      const responseWrap = await OfferPurchase.api().getListOfferPurchase();
+      const response = await apiDecorator(OfferApi.getListOfferPurchase);
 
-      const offersPurchase = responseWrap.response.data.items
-        ? responseWrap.response.data.items
-        : responseWrap.response.data;
+      const offersPurchase = response.data.items
+        ? response.data.items
+        : response.data;
       return offersPurchase;
     },
     async getPurchaseOffersDone() {
@@ -119,8 +120,8 @@ export const offer = {
     async createOfferPurchase(context, modelOfferPurchase) {
       console.warn('MODULE.OFFER: createOfferPurchase');
       console.log(modelOfferPurchase);
-      const response = await decorateResponseApi(
-        OfferPurchase.api().offerPurchasePlace,
+      const response = await apiDecorator(
+        OfferApi.offerPurchasePlace,
         modelOfferPurchase
       );
 
@@ -128,8 +129,9 @@ export const offer = {
     },
     async offerPurchaseAcquire(context, model) {
       // INFO: model = {offerId: int, customer_id: int}
+
       const response = await decorateResponseApi(
-        OfferPurchase.api().offerPurchaseAcquire,
+        OfferApi.offerPurchaseAcquire,
         model
       );
       return response;

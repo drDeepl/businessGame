@@ -224,11 +224,7 @@ export default {
       team_id
     );
     this.arrays.productKits = productKits;
-    // this.arrays.productKits = productKits.filter((pk) => {
-    //   console.error(pk);
-    //   this.dicts.products[pk.product];
-    // });
-    console.log(productKits);
+
     productKits.forEach((pk) => console.log(pk)); // pk.product_kit.product
     this.$store.commit('storageTeam/SET_GET_PRODUCTS_KIT_TEAM_RUN_COMPLETE');
     this.load.main = false;
@@ -338,7 +334,6 @@ export default {
         );
         console.log('RESPONSE OFFER PURCHASE PLACE\n', responsePlace);
         if (responsePlace.status === 200) {
-          this.form.success = true;
           console.log(responsePlace.data);
           const offer = responsePlace.data;
 
@@ -357,6 +352,8 @@ export default {
             this.form.errors.push('Произошла ошибка во время продажи');
             this.form.isLoad = false;
           }
+          this.form.isLoad = false;
+          this.form.success = true;
         } else {
           this.form.errors.push('Произошла ошибка во время продажи');
           this.form.isLoad = false;
