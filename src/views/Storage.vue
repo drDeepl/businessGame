@@ -322,7 +322,7 @@ export default {
         this.form.isLoad = true;
         // const product_id = this.form.currentData.product.id;
 
-        const product_id = this.form.currentData.product_id;
+        const product_id = this.form.currentData.product;
 
         const customer_id =
           this.dicts.customers[modelOfferProductSell.to_customer];
