@@ -29,6 +29,10 @@ export default class Product extends Model {
 
         return this.post('products', data);
       },
+      async setStateDeletedProduct(productId) {
+        console.warn('MODULE.MODEL.PRODUCT: setStateDeletedProduct');
+        return this.get(`products/delete/${productId}`);
+      },
       async deleteProduct(id) {
         console.warn('STORE.MODEL.PRODUCT: deleteProduct');
 

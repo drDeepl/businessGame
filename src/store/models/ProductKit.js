@@ -44,6 +44,9 @@ export default class ProductKit extends Model {
           delete: productKitId,
         });
       },
+      async setStateDeletedProductKit(productKitId) {
+        return this.get(`product-kits/delete/${productKitId}`);
+      },
     },
   };
 }

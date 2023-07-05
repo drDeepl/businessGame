@@ -70,6 +70,14 @@ export const products = {
 
       return responseWrap.data;
     },
+    async setStateDeletedProduct(context, productId) {
+      console.warn('MODULE.PRODUCTS: setStateDeletedProduct');
+      const response = await decorateResponseApi(
+        Product.api().setStateDeletedProduct,
+        productId
+      );
+      return response;
+    },
     async deleteProduct(context, productId) {
       console.warn('MODULE.PRODUCTS: deleteProduct');
       const id = Number.parseInt(productId);

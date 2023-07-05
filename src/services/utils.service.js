@@ -27,7 +27,7 @@ export const decorateResponseApi = async function (func, context) {
 export const apiDecorator = async function (func, context) {
   console.warn('API.DECORATOR');
   let response = {status: 200, data: null, message: ''};
-  console.log(func, context, response);
+
   await func(context)
     .catch((resp) => {
       console.warn(resp);

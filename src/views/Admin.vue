@@ -397,9 +397,7 @@
 
 <script>
 import {mapGetters} from 'vuex';
-import {develop} from '@/_config';
 
-// FIX: import {codeErrorResponse} from '@/helpers/helper.error';
 import {createRandomUser} from '@/helpers/helper.fake';
 import Message from '@/helpers/messages';
 
@@ -409,16 +407,15 @@ import ModelUpdateUser from '@/models/model.user.update';
 import ModelCreateTeam from '@/models/model.team.create';
 import ModelTeam from '@/models/model.team';
 import ModelUser from '@/models/model.user';
+
 import UserService from '@/services/user.service';
 
 import User from '@/store/models/User';
-//  FIX: import Team from '@/store/models/Team';
 
 import Form from '@/UI/Form.vue';
 import Load from '@/UI/Load.vue';
 import DataTable from '@/UI/DataTable.vue';
 import DialogError from '@/UI/DialogError.vue';
-// import ProductCard from '@/UI/ProductCard.vue';
 
 export default {
   components: {
@@ -537,11 +534,8 @@ export default {
     const currentUser = this.$store.state.auth.user;
     const username = currentUser.username;
     console.error(username);
-    const userData = await User.api().getUserByUsername(username);
-
-    if (develop) {
-      userData.is_superuser = true;
-    }
+    const userDataResponse = await User.api().getUserByUsername(username);
+    const userData = userDataResponse.response.data;
 
     if (!userData.is_superuser) {
       this.$router.push('/');

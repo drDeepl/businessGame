@@ -1,5 +1,6 @@
 import ProductKit from './models/ProductKit';
 import Messages from '@/models/model.messages';
+import {decorateResponseApi} from '@/services/utils.service';
 export const productKit = {
   namespaced: true,
   state: {
@@ -77,6 +78,15 @@ export const productKit = {
       } else {
         response.message = 'При удалении произошла ошибка...';
       }
+      return response;
+    },
+
+    async setStateDeletedProductKit(context, productKitId) {
+      console.warn('MODULE.PRODUCT.KIT: setStateDeletedProductKit');
+      const response = await decorateResponseApi(
+        ProductKit.api().setStateDeletedProductKit,
+        productKitId
+      );
       return response;
     },
   },

@@ -317,12 +317,13 @@ export default {
     },
     async onClickApplySellProduct(modelOfferProductSell) {
       console.warn('STORAGE: onClickApplySellProduct');
-
+      console.log(modelOfferProductSell);
       if (modelOfferProductSell.count <= this.form.currentData.count) {
         this.form.isLoad = true;
         // const product_id = this.form.currentData.product.id;
 
-        const product_id = this.form.currentData.product;
+        const product_id = this.form.currentData.product_id;
+
         const customer_id =
           this.dicts.customers[modelOfferProductSell.to_customer];
         modelOfferProductSell.product = product_id;

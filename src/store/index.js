@@ -8,10 +8,10 @@ import Team from './models/Team';
 import Account from './models/Account';
 import Product from './models/Product';
 import ProductKit from './models/ProductKit';
-import OfferSale from './models/OfferSale';
-import OfferPurchase from './models/OfferPurchase';
 import Token from './models/Token';
 
+// import OfferSale from './models/OfferSale';
+// import OfferPurchase from './models/OfferPurchase';
 import {auth} from './module.auth';
 import {user} from './module.user';
 import {account} from './module.account';
@@ -50,8 +50,8 @@ database.register(Team);
 database.register(Account);
 database.register(Product);
 database.register(ProductKit);
-database.register(OfferSale);
-database.register(OfferPurchase);
+// database.register(OfferSale);
+// database.register(OfferPurchase);
 
 export default new Vuex.Store({
   modules: {

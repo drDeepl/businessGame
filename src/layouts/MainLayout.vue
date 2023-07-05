@@ -309,9 +309,13 @@ export default {
       if (dataUser.is_superuser) {
         console.warn('GET TEAMS');
         const teams = await this.$store.dispatch('team/getTeams');
-        const adminRow = {title: 'Панель администратора', url: 'admin'};
-        sidebarLinks.shift();
-        sidebarLinks.push(adminRow);
+        const adminRow = [
+          {title: 'Панель администратора', url: 'admin'},
+          {title: 'Транзакции', url: 'transaction'},
+        ];
+        // sidebarLinks.shift();
+        // sidebarLinks.push(adminRow);
+        sidebarLinks = adminRow;
 
         console.warn('LIST TEAMS\n', teams);
       }

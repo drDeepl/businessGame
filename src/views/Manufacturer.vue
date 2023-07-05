@@ -332,14 +332,16 @@ export default {
     this.render.content = true;
     const products = await this.$store.dispatch('products/getProducts');
     const productKits = await this.$store.dispatch('productKit/getProductKits');
+    console.error('PRODUCT KITS');
+    console.log(productKits);
+    // FIXED: Added to database field "deleted"
+    // const deletedProductKits = localStorage.getItem('deletedProductKits')
+    //   ? JSON.parse(localStorage.getItem('deletedProductKits'))
+    //   : {};
 
-    const deletedProductKits = localStorage.getItem('deletedProductKits')
-      ? JSON.parse(localStorage.getItem('deletedProductKits'))
-      : {};
-
-    this.dict.deletedProductKits = deletedProductKits;
+    // this.dict.deletedProductKits = deletedProductKits;
     const productKitWithoutDeleted = productKits.filter((productKit) => {
-      return !deletedProductKits[productKit.id];
+      return !productKit.is_deleted;
     });
 
     const teams = await this.$store.dispatch('team/getTeams');
@@ -519,15 +521,20 @@ export default {
       const productKit = this.currentItem.data;
       console.log('productKit', productKit);
       this.render.delete = true;
-      this.dict.deletedProductKits[productKit.id] = true;
       this.upgradeProductKits();
-      const deletedProductKits = this.dict.deletedProductKits;
-      localStorage.setItem(
-        'deletedProductKits',
-        JSON.stringify(deletedProductKits)
+      const responseDeletePK = await this.$store.dispatch(
+        'productKit/setStateDeletedProductKit',
+        productKit.id
       );
-      this.forms.message.text = 'Продуктовый набор удалён!';
-      this.clearCurrentItem();
+      console.error('DELETED PRODUCT KIT');
+      console.log(responseDeletePK);
+      if (responseDeletePK.status == 200) {
+        this.forms.message.text = 'Продуктовый набор удалён!';
+        this.clearCurrentItem();
+      } else {
+        this.forms.message.text = responseDeletePK.message;
+      }
+
       this.render.delete = false;
     },
 
@@ -622,21 +629,28 @@ export default {
       });
       this.arrays.productKits = productKits;
       this.arrays.products = products;
-
-      try {
-        const response = await this.$store.dispatch(
-          'products/deleteProduct',
-          product.id
-        );
+      const responseDeleteProduct = await this.$store.dispatch(
+        'products/setStateDeletedProduct',
+        product.id
+      );
+      if (responseDeleteProduct.status == 200) {
         this.alert.warn.message = 'Продукт был успешно удалён!✔️';
         this.render.delete = false;
         this.deleteState.product.isDelete = true;
-        console.warn(response);
-      } catch (error) {
-        console.warn(error);
+      } else {
         this.$store.commit('products/SET_DELETE_PRODUCT_ERROR');
-        this.deleteState.errors.push(error);
+        this.deleteState.errors.push(responseDeleteProduct.message);
       }
+      // try {
+      //   const response = await this.$store.dispatch(
+      //     'products/deleteProduct',
+      //     product.id
+      //   );
+
+      //   console.warn(response);
+      // } catch (error) {
+      //   console.warn(error);
+      // }
     },
 
     onClickCancelForm() {

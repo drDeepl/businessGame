@@ -116,7 +116,6 @@ export const offer = {
       }
     },
 
-    // NOTE: Что, если создать подобие декоратора для запросов?
     async createOfferPurchase(context, modelOfferPurchase) {
       console.warn('MODULE.OFFER: createOfferPurchase');
       console.log(modelOfferPurchase);
