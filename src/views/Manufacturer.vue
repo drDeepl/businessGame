@@ -442,12 +442,13 @@ export default {
       createdProduct.name = createdProduct.name.toLowerCase();
 
       console.log(createdProduct);
-      const productsWithCurrentName = this.$store
-        .$db()
-        .model('products')
-        .query()
-        .where('name', createdProduct.name)
-        .get();
+      // const productsWithCurrentName = this.$store
+      //   .$db()
+      //   .model('products')
+      //   .query()
+      //   .where('name', createdProduct.name)
+      //   .get();
+      const productsWithCurrentName = [];
       if (productsWithCurrentName.length == 0) {
         const product = await this.$store.dispatch(
           'products/createProduct',
@@ -473,27 +474,30 @@ export default {
       this.forms.formAddProductKit.applySuccess = false;
       console.error(productKit);
       console.log(this.arrays.products);
-      const productKitIsExists = this.$store
-        .$db()
-        .model('productKits')
-        .query()
-        .where('product', productKit.product_id)
-        .where('count', productKit.count)
-        .where('time', productKit.time)
-        .exists();
-      if (productKitIsExists) {
-        this.forms.formAddProductKit.errors.push(
-          'Такой продуктовый набор уже существует'
-        );
-      } else {
-        const createdProductKit = await this.$store.dispatch(
-          'productKit/createProductKit',
-          productKit
-        );
-        console.log('CREATED PRODUCT KIT:', createdProductKit);
-        this.forms.formAddProductKit.applySuccess = true;
-        this.arrays.productKits.push(createdProductKit);
-      }
+      // NOTE: is check exists product kit
+      // const productKitIsExists = this.$store
+      //   .$db()
+      //   .model('productKits')
+      //   .query()
+      //   .where('product', productKit.product_id)
+      //   .where('count', productKit.count)
+      //   .where('time', productKit.time)
+      //   .exists();
+      // if (productKitIsExists) {
+      //   this.forms.formAddProductKit.errors.push(
+      //     'Такой продуктовый набор уже существует'
+      //   );
+      // } else {
+
+      // NOTE: end check exists product kit
+      const createdProductKit = await this.$store.dispatch(
+        'productKit/createProductKit',
+        productKit
+      );
+      console.log('CREATED PRODUCT KIT:', createdProductKit);
+      this.forms.formAddProductKit.applySuccess = true;
+      this.arrays.productKits.push(createdProductKit);
+      // }
       this.$store.commit('productKit/SET_CREATE_PRODUCT_KIT_COMPLETE');
       this.render.addProductKit = false;
     },
@@ -645,23 +649,13 @@ export default {
         responseDeleteProduct.status == 200 &&
         responseDeleteRelatedProductKits.status == 200
       ) {
-        this.alert.warn.message.push('Продукт был успешно удалён!✔️');
+        this.alert.warn.message = ['Продукт был успешно удалён!✔️'];
         this.render.delete = false;
         this.deleteState.product.isDelete = true;
       } else {
         this.$store.commit('products/SET_DELETE_PRODUCT_ERROR');
         this.deleteState.errors.push(responseDeleteProduct.message);
       }
-      // try {
-      //   const response = await this.$store.dispatch(
-      //     'products/deleteProduct',
-      //     product.id
-      //   );
-
-      //   console.warn(response);
-      // } catch (error) {
-      //   console.warn(error);
-      // }
     },
 
     onClickCancelForm() {
