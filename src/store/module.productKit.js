@@ -89,6 +89,15 @@ export const productKit = {
       );
       return response;
     },
+
+    async setDeletedProductKitWithProduct(context, productId) {
+      console.warn('MODULE.PRODUCT.KIT: setDeletedProductKitWithProduct');
+      const response = await decorateResponseApi(
+        ProductKit.api().setDeletedProductKitWithProduct,
+        productId
+      );
+      return response;
+    },
   },
   getters: {
     GET_PRODUCT_KIT_DELETE_RUN: (state) => {

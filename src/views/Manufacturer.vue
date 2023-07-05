@@ -181,7 +181,7 @@
 
       <ErrorAlert
         v-if="alert.warn.active"
-        :errorsAr="[alert.warn.message]"
+        :errorsAr="alert.warn.message"
         :hasErrors="alert.warn.active"
       >
         <v-btn
@@ -284,7 +284,7 @@ export default {
       alert: {
         warn: {
           active: false,
-          message: '',
+          message: [],
         },
       },
       forms: {
@@ -606,12 +606,16 @@ export default {
     // NOTE: Products
     onClickDeleteProduct(product) {
       this.alert.warn.active = true;
-      this.alert.warn.message = `Удалить продукт "${product.name}"?`;
+
+      this.alert.warn.message.push(
+        `Удалить продукт "${product.name}"?`,
+        `Будут так же удалены продуктовые наборы для выбранного продукта`
+      );
       this.currentItem.data = product;
     },
     onClickCancelDeleteProduct() {
       this.alert.warn.active = false;
-      this.alert.warn.message = '';
+      this.alert.warn.message = [];
       this.deleteState.product.isDelete = false;
     },
     async onClickApplyDeleteProduct() {
@@ -633,8 +637,15 @@ export default {
         'products/setStateDeletedProduct',
         product.id
       );
-      if (responseDeleteProduct.status == 200) {
-        this.alert.warn.message = 'Продукт был успешно удалён!✔️';
+      const responseDeleteRelatedProductKits = await this.$store.dispatch(
+        'productKit/setDeletedProductKitWithProduct',
+        product.id
+      );
+      if (
+        responseDeleteProduct.status == 200 &&
+        responseDeleteRelatedProductKits.status == 200
+      ) {
+        this.alert.warn.message.push('Продукт был успешно удалён!✔️');
         this.render.delete = false;
         this.deleteState.product.isDelete = true;
       } else {
