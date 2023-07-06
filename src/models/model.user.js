@@ -49,5 +49,6 @@ export default class ModelUser {
       first_name: true,
       last_name: true,
     };
+    this.fieldToShow = ['username', 'role', 'team'];
   }
 }

@@ -1,5 +1,6 @@
 import UserService from '@/services/user.service';
 import User from './models/User';
+import {decorateResponseApi} from '@/services/utils.service';
 import {
   adminSidebarLinks,
   playerSidebarLinks,
@@ -96,9 +97,14 @@ export const user = {
     },
     async deleteUser(context, userId) {
       console.warn('MODULE.USER: deleteUser');
-      const responseWrap = await User.api().deleteUser(userId);
-      context.commit('SET_USER_DELETED');
-      return responseWrap.response;
+      // const responseWrap = await User.api().deleteUser(userId);
+      // context.commit('SET_USER_DELETED');
+      // return responseWrap.response;
+      const responseDeleteUser = await decorateResponseApi(
+        User.api().deleteUser,
+        userId
+      );
+      return responseDeleteUser;
     },
 
     async deleteUsers(context, flag) {

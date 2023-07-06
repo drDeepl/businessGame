@@ -16,5 +16,6 @@ export default class ModelTeam {
       name: 'field',
       account: 'field',
     };
+    this.fieldToShow = ['name', 'account'];
   }
 }

@@ -119,281 +119,218 @@
           </v-tab-item>
         </v-tabs>
         <!-- // INFO: Список пользователей -->
-        <v-expansion-panels>
-          <v-expansion-panel>
-            <v-expansion-panel-header>
-              <span>Список пользователей</span>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <Load v-if="panels.users.render" />
-              <div v-else>
+
+        <v-card class="mb-5">
+          <v-card-title
+            class="offer-card-table-header"
+            @click="onClickListUsers"
+          >
+            <span>Пользователи</span>
+            <arrow-icon
+              :size="30"
+              :class="`arrow-btn ${cardTable.users.active ? 'open' : ''}`"
+            />
+          </v-card-title>
+          <div class="offers-table" v-if="cardTable.users.active">
+            <v-list-item class="row-table-offers">
+              <v-list-item-content
+                v-for="label in models.modelUser.fieldToShow"
+                :key="`th_${label}`"
+              >
+                <span class="row-table-offers-value row-table-header">
+                  {{ models.modelUser.titleProps[label] }}
+                </span>
+              </v-list-item-content>
+              <v-list-item-content
+                ><span class="row-table-offers-value row-table-header">
+                  {{ '' }}
+                </span>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item
+              class="row-table-offers"
+              v-for="user in arrays.users"
+              :key="user.id"
+            >
+              <v-list-item-content
+                v-for="fieldUser in models.modelUser.fieldToShow"
+                :key="fieldUser"
+              >
+                <span class="row-table-offers-value">
+                  {{ user[fieldUser] }}
+                </span>
+              </v-list-item-content>
+              <v-list-item-content class="column-actions">
                 <v-btn
-                  text
+                  v-if="!user.is_superuser"
+                  color="red lighten-1"
                   icon
-                  color="green lighten-1"
-                  @click.prevent="updateListUsers"
-                  ><restore-icon
-                /></v-btn>
-
-                <v-btn
                   text
-                  color="red lighten-1"
-                  @click.prevent="dialogDeleteActive.users = true"
+                  class="table-btn-action"
+                  @click="onClickDeleteUser(user)"
                 >
-                  <span>удалить всех пользователей</span>
+                  <delete-icon></delete-icon>
                 </v-btn>
-                <DataTable
-                  :items="arrays.users"
-                  :modelItem="models.user"
-                  :haveDeleteFunc="true"
-                  :onClickDeleteItem="onClickDeleteUser"
-                  :hideColumns="{account: true}"
-                />
-              </div>
-
-              <v-expand-transition :hide-on-leave="true" mode="out-in">
-                <DialogError
-                  v-if="isDeleteUserError"
-                  :active="isDeleteUserError"
-                  :title="messages.errorTitle"
-                >
-                  <v-card-text class="text-display-1 text-center">
-                    {{ messages.reloadPage }}
-                  </v-card-text>
-
-                  <v-flex align-self-center>
-                    <v-card-actions>
-                      <v-btn
-                        color="red lighten-1"
-                        text
-                        :loading="deleteUserInProgress"
-                        @click.prevent="onClickCancelDeleteUser"
-                      >
-                        закрыть
-                      </v-btn>
-                    </v-card-actions>
-                  </v-flex>
-                </DialogError>
-                <DialogError
-                  v-else
-                  :title="messages.deleteUserTitle + '?'"
-                  :active="isDeleteUser"
-                >
-                  <v-card-text v-if="!!dataUserToDelete" class="text-body-2">
-                    Будет удалён пользователь с именем
-                    <span class="font-weight-bold">
-                      {{ dataUserToDelete.username }}
-                    </span>
-                  </v-card-text>
-                  <v-flex align-self-center>
-                    <v-card-actions>
-                      <v-btn
-                        color="green lighten-1"
-                        text
-                        :loading="deleteUserInProgress"
-                        @click.prevent="onClickApplyDeleteUser"
-                      >
-                        Да
-                      </v-btn>
-                      <v-btn
-                        color="red lighten-1"
-                        text
-                        @click.prevent="onClickCancelDeleteUser"
-                      >
-                        Нет
-                      </v-btn>
-                    </v-card-actions>
-                  </v-flex>
-                </DialogError>
-              </v-expand-transition>
-              <DialogError
-                :active="dialogDeleteActive.users"
-                :title="messages.deleteAllUsersTitle"
+              </v-list-item-content>
+            </v-list-item>
+          </div>
+          <DialogError
+            :title="alert.message"
+            :active="alert.delete.user"
+            v-if="alert.delete.user"
+          >
+            <v-card-actions
+              v-if="!alert.delete.success && alert.errors.length == 0"
+            >
+              <v-btn
+                :loading="alert.render"
+                color="red"
+                text
+                @click="onClickDeleteUserApply"
               >
-                <v-flex align-self-center>
-                  <v-card-actions>
-                    <v-btn
-                      @click.prevent="onClickApplyDeleteAllUsers"
-                      :loading="isDeleteAllUsers"
-                      text
-                      color="red lighten-1"
-                      >Да, удалить
-                    </v-btn>
-                    <v-btn
-                      text
-                      @click.prevent="dialogDeleteActivator('users', false)"
-                      >Отмена
-                    </v-btn>
-                  </v-card-actions>
-                </v-flex>
-              </DialogError>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel @click="onClickListProducts">
-            <v-expansion-panel-header>
-              <span>Список продуктов</span>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <div v-if="products.length > 0">
-                <v-btn
-                  color="red darken-1"
-                  text
-                  :loading="isAllProductsDeleted"
-                  @click="onClickDeleteProductAll"
-                >
-                  <span>Очистить список продуктов</span>
-                </v-btn>
-                {{ products }}
-                <DataTable
-                  :items="products"
-                  :modelItem="models.modelProduct"
-                  :haveDeleteFunc="true"
-                  :onClickDeleteItem="onClickDeleteProduct"
-                />
-              </div>
-              <Load v-else-if="panels.products.render" />
-              <div v-else>
-                <v-card-text>Нет созданных продуктов</v-card-text>
-              </div>
-              <DialogError
-                :active="isAllProductsDeleteError"
-                :title="messages.errorTtile"
+                Удалить
+              </v-btn>
+              <v-spacer></v-spacer>
+              <v-btn :disabled="alert.render" text @click="onClickCancelDelete"
+                >Отмена</v-btn
               >
+            </v-card-actions>
+
+            <v-card-actions
+              v-else-if="alert.errors.length > 0"
+              class="d-flex flex-column"
+            >
+              <ol>
+                <li
+                  class="dialog-error-li text-center ma-3"
+                  v-for="(error, id) in alert.errors"
+                  :key="'del_user_' + id"
+                >
+                  <span>{{ error }}</span>
+                </li>
+              </ol>
+
+              <v-btn class="btn-apply" @click="onClickCancelDelete">
+                закрыть
+              </v-btn>
+            </v-card-actions>
+            <v-card-actions v-else>
+              <v-spacer></v-spacer>
+              <v-btn class="btn-apply" @click="onClickCancelDelete">
+                Отлично
+              </v-btn>
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </DialogError>
+        </v-card>
+        <v-card class="mb-5">
+          <v-card-title
+            class="offer-card-table-header"
+            @click="onClickListTeam"
+          >
+            <span>Команды</span>
+            <arrow-icon
+              :size="30"
+              :class="`arrow-btn ${cardTable.teams.active ? 'open' : ''}`"
+            />
+          </v-card-title>
+          <div class="offers-table" v-if="cardTable.teams.active">
+            <v-list-item class="row-table-offers">
+              <v-list-item-content
+                v-for="label in models.modelTeam.fieldToShow"
+                :key="`th_${label}`"
+              >
+                <span class="row-table-offers-value row-table-header">
+                  {{ models.modelTeam.titleProps[label] }}
+                </span>
+              </v-list-item-content>
+              <v-list-item-content
+                ><span class="row-table-offers-value row-table-header">
+                  {{ '' }}
+                </span>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
+              class="row-table-offers"
+              v-for="team in arrays.teams"
+              :key="team.id"
+            >
+              <v-list-item-content
+                v-for="fieldTeam in models.modelTeam.fieldToShow"
+                :key="fieldTeam"
+              >
+                <span class="row-table-offers-value">
+                  {{ team[fieldTeam] }}
+                </span>
+              </v-list-item-content>
+              <v-list-item-content class="column-actions">
                 <v-btn
-                  text
                   color="red lighten-1"
-                  @click.prevent="onClickCloseErrorProducts"
-                  >закрыть</v-btn
+                  icon
+                  text
+                  class="table-btn-action"
+                  @click="onClickDeleteTeam(team)"
                 >
-              </DialogError>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header>
-              <span>Список команд</span>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-card-text v-if="arrays.teams.length == 0">
-                Список команд ещё пуст
-              </v-card-text>
+                  <delete-icon></delete-icon>
+                </v-btn>
+              </v-list-item-content>
+            </v-list-item>
+          </div>
+          <DialogError
+            :title="alert.message"
+            :active="alert.delete.team"
+            v-if="alert.delete.team"
+          >
+            <v-card-actions
+              v-if="!alert.delete.success && alert.errors.length == 0"
+            >
+              <v-btn
+                :loading="alert.render"
+                color="red"
+                text
+                @click="onClickDeleteTeamApply"
+              >
+                Удалить
+              </v-btn>
+              <v-spacer></v-spacer>
+              <v-btn :disabled="alert.render" text @click="onClickCancelDelete"
+                >Отмена</v-btn
+              >
+            </v-card-actions>
+            <v-card-actions
+              v-else-if="alert.errors.length > 0"
+              class="d-flex flex-column"
+            >
+              <ol>
+                <li
+                  class="dialog-error-li text-center ma-3"
+                  v-for="(error, id) in alert.errors"
+                  :key="'del_team_' + id"
+                >
+                  <span>{{ error }}</span>
+                </li>
+              </ol>
 
-              <v-list v-else dense>
-                <v-card-actions
-                  class="flex-sm-column justify-start align-start"
-                >
-                  <v-btn
-                    class="mb-1"
-                    text
-                    color="red"
-                    @click="
-                      dialogDeleteActivator(
-                        'teamAll',
-                        true,
-                        messages.deleteTeamDescription
-                      )
-                    "
-                  >
-                    <span>Удалить все команды</span>
-                  </v-btn>
-                  <v-select
-                    class="mb-1 mt-1"
-                    v-model="values.teamToDelete"
-                    :items="arrays.teamNames"
-                    chips
-                    attach
-                    multiple
-                    :menu-props="{closeOnContentClick: true}"
-                    color="#6c63ff"
-                    item-color="success"
-                    label="Удалить команды"
-                  ></v-select>
-                  <v-btn
-                    v-if="values.teamToDelete.length > 0"
-                    class="btn-cancel"
-                    @click="onClickDeleteChoiceTeam"
-                  >
-                    Удалить выбранные
-                  </v-btn>
-                </v-card-actions>
-                <DataTable
-                  :items="arrays.teams"
-                  :modelItem="models.modelTeam"
-                />
-                <DialogError
-                  v-if="dialogDeleteActive.teamAll"
-                  :title="messages.deleteTeam"
-                  :active="dialogDeleteActive.teamAll"
-                >
-                  <v-card-text>
-                    {{ messages.deleteTeamDescription }}
-                  </v-card-text>
-                  <v-btn
-                    text
-                    color="red lighten-1"
-                    :loading="isTeamDelete"
-                    @click.prevent="onClickDeleteTeamAll"
-                  >
-                    Да, удалить
-                  </v-btn>
-                  <v-btn
-                    text
-                    color="green lighten-1"
-                    :loading="isTeamDelete"
-                    @click.prevent="() => (dialogDeleteActive.teamAll = false)"
-                  >
-                    Отмена
-                  </v-btn>
-                </DialogError>
-                <DialogError
-                  title="Что-то пошло не так"
-                  :active="dialogDeleteActive.errors.length > 0"
-                >
-                  <v-card-text
-                    v-for="message in dialogDeleteActive.errors"
-                    :key="message"
-                  >
-                    {{ message }}
-                  </v-card-text>
-                  <v-btn
-                    text
-                    color="red lighten-1"
-                    :loading="isTeamDelete"
-                    @click.prevent="() => (dialogDeleteActive.errors = [])"
-                  >
-                    Ок
-                  </v-btn>
-                </DialogError>
-                <DialogError
-                  title="Удалить выбранные команды?"
-                  :active="dialogDeleteActive.choiceTeam"
-                >
-                  <v-card-text>
-                    {{ messages.deleteTeamDescription }}
-                  </v-card-text>
-                  <v-btn
-                    text
-                    color="red lighten-1"
-                    :loading="render.team.choiceDelete"
-                    @click.prevent="onClickApplyDeleteChoiceTeam"
-                  >
-                    Да
-                  </v-btn>
-                  <v-btn
-                    text
-                    color="green lighten-1"
-                    :loading="render.team.choiceDelete"
-                    @click.prevent="dialogDeleteActivator('choiceTeam', false)"
-                  >
-                    Закрыть
-                  </v-btn>
-                </DialogError>
-              </v-list>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-        <v-card outlined @click="onClickListProducts">
-          <v-card-title class="offer-card-table-header">
-            <span>Список продуктов</span>
+              <v-btn class="btn-apply" @click="onClickCancelDelete">
+                закрыть
+              </v-btn>
+            </v-card-actions>
+            <v-card-actions v-else>
+              <v-spacer></v-spacer>
+              <v-btn class="btn-apply" @click="onClickCancelDelete">
+                Отлично
+              </v-btn>
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </DialogError>
+        </v-card>
+        <v-card>
+          <v-card-title
+            class="offer-card-table-header"
+            @click="onClickListProducts"
+          >
+            <span>Продукты</span>
             <arrow-icon
               v-if="!cardTable.products.render"
               :size="30"
@@ -413,7 +350,7 @@
               </v-list-item-content>
               <v-list-item-content
                 ><span class="row-table-offers-value row-table-header">
-                  Действие
+                  {{ '' }}
                 </span>
               </v-list-item-content>
             </v-list-item>
@@ -444,6 +381,53 @@
             </v-list-item>
           </div>
         </v-card>
+        <DialogError
+          :title="alert.message"
+          :active="alert.delete.product"
+          v-if="alert.delete.product"
+        >
+          <v-card-actions
+            v-if="!alert.delete.success && alert.errors.length == 0"
+          >
+            <v-btn
+              :loading="alert.render"
+              color="red"
+              text
+              @click="onClickDeleteProductApply"
+            >
+              Удалить
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn :disabled="alert.render" text @click="onClickCancelDelete"
+              >Отмена</v-btn
+            >
+          </v-card-actions>
+          <v-card-actions
+            v-else-if="alert.errors.length > 0"
+            class="d-flex flex-column"
+          >
+            <ol>
+              <li
+                class="dialog-error-li text-center ma-3"
+                v-for="(error, id) in alert.errors"
+                :key="'del_user_' + id"
+              >
+                <span>{{ error }}</span>
+              </li>
+            </ol>
+
+            <v-btn class="btn-apply" @click="onClickCancelDelete">
+              закрыть
+            </v-btn>
+          </v-card-actions>
+          <v-card-actions v-else>
+            <v-spacer></v-spacer>
+            <v-btn class="btn-apply" @click="onClickCancelDelete">
+              Отлично
+            </v-btn>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </DialogError>
       </div>
     </div>
   </div>
@@ -469,14 +453,13 @@ import User from '@/store/models/User';
 import Form from '@/UI/Form.vue';
 import Load from '@/UI/Load.vue';
 
-import DataTable from '@/UI/DataTable.vue';
 import DialogError from '@/UI/DialogError.vue';
 
 export default {
   components: {
     Form,
     Load,
-    DataTable,
+
     DialogError,
   },
   data() {
@@ -486,6 +469,26 @@ export default {
           active: false,
           render: false,
         },
+        teams: {
+          active: false,
+          render: false,
+        },
+        users: {
+          active: false,
+          render: false,
+        },
+      },
+      alert: {
+        delete: {
+          user: false,
+          product: false,
+          team: false,
+          currentItem: null,
+          success: false,
+        },
+        message: '',
+        render: false,
+        errors: [],
       },
       panels: {
         users: {
@@ -528,7 +531,7 @@ export default {
       titles:
         this.$store.getters['user/GET_SIDEBAR_LINKS_BY_ROLE']('SUPERUSER')[0],
       models: {
-        user: new ModelUser(),
+        modelUser: new ModelUser(),
         modelCreateUser: new ModelUserCreate(),
         modelUpdateUser: new ModelUpdateUser(),
         modelProduct: new ModelProduct(),
@@ -641,21 +644,13 @@ export default {
       isDeleteAllUsersError: 'admin/GET_DELETE_ALL_USERS_ERROR',
       isGetUsers: 'user/GET_STATE_getUser',
     }),
-    // teamNames() {
-    //   console.warn('ADMIN.VUE: teamNames');
-    //   let listTeams = this.$store.$db().model('teams').query().all();
-    //   let namesTeam = listTeams.map((team) => team.name);
-    //   return namesTeam;
-    // },
+
     users() {
       return this.$store.$db().model('users').query().all();
     },
     products() {
       return this.arrays.products;
     },
-    // teams() {
-    //   return this.arrays.teams;
-    // },
   },
   methods: {
     checkRenderPanels(name, flag) {
@@ -752,7 +747,7 @@ export default {
       this.$store.commit('user/SET_USER_ID_ON_UPDATING', user.id);
     },
     async onClickApplyUpdateUser(modelUpdateUser) {
-      this.forms.formCreateUser.erros = [];
+      this.forms.formCreateUser.errors = [];
       this.$store.commit('user/SET_USER_UPDATING');
 
       console.warn('ADMIN.vue: onClickUpdateUser');
@@ -774,6 +769,10 @@ export default {
       this.$store.commit('user/SET_USER_UPDATED');
     },
 
+    onClickListUsers() {
+      console.warn('ADMIN.VUE: onClickListUsers');
+      this.cardTable.users.active = !this.cardTable.users.active;
+    },
     async onClickApplyDeleteUser() {
       console.warn('ADMIN: onClicApplykDeleteUser');
       this.$store.commit('admin/SET_DELETE_USER_inProgress', true);
@@ -801,11 +800,32 @@ export default {
       this.$store.commit('admin/SET_DELETE_USER_inProgress', false);
       this.$store.commit('admin/SET_DELETE_USER_error', false);
     },
-    async onClickDeleteUser(user) {
-      console.warn('onClickDeleteUser');
-      this.$store.commit('admin/SET_DELETE_USER_ACTIVE', true);
-      this.$store.commit('admin/SET_DELETE_USER_DATA', user);
+
+    onClickDeleteUser(user) {
+      console.warn('ADMIN.VUE: onClickDeleteUser');
+      this.alert.message = `Удалить пользователя "${user.username}" ?`;
+      this.alert.delete.currentDeleteItem = 'user';
+      this.alert.delete.currentItem = user;
+      this.alert.delete.user = true;
     },
+    async onClickDeleteUserApply() {
+      console.warn('ADMIN.VUE: onClickDeleteUserApply');
+      const user = this.alert.delete.currentItem;
+      this.alert.render = true;
+      const responseDeleteUser = await this.$store.dispatch(
+        'user/deleteUser',
+        user.id
+      );
+      if (responseDeleteUser.status == 200) {
+        await this.updateListUsers();
+        this.alert.delete.success = true;
+        this.alert.message = 'Пользователь успешно удалён!';
+      } else {
+        this.alert.errors.push('Упс, что-то пошло не так');
+      }
+      this.alert.render = false;
+    },
+
     async onClickApplyDeleteAllUsers() {
       this.$store.commit('admin/SET_DELETE_ALL_USERS', true);
       await this.$store.dispatch('user/deleteUsers', 1);
@@ -833,27 +853,41 @@ export default {
         this.cardTable.products.render = false;
         this.cardTable.products.active = true;
       }
-
-      // this.$store.commit('products/SET_GET_LIST_PRODUCTS_RUN');
-      // this.checkRenderPanels('products', true);
-      // if (this.panels.products) {
-      //   console.log('open panel with products');
-
-      //   this.checkRenderPanels('products', false);
-      // }
     },
 
     onClickDeleteProduct(product) {
       console.warn('ADMIN.VUE: onClickDeleteProduct');
-      console.log(product);
+      this.alert.message = `Удалить продукт "${product.name}" ?`;
+      this.alert.delete.currentDeleteItem = 'product';
+      this.alert.delete.currentItem = product;
+      this.alert.delete.product = true;
     },
-    async onClickDeleteProductApply(product) {
+    onClickCancelDelete() {
+      console.warn('ADMIN.VUE: onClickCancelDelete');
+      const currentItemDelete = this.alert.delete.currentDeleteItem;
+      this.alert.delete[currentItemDelete] = false;
+      this.alert.delete.success = false;
+      this.alert.currentItem = null;
+      this.alert.errors = [];
+      this.alert.message = '';
+    },
+    async onClickDeleteProductApply() {
       console.warn('onClickDeleteProduct');
-      this.$store.commit('products/SET_DELETE_PRODUCT_RUN');
-      console.error('TODO');
+      this.alert.render = true;
+      const product = this.alert.delete.currentItem;
       console.log(product);
-      await this.$store.dispatch('products/deleteProduct', product.id);
-      await this.updateListProduct();
+      const responseDeleteProduct = await this.$store.dispatch(
+        'products/deleteProduct',
+        product.id
+      );
+      if (responseDeleteProduct.status == 200) {
+        await this.updateListProduct();
+        this.alert.delete.success = true;
+        this.alert.message = 'Продукт успешно удалён!';
+      } else {
+        this.alert.errors.push('Упс, что-то пошло не так');
+      }
+      this.alert.render = false;
     },
     async onClickDeleteProductAll() {
       console.warn('onClickDeleteProductAll');
@@ -891,35 +925,41 @@ export default {
         this.dicts.teams[team.name] = team.id;
       }
     },
-    async onClickDeleteTeam(teamName) {
-      console.warn('onClickDeleteTeam');
-      this.render.team.choiceDelete = true;
 
-      try {
-        const teamId = this.dicts.teams[teamName];
-        console.log(teamId);
-        const teams = this.arrays.teams;
-        const newTeams = teams.filter((team) => team.id != teamId);
-        this.arrays.teams = newTeams;
-        await this.$store.dispatch('team/deleteTeam', teamId);
-        const dictsTeams = this.dicts.teams;
-        delete dictsTeams[teamName];
-        const users = this.arrays.users;
-        const newUsers = users.filter((user) => user.team_id != teamId);
-        this.arrays.users = newUsers;
-        this.dicts.teams = dictsTeams;
-        this.arrays.teamNames = Object.keys(dictsTeams);
-        console.log(Object.keys(dictsTeams));
-      } catch (e) {
-        console.error(e);
-        this.dialogDeleteActivator('choiceTeam', false);
-        this.dialogDeleteActive.errors.push(
-          'Что-то пошло не так. Попробуйте перезагрузить страницу'
-        );
-      }
-
-      this.render.team.choiceDelete = false;
+    onClickListTeam() {
+      console.warn('ADMIN.VUE: onClickListTeam');
+      this.cardTable.teams.active = !this.cardTable.teams.active;
     },
+
+    onClickDeleteTeam(team) {
+      console.warn('ADMIN.VUE: onClickDeleteTeam');
+      this.alert.message = `Удалить команду "${team.name}" ?`;
+      this.alert.delete.currentDeleteItem = 'team';
+      this.alert.delete.currentItem = team;
+      this.alert.delete.team = true;
+    },
+
+    async onClickDeleteTeamApply() {
+      console.warn('ADMIN.VUE: onClickDeleteTeamApply');
+      this.alert.render = true;
+      const team = this.alert.delete.currentItem;
+      const responseDeleteTeam = await this.$store.dispatch(
+        'team/deleteTeam',
+        team.id
+      );
+      if (responseDeleteTeam.status == 200) {
+        const newTeams = this.arrays.teams.filter(
+          (oldTeam) => oldTeam.id != team.id
+        );
+        this.arrays.teams = newTeams;
+        this.alert.delete.success = true;
+        this.alert.message = 'Команда успешно удалена!';
+      } else {
+        this.alert.errors.push('Упс, что-то пошло не так');
+      }
+      this.alert.render = false;
+    },
+
     onClickDeleteChoiceTeam() {
       this.dialogDeleteActivator('choiceTeam', true);
     },

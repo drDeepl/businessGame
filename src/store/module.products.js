@@ -81,10 +81,13 @@ export const products = {
     async deleteProduct(context, productId) {
       console.warn('MODULE.PRODUCTS: deleteProduct');
       const id = Number.parseInt(productId);
-      const responseWrap = await Product.api().deleteProduct(id);
-      console.log(responseWrap);
+
+      const responseDeleteProduct = await decorateResponseApi(
+        Product.api().deleteProduct,
+        id
+      );
       context.commit('SET_DELETE_PRODUCT_COMPLETE');
-      return responseWrap.response;
+      return responseDeleteProduct;
     },
     async deleteProducts(context, flag) {
       console.warn('deleteProducts');

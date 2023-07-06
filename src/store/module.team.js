@@ -86,8 +86,13 @@ export const team = {
       console.warn('TEAM.MODULE: deleteTeam');
       console.log(context);
       context.commit('SET_DELETE_TEAM_COMPLETE');
-      const responseWrap = await Team.api().removeTeam(teamId);
-      return responseWrap.response.data;
+      // const responseWrap = await Team.api().removeTeam(teamId);
+      // return responseWrap.response.data;
+      const responseDeleteTeam = await decorateResponseApi(
+        Team.api().removeTeam,
+        teamId
+      );
+      return responseDeleteTeam;
     },
     async deleteTeams(context) {
       console.warn('TEAM.MODULE: deleteTeam');
