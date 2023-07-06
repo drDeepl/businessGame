@@ -1,17 +1,18 @@
 <template>
   <div>
     <div class="player-layout">
-      <Load v-if="render.offersContainer"></Load>
-      <div v-else-if="arrays.offersSale.length > 0" class="cards-container">
+      <Load v-if="render.offersContainer || render.page"></Load>
+      <div v-else-if="offersAwaited.length > 0" class="cards-container">
         <OfferCard
-          v-for="offer in arrays.offersSale"
+          class="ma-1"
+          v-for="offer in offersAwaited"
           :key="offer.id"
           :title="`${offer.product_kit}`"
           :item="offer"
           :modelItem="model.offerSale"
           :propsItemToShow="['product_kit', 'trader', 'price', '']"
-          :isGetNameProductFromProductKit="true"
-          :isGetTraderUserName="true"
+          :isGetNameProductFromProductKit="offer.is_canceled ? false : true"
+          :isGetTraderUserName="offer.is_canceled ? false : true"
         >
           <v-btn
             class="btn-apply"
@@ -69,7 +70,17 @@ export default {
     offersAwaitedCount() {
       return this.$store.state.mainLayout.countAwaitedOffers;
     },
+    offersAwaited() {
+      return this.$store.state.mainLayout.offersAwaitedTeam;
+    },
   },
+  // watch: {
+  //   async '$store.state.mainLayout.offersAwaitedCount'(newOffer, oldOffer) {
+  //     console.error(`oldValue:${oldOffer}\nnewValue:${newOffer}`);
+  //     this.arrays.offersSale.push(newOffer);
+  //   },
+  // },
+
   async created() {
     this.render.page = true;
     if (this.currentUser) {
@@ -82,13 +93,12 @@ export default {
       const currentUserData = responseUser.data;
       this.currentUserData = currentUserData;
 
-      // const dataRoute = this.$route.params.data;
       let offersSale = await this.$store.dispatch(
         'offer/getOfferAwaitedSell',
         currentUserData.team
       );
 
-      this.arrays.offersSale = offersSale.data;
+      this.arrays.offersSale = offersSale.data.reverse();
     } else {
       this.$router.push('/login');
     }
@@ -96,6 +106,7 @@ export default {
     this.render.page = false;
     // TODO console.error(this.$route.params.data);
   },
+
   methods: {
     async onClickBuyOffer(offerSalePlace) {
       console.warn('PLAYER: onClickBuyOffer');
@@ -128,7 +139,7 @@ export default {
         this.currentUserData.team
       );
       const offersSale = responseOffersAwaited.data;
-      this.arrays.offersSale = offersSale;
+      this.arrays.offersSale = offersSale.reverse();
       this.render.offersContainer = false;
     },
 

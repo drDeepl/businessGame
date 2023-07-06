@@ -50,7 +50,7 @@
             () =>
               rowModel.url == 'player'
                 ? onClickTab(rowModel, {
-                    offersAwaited: arrays.offersAwaited,
+                    // offersAwaited: arrays.offersAwaited,
                     toUpdateOffersBadge: updateOffersAwaitedCount,
                   })
                 : onClickTab(rowModel)
@@ -273,6 +273,7 @@ export default {
           const product = response.data;
           this.alert.newOfferSale.offer.product_kit = product.name;
           this.alert.newOfferSale.offer.trader = trader.username;
+          this.alert.newOfferSale.offer.is_canceled = true;
           this.alert.newOfferSale.active = true;
           console.log('PRODUCT', product);
         }
@@ -357,6 +358,11 @@ export default {
         );
         // this.alert.newOfferSale.count = offerSaleCount;
         this.arrays.offersAwaited = responseOffersAwaited.data;
+        console.error(responseOffersAwaited.data);
+        this.$store.commit(
+          'mainLayout/SET_OFFERS_FOR_TEAM',
+          responseOffersAwaited.data
+        );
         console.error('DATA USER\n', dataUser);
         // this.$store.commit('team/SET_BALANCE_RUNNING');
         const dataTeam = await this.$store.dispatch('team/getDataTeam', teamId);
@@ -400,9 +406,11 @@ export default {
 
     addOfferSaleToAwaitedList(offer) {
       console.warn('MAINLAYOUT: addOfferSaleToAwaitedList');
-      this.arrays.offersAwaited.push(offer);
+
+      this.$store.commit('mainLayout/SET_OFFER_FOR_TEAM', offer);
+
       let offersCount = this.offersAwaitedCount;
-      // this.alert.newOfferSale.count += 1;
+
       offersCount += 1;
       this.$store.commit('mainLayout/SET_COUNT_AWAITED_OFFERS', offersCount);
     },

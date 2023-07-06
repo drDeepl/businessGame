@@ -11,6 +11,7 @@ export const mainLayout = {
       message: '',
     },
     countAwaitedOffers: 0,
+    offersAwaitedTeam: [],
   },
   actions: {},
   getters: {
@@ -46,6 +47,12 @@ export const mainLayout = {
     },
     SET_COUNT_AWAITED_OFFERS(state, count) {
       state.countAwaitedOffers = count;
+    },
+    SET_OFFERS_FOR_TEAM(state, offers) {
+      state.offersAwaitedTeam = offers.reverse();
+    },
+    SET_OFFER_FOR_TEAM(state, offer) {
+      state.offersAwaitedTeam.unshift(offer);
     },
   },
 };

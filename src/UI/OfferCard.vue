@@ -122,7 +122,10 @@ export default {
     console.warn('OFFER CARD: created');
     const item = this.item;
     console.log(item);
-    if (this.isGetNameProductFromProductKit) {
+    if (
+      this.isGetNameProductFromProductKit &&
+      typeof item.product_kit != 'string'
+    ) {
       this.render.nameProduct = true;
       const responseProduct = await this.$store.dispatch(
         'productKit/getProductFromProductKit',
@@ -131,7 +134,7 @@ export default {
       this.item.product_kit = responseProduct.data.name;
       this.render.nameProduct = false;
     }
-    if (this.isGetProductName) {
+    if (this.isGetProductName && typeof item.product != 'string') {
       this.render.nameProduct = true;
       const product = await this.$store.dispatch(
         'products/getProduct',
@@ -140,7 +143,7 @@ export default {
       this.item.product = product.name;
       this.render.nameProduct = false;
     }
-    if (this.isGetTraderUserName) {
+    if (this.isGetTraderUserName && typeof item.trader != 'string') {
       this.render.usernametrader = true;
       const userDataResponse = await this.$store.dispatch(
         'user/getUser',
