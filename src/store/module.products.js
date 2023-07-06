@@ -60,6 +60,18 @@ export const products = {
       context.commit('SET_GET_LIST_PRODUCTS_COMPLETE');
       return products;
     },
+
+    async getAllProducts(context) {
+      const responseAllProducts = await decorateResponseApi(
+        Product.api().getListProductsAll
+      );
+      context.commit('SET_GET_LIST_PRODUCTS_COMPLETE');
+      if (responseAllProducts.status == 200) {
+        return responseAllProducts.data;
+      } else {
+        return [];
+      }
+    },
     async getProduct(context, productId) {
       console.warn('module.productKit: getProductKit');
 

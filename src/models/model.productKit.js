@@ -4,7 +4,7 @@ export default class ModelProductKit {
       id: 'id',
       product: 'Продукт',
       count: 'Количество продуктов',
-      time: 'Время приготовления / мин.',
+      time: 'Время приготовления / сек.',
     };
     this.types = {
       id: 'number',

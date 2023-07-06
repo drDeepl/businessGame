@@ -17,8 +17,11 @@ export default class Product extends Model {
     actions: {
       async getListProducts() {
         console.warn('STORE.MODEL.PRODUCT: getListProduct');
-
         return this.get('products');
+      },
+      async getListProductsAll() {
+        console.warn('STORE.MODEL.PRODUCT: getListProduct');
+        return this.get('products/with/hide');
       },
       async getProduct(productId) {
         console.warn('STORE.MODEL.PRODUCT: getProduct');

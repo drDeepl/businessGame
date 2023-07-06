@@ -616,7 +616,7 @@ export default {
       const listUsers = await this.$store.dispatch('user/getUsers');
 
       // const listUsers = responseUsers.data ? responseUsers.data : [];
-      const products = await this.$store.dispatch('products/getProducts');
+      const products = await this.$store.dispatch('products/getAllProducts');
       this.arrays.products = products;
       this.arrays.users = listUsers.filter((user) => !user.is_superuser);
       this.arrays.teams = listTeams;
@@ -678,12 +678,10 @@ export default {
     },
 
     async updateListProduct() {
-      console.warn('updateListProduct');
-
-      const products = await this.$store.dispatch('products/getProducts');
+      console.warn('ADMIN.VUE:updateListProduct');
+      const products = await this.$store.dispatch('products/getAllProducts');
       this.arrays.products = products;
     },
-    // NOTE: USER
 
     async onClickCreateUser(modelCreateUser) {
       console.warn('ADMIN.VUE: onClickCreateUser');
