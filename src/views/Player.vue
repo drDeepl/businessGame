@@ -126,6 +126,7 @@ export default {
           'mainLayout/SET_COUNT_AWAITED_OFFERS',
           offerSaleCount
         );
+        await this.updateListOffers();
       }
 
       this.render.buyOffer = false;
@@ -139,7 +140,8 @@ export default {
         this.currentUserData.team
       );
       const offersSale = responseOffersAwaited.data;
-      this.arrays.offersSale = offersSale.reverse();
+      // this.arrays.offersSale = offersSale.reverse();
+      this.$store.commit('mainLayout/SET_OFFERS_FOR_TEAM', offersSale);
       this.render.offersContainer = false;
     },
 

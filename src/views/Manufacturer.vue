@@ -475,19 +475,6 @@ export default {
       console.error(productKit);
       console.log(this.arrays.products);
       // NOTE: is check exists product kit
-      // const productKitIsExists = this.$store
-      //   .$db()
-      //   .model('productKits')
-      //   .query()
-      //   .where('product', productKit.product_id)
-      //   .where('count', productKit.count)
-      //   .where('time', productKit.time)
-      //   .exists();
-      // if (productKitIsExists) {
-      //   this.forms.formAddProductKit.errors.push(
-      //     'Такой продуктовый набор уже существует'
-      //   );
-      // } else {
 
       // NOTE: end check exists product kit
       const createdProductKit = await this.$store.dispatch(
@@ -591,13 +578,17 @@ export default {
         );
         console.warn('RESPONSE OFFER SALE PLACE');
         console.log(responseOfferSalePlace);
+        await this.$store.dispatch(
+          'productKit/setStateDeletedProductKit',
+          saleOfferProductKit.product_kit_id
+        );
+
         if (responseOfferSalePlace.status != 200) {
           this.forms.hasErrors = true;
           const msgError = 'У команды недостаточно средств для покупки';
           this.forms.errors.push(msgError);
           return;
         }
-        this.onClickApplyDeleteProductKit();
         this.forms.formSellProductKit.applySucces = true;
       } else {
         this.forms.hasErrors = true;
@@ -605,6 +596,11 @@ export default {
         this.forms.errors.push(msgError);
       }
       this.render.sellProductKit = false;
+      setTimeout(() => {
+        this.$store
+          .dispatch('productKit/getProductKits')
+          .then((productKits) => (this.arrays.productKits = productKits));
+      }, 3000);
     },
 
     // NOTE: Products
