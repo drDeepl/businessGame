@@ -21,5 +21,6 @@ export default class ModelProduct {
       name: '',
     };
     this.hideShow = {id: true, name: true};
+    this.fieldToShow = ['id', 'name'];
   }
 }

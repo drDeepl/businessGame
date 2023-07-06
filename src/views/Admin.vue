@@ -243,6 +243,7 @@
                 >
                   <span>Очистить список продуктов</span>
                 </v-btn>
+                {{ products }}
                 <DataTable
                   :items="products"
                   :modelItem="models.modelProduct"
@@ -390,6 +391,59 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
+        <v-card outlined @click="onClickListProducts">
+          <v-card-title class="offer-card-table-header">
+            <span>Список продуктов</span>
+            <arrow-icon
+              v-if="!cardTable.products.render"
+              :size="30"
+              :class="`arrow-btn ${cardTable.products.active ? 'open' : ''}`"
+            />
+            <Load v-else size="20"></Load>
+          </v-card-title>
+          <div class="offers-table" v-if="cardTable.products.active">
+            <v-list-item class="row-table-offers">
+              <v-list-item-content
+                v-for="label in models.modelProduct.fieldToShow"
+                :key="`th_${label}`"
+              >
+                <span class="row-table-offers-value row-table-header">
+                  {{ models.modelProduct.props[label] }}
+                </span>
+              </v-list-item-content>
+              <v-list-item-content
+                ><span class="row-table-offers-value row-table-header">
+                  Действие
+                </span>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
+              class="row-table-offers"
+              v-for="product in products"
+              :key="product.id"
+            >
+              <v-list-item-content
+                v-for="fieldProduct in models.modelProduct.fieldToShow"
+                :key="fieldProduct"
+              >
+                <span class="row-table-offers-value">
+                  {{ product[fieldProduct] }}
+                </span>
+              </v-list-item-content>
+              <v-list-item-content class="column-actions">
+                <v-btn
+                  color="red lighten-1"
+                  icon
+                  text
+                  class="table-btn-action"
+                  @click="onClickDeleteProduct(product)"
+                >
+                  <delete-icon></delete-icon>
+                </v-btn>
+              </v-list-item-content>
+            </v-list-item>
+          </div>
+        </v-card>
       </div>
     </div>
   </div>
@@ -414,6 +468,7 @@ import User from '@/store/models/User';
 
 import Form from '@/UI/Form.vue';
 import Load from '@/UI/Load.vue';
+
 import DataTable from '@/UI/DataTable.vue';
 import DialogError from '@/UI/DialogError.vue';
 
@@ -426,6 +481,12 @@ export default {
   },
   data() {
     return {
+      cardTable: {
+        products: {
+          active: false,
+          render: false,
+        },
+      },
       panels: {
         users: {
           render: false,
@@ -552,7 +613,8 @@ export default {
       const listUsers = await this.$store.dispatch('user/getUsers');
 
       // const listUsers = responseUsers.data ? responseUsers.data : [];
-
+      const products = await this.$store.dispatch('products/getProducts');
+      this.arrays.products = products;
       this.arrays.users = listUsers.filter((user) => !user.is_superuser);
       this.arrays.teams = listTeams;
       // this.arrays.teamNames = listTeams.map((team) => team.name);
@@ -762,18 +824,30 @@ export default {
     },
 
     async onClickListProducts() {
-      console.warn('onClickListProducts');
-      this.$store.commit('products/SET_GET_LIST_PRODUCTS_RUN');
-      this.checkRenderPanels('products', true);
-      if (this.panels.products) {
-        console.log('open panel with products');
-
+      console.warn('ADMIN.VUE: onClickListProducts');
+      if (this.cardTable.products.active) {
+        this.cardTable.products.active = false;
+      } else {
+        this.cardTable.products.render = true;
         await this.updateListProduct();
-        this.checkRenderPanels('products', false);
+        this.cardTable.products.render = false;
+        this.cardTable.products.active = true;
       }
+
+      // this.$store.commit('products/SET_GET_LIST_PRODUCTS_RUN');
+      // this.checkRenderPanels('products', true);
+      // if (this.panels.products) {
+      //   console.log('open panel with products');
+
+      //   this.checkRenderPanels('products', false);
+      // }
     },
 
-    async onClickDeleteProduct(product) {
+    onClickDeleteProduct(product) {
+      console.warn('ADMIN.VUE: onClickDeleteProduct');
+      console.log(product);
+    },
+    async onClickDeleteProductApply(product) {
       console.warn('onClickDeleteProduct');
       this.$store.commit('products/SET_DELETE_PRODUCT_RUN');
       console.error('TODO');

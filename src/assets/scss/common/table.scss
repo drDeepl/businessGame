@@ -45,3 +45,12 @@
   color: black;
   text-transform: lowercase;
 }
+
+.column-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.table-btn-action {
+  max-width: 3em !important;
+}

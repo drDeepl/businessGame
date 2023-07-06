@@ -49,6 +49,7 @@ export default {
   },
   created() {
     this.render = true;
+    console.error(this.modelItem.props);
 
     try {
       const headers = this.modelItem.props.filter(
