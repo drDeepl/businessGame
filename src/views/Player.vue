@@ -74,12 +74,6 @@ export default {
       return this.$store.state.mainLayout.offersAwaitedTeam;
     },
   },
-  // watch: {
-  //   async '$store.state.mainLayout.offersAwaitedCount'(newOffer, oldOffer) {
-  //     console.error(`oldValue:${oldOffer}\nnewValue:${newOffer}`);
-  //     this.arrays.offersSale.push(newOffer);
-  //   },
-  // },
 
   async created() {
     this.render.page = true;
@@ -93,18 +87,21 @@ export default {
       const currentUserData = responseUser.data;
       this.currentUserData = currentUserData;
 
-      let offersSale = await this.$store.dispatch(
-        'offer/getOfferAwaitedSell',
-        currentUserData.team
-      );
+      // let offersSale = await this.$store.dispatch(
+      //   'offer/getOfferAwaitedSell',
+      //   currentUserData.team
+      // );
 
-      this.arrays.offersSale = offersSale.data.reverse();
+      // console.error('OFFERS ACTIVE');
+      // console.log(offersActive);
+      // const offersToSell = offersActive.concat(offersSale);
+      // console.error(offersToSell);
+      // this.arrays.offersSale = offersToSell.reverse();
     } else {
       this.$router.push('/login');
     }
 
     this.render.page = false;
-    // TODO console.error(this.$route.params.data);
   },
 
   methods: {
@@ -135,12 +132,12 @@ export default {
     async updateListOffers() {
       console.warn('PLAYER: updateListOffers');
       this.render.offersContainer = true;
-      const responseOffersAwaited = await this.$store.dispatch(
+      const offersAwaited = await this.$store.dispatch(
         'offer/getOfferAwaitedSell',
         this.currentUserData.team
       );
-      const offersSale = responseOffersAwaited.data;
-      // this.arrays.offersSale = offersSale.reverse();
+      const offersSale = offersAwaited;
+
       this.$store.commit('mainLayout/SET_OFFERS_FOR_TEAM', offersSale);
       this.render.offersContainer = false;
     },

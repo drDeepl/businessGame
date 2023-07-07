@@ -20,7 +20,13 @@ export const offer = {
       console.warn('MODULE.OFFER: getOffers');
 
       const response = await apiDecorator(OfferApi.getListOffersSale, teamId);
-      return response;
+      return response.status === 200 ? response.data : null;
+    },
+
+    async getOffersActiveSell(context, teamId) {
+      console.warn('MODULE.OFFER: getOffersActiveSell');
+      const response = await apiDecorator(OfferApi.getOffersActiveSell, teamId);
+      return response.status === 200 ? response.data : [];
     },
 
     async getOfferAwaitedSell(context, teamId) {
@@ -30,7 +36,7 @@ export const offer = {
         OfferApi.getOffersSaleAwaited,
         teamId
       );
-      return response;
+      return response.status === 200 ? response.data : [];
     },
     async getSaleOffersDone() {
       console.warn('MODULE.OFFER: getOfferSaleDone');

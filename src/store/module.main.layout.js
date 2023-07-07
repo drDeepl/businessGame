@@ -49,6 +49,7 @@ export const mainLayout = {
       state.countAwaitedOffers = count;
     },
     SET_OFFERS_FOR_TEAM(state, offers) {
+      console.error(offers);
       state.offersAwaitedTeam = offers.reverse();
     },
     SET_OFFER_FOR_TEAM(state, offer) {

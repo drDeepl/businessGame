@@ -318,6 +318,8 @@ export default {
     async onClickApplySellProduct(modelOfferProductSell) {
       console.warn('STORAGE: onClickApplySellProduct');
       console.log(modelOfferProductSell);
+      this.form.errors = [];
+      this.form.success = false;
       if (modelOfferProductSell.count <= this.form.currentData.count) {
         this.form.isLoad = true;
         // const product_id = this.form.currentData.product.id;
@@ -363,6 +365,7 @@ export default {
       } else {
         this.form.errors.push('Недостаточно продуктов для продажи');
       }
+      this.form.success = true;
     },
     async updateNamesProducts() {
       console.log('updateNameProducts');

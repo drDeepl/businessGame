@@ -28,30 +28,31 @@ export default {
         'team/getDataTeam',
         this.offer.team
       );
-      this.offer.team = team.name;
+      this.offer.team = team?.name;
     }
     if (this.offer['to_customer']) {
       const customer = await this.$store.dispatch(
         'user/getUser',
         this.offer.to_customer
       );
-      this.offer.to_customer = customer.username;
+      this.offer.to_customer = customer?.username;
     }
     if (this.offer['product']) {
       const product = await this.$store.dispatch(
         'products/getProduct',
         this.offer.product
       );
-      this.offer.product = product.name;
+      console.error(product);
+      this.offer.product = product?.name;
     } else {
       const responseProduct = await this.$store.dispatch(
         'productKit/getProductFromProductKit',
         this.offer.product_kit
       );
 
-      this.offer.product_kit = responseProduct.data.name;
+      this.offer.product_kit = responseProduct.data?.name;
     }
-    this.offer.trader = user.username;
+    this.offer.trader = user?.username;
     this.render = false;
   },
 };

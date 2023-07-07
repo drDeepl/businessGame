@@ -134,7 +134,7 @@
                       "
                       :disabled="alert.load.newOffer"
                     >
-                      Отклонить
+                      закрыть
                     </v-btn>
                   </OfferCard>
                 </v-dialog>
@@ -291,6 +291,7 @@ export default {
       // INFO: Work of WebSockets ====================================================
       this.render.balance = true;
       this.connection = new WebSocket(`ws://${domain}/ws/`);
+
       // INFO: ============================================================================= END
       const username = this.currentUser.username;
       const responseUser = await this.$store.dispatch(
@@ -314,8 +315,7 @@ export default {
           {title: 'Панель администратора', url: 'admin'},
           {title: 'Транзакции', url: 'transaction'},
         ];
-        // sidebarLinks.shift();
-        // sidebarLinks.push(adminRow);
+
         sidebarLinks = adminRow;
 
         console.warn('LIST TEAMS\n', teams);
@@ -347,39 +347,31 @@ export default {
         };
         console.warn(User.api());
         const teamId = dataUser.team;
-        const responseOffersAwaited = await this.$store.dispatch(
+        const offersAwaited = await this.$store.dispatch(
           'offer/getOfferAwaitedSell',
           teamId
         );
-        const offerSaleCount = responseOffersAwaited.data.length;
+
+        const offersToSell = offersAwaited.reverse();
+        const offerSaleCount = offersToSell.length;
         this.$store.commit(
           'mainLayout/SET_COUNT_AWAITED_OFFERS',
           offerSaleCount
         );
-        // this.alert.newOfferSale.count = offerSaleCount;
-        this.arrays.offersAwaited = responseOffersAwaited.data;
-        console.error(responseOffersAwaited.data);
-        this.$store.commit(
-          'mainLayout/SET_OFFERS_FOR_TEAM',
-          responseOffersAwaited.data
-        );
+
+        this.arrays.offersAwaited = offersToSell;
+        console.error(offersToSell);
+        this.$store.commit('mainLayout/SET_OFFERS_FOR_TEAM', offersToSell);
         console.error('DATA USER\n', dataUser);
-        // this.$store.commit('team/SET_BALANCE_RUNNING');
+
         const dataTeam = await this.$store.dispatch('team/getDataTeam', teamId);
-        // const responseAccount = await this.$store.dispatch(
-        //   'account/getAccountById',
-        //   dataTeam.account
-        // );
-        // const dataAccount =
-        //   responseAccount.status == 200 ? responseAccount.data : {};
+
         this.sidebarUserInfo.role.value = roleUser;
 
         this.sidebarUserInfo.username.value = username;
 
         this.sidebarUserInfo.team.value = dataTeam.name;
 
-        // this.$store.commit('team/SET_BALANCE', dataAccount.balance);
-        // this.$store.commit('team/SET_BALANCE_RUNNING_COMPLETE');
         await this.$store.dispatch('team/updateTeamBalance', teamId);
         this.render.balance = false;
       }
@@ -495,18 +487,11 @@ export default {
 
         console.log(this.currentUserData);
         const teamId = this.currentUserData.team;
-        // await this.updateTeamBalance(teamId);
+
         this.render.balance = true;
         await this.$store.dispatch('team/updateTeamBalance', teamId);
         this.render.balance = false;
-        // const responseTeamBalance = await this.$store.dispatch(
-        //   'team/getBalance',
-        //   teamId
-        // );
-        // const balance = this.getDataOrError(responseTeamBalance);
-        // console.log('MAINLAYOUT: team balance', balance);
-        // this.$store.commit('team/SET_BALANCE', balance);
-        // this.render.balance = false;
+
         this.alert.success.active = true;
       } else {
         this.onClickNewOfferCancel();
