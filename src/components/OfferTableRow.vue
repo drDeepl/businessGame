@@ -38,12 +38,12 @@ export default {
       this.offer.to_customer = customer?.username;
     }
     if (this.offer['product']) {
-      const product = await this.$store.dispatch(
-        'products/getProduct',
+      const teamProduct = await this.$store.dispatch(
+        'storageTeam/getTeamProduct',
         this.offer.product
       );
-      console.error(product);
-      this.offer.product = product?.name;
+      console.error(teamProduct);
+      this.offer.product = teamProduct?.product_name;
     } else {
       const responseProduct = await this.$store.dispatch(
         'productKit/getProductFromProductKit',

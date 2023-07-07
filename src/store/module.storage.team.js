@@ -1,5 +1,6 @@
 import ProductStorage from '@/store/models/ProductStorage';
 import ProductKitStorage from '@/store/models/ProductKitStorage';
+import {decorateResponseApi} from '@/services/utils.service';
 export const storageTeam = {
   namespaced: true,
   state: {
@@ -67,6 +68,14 @@ export const storageTeam = {
         // context.commit('SET_GET_PRODUCTS_KIT_TEAM_ERROR');
         return [];
       }
+    },
+    async getTeamProduct(context, teamProductId) {
+      console.warn('MODULE.STORAGE.TEAM: getTeamProduct');
+      const responseTeamProduct = await decorateResponseApi(
+        ProductStorage.api().getTeamProduct,
+        teamProductId
+      );
+      return responseTeamProduct.status === 200 ? responseTeamProduct.data : {};
     },
     async checkCreatedProductKits(context, payload) {
       const teamId = payload.teamId;

@@ -20,6 +20,10 @@ export default class ProductStorage extends Model {
       async addProduct(StoreProduct) {
         return this.post('store/add-product', StoreProduct);
       },
+      async getTeamProduct(teamProductId) {
+        console.warn('OFFER.API: getTeamProduct');
+        return this.get(`store/team-product/${teamProductId}`);
+      },
     },
   };
 }
