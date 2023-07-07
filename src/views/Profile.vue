@@ -2,7 +2,6 @@
   <div class="md-body">
     <Load v-if="render.main"></Load>
     <div v-else>
-      {{ arrays.offersPurchaseDone }}
       <div class="card-transaction-conatiner">
         <v-card outlined class="offer-card-table">
           <v-card-title
